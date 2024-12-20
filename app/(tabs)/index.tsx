@@ -2,9 +2,7 @@ import * as React from "react";
 import { View, useWindowDimensions, Text, StyleSheet } from "react-native";
 import {
   TabView,
-  SceneMap,
   TabBar,
-  SceneRendererProps,
 } from "react-native-tab-view";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,6 +16,7 @@ import { useColorScheme } from "react-native";
 export default function index() {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
+  const colorScheme = useColorScheme() ?? "light";
 
   // Custom renderScene function
   const renderScene = ({ route }: any) => {
@@ -35,8 +34,6 @@ export default function index() {
     { key: "first", title: "" },
     { key: "second", title: "" },
   ];
-
-  const colorScheme = useColorScheme() ?? "light";
 
   // Coustome settings for top bar
   const renderTabBar = (props: any) => (
@@ -80,7 +77,7 @@ const styles = StyleSheet.create({
   },
   swipeList: {
     flex: 1,
-    backgroundColor: "red",
+    
   },
   renderScene: {
     flex: 1,

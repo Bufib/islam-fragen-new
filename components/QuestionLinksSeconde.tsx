@@ -1,33 +1,39 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { ThemedView } from "./ThemedView";
-import { ThemedText } from "./ThemedText";
 import { Link } from "expo-router";
 import { Pressable } from "react-native";
 import { Image } from "expo-image";
 import { useColorScheme } from "react-native";
 import { coustomTheme } from "./coustomTheme";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text } from "react-native";
-import { TouchableOpacity } from "react-native";
+import { Text } from "react-native";
+import { useState } from "react";
 
 export default function QuestionLinksFirst() {
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
+
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null);
 
   const categories = [
     {
       name: "Ethik",
       image: require("@/assets/images/ethik.png"),
       path: "getSuperCategories/[getSuperCategories]",
-      backgroundColor: "red",
+      backgroundColor: "#8c7ae6",
     },
 
     {
       name: "Ratschläge",
       image: require("@/assets/images/ratschlaege.png"),
       path: "getSuperCategories/[getSuperCategories]",
-      backgroundColor: "green",
+      backgroundColor: "#487eb0",
+    },
+    {
+      name: "Frage stellen",
+      image: require("@/assets/images/ratschlaege.png"),
+      path: "getSuperCategories/[getSuperCategories]",
+      backgroundColor: "#487eb0",
     },
   ];
 
@@ -44,10 +50,21 @@ export default function QuestionLinksFirst() {
               },
             } as any
           }
-          asChild
         >
-          <Pressable style={[styles.element, {backgroundColor: category.backgroundColor}]}>
-            {/*backgorund color and shadow color */}
+          <Pressable
+            onPressIn={() => setPressedIndex(index)}
+            onPressOut={() => setPressedIndex(null)}
+            style={[
+              styles.element,
+              {
+                backgroundColor: category.backgroundColor,
+                shadowColor: colorScheme === "light" ? "black" : "white",
+              },
+              pressedIndex === index && { shadowOpacity: 0 },
+
+              index === 2 && styles.askQuestionElement,
+            ]}
+          >
             <Image
               style={styles.elementIcon}
               source={category.image}
@@ -63,14 +80,7 @@ export default function QuestionLinksFirst() {
             pathname: "",
           } as any
         }
-        asChild
-      >
-        <Pressable style={styles.questionElement}>
-          {/*backgorund color and shadow color */}
-          <Image style={styles.elementIcon} contentFit="contain" />
-          <Text style={styles.elementText}>Frage Stellen</Text>
-        </Pressable>
-      </Link>
+      ></Link>
     </ThemedView>
   );
 }
@@ -90,39 +100,29 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "center",
     alignItems: "center",
-    width: "45%",
-    height: "30%",
+    width: 200,
+    height: 200,
     borderRadius: 30,
     borderWidth: 2,
-    backgroundColor: "green",
-    shadowOffset: { width: -3.5, height: 4 },
-    shadowOpacity: 0.5,
+    shadowOffset: { width: -2.5, height: 4 },
+    shadowOpacity: 0.65,
     shadowRadius: 3,
+  
   },
-  questionElement: {
-    flexDirection: "column",
-    gap: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "80%",
-    height: "30%",
-    borderRadius: 30,
-    borderWidth: 2,
-    backgroundColor: "green",
-    shadowOffset: { width: -3.5, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
+  askQuestionElement: {
+    width: 420, // double with
+    backgroundColor: "#f5f6fa",
   },
 
   elementIcon: {
-    width: "80%",
+    width: 150,
     height: "auto",
     aspectRatio: 1.5,
     alignSelf: "center",
   },
 
   elementText: {
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: "bold",
     padding: 5,
     textAlign: "center",

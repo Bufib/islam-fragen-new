@@ -1,39 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet } from "react-native";
 import { ThemedView } from "./ThemedView";
-import { ThemedText } from "./ThemedText";
 import { Link } from "expo-router";
 import { Pressable } from "react-native";
 import { Image } from "expo-image";
 import { useColorScheme } from "react-native";
 import { coustomTheme } from "./coustomTheme";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text } from "react-native";
+import { Text } from "react-native";
 
 export default function QuestionLinksFirst() {
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
+  const [pressedIndex, setPressedIndex] = useState<number | null>(null);
 
   const categories = [
     {
       name: "Rechtsfragen",
       image: require("@/assets/images/rechtsfragen.png"),
-      backgroundColor: "red",
+      backgroundColor: "#00a8ff",
     },
     {
       name: "Quran",
       image: require("@/assets/images/quran.png"),
-      backgroundColor: "blue",
+      backgroundColor: "#4cd137",
     },
     {
       name: "Historie",
       image: require("@/assets/images/historie.png"),
-      backgroundColor: "green",
+      backgroundColor: "#e84118",
     },
     {
       name: "Glaubensfragen",
       image: require("@/assets/images/glaubensfragen.png"),
-      backgroundColor: "yellow",
+      backgroundColor: "#fbc531",
     },
   ];
 
@@ -50,9 +49,20 @@ export default function QuestionLinksFirst() {
               },
             } as any
           }
-          asChild
+          //asChild
         >
-          <Pressable style={[styles.element, {backgroundColor: category.backgroundColor}]}>{/* Problem here */} 
+          <Pressable
+            onPressIn={() => setPressedIndex(index)}
+            onPressOut={() => setPressedIndex(null)}
+            style={[
+              styles.element,
+              {
+                backgroundColor: category.backgroundColor,
+                shadowColor: colorScheme === "light" ? "black" : "white",
+              },
+              pressedIndex === index && { shadowOpacity: 0 },
+            ]}
+          >
             <Image
               style={styles.elementIcon}
               source={category.image}
@@ -74,6 +84,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
     gap: 20,
+
   },
 
   element: {
@@ -81,15 +92,15 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "center",
     alignItems: "center",
-    width: "45%",
-    height: "30%",
+    width: "70%",
+    height: "auto",
     borderRadius: 30,
     borderWidth: 2,
-    backgroundColor: "green",
-    shadowOffset: {width: -3.5, height: 4},
-    shadowOpacity: 0.5,
+    shadowOffset: { width: -2.5, height: 4 },
+    shadowOpacity: 0.65,
     shadowRadius: 3,
 
+    
   },
 
   elementIcon: {
@@ -100,7 +111,7 @@ const styles = StyleSheet.create({
   },
 
   elementText: {
-    fontSize: 15,
+    fontSize: 20,
     fontWeight: "bold",
     padding: 5,
     textAlign: "center",
