@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { ThemedView } from "./ThemedView";
 import { Link } from "expo-router";
 import { Pressable } from "react-native";
@@ -12,6 +12,11 @@ export default function QuestionLinksFirst() {
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
+  const { width } = useWindowDimensions();
+
+  // Dynamically calculate the size of each element based on screen width
+  const elementSize = width > 400 ? 200 : 160;
+  const fontSize = width > 400 ? 20 : 16;
 
   const categories = [
     {
@@ -59,6 +64,8 @@ export default function QuestionLinksFirst() {
               {
                 backgroundColor: category.backgroundColor,
                 shadowColor: colorScheme === "light" ? "black" : "white",
+                width: elementSize,
+                height: elementSize,
               },
               pressedIndex === index && { shadowOpacity: 0 },
             ]}
@@ -68,7 +75,9 @@ export default function QuestionLinksFirst() {
               source={category.image}
               contentFit="contain"
             />
-            <Text style={styles.elementText}>{category.name}</Text>
+            <Text style={[styles.elementText, { fontSize: fontSize }]}>
+              {category.name}
+            </Text>
           </Pressable>
         </Link>
       ))}
@@ -84,7 +93,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
     gap: 20,
-
   },
 
   element: {
@@ -92,15 +100,11 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "center",
     alignItems: "center",
-    width: "70%",
-    height: "auto",
     borderRadius: 30,
     borderWidth: 2,
     shadowOffset: { width: -2.5, height: 4 },
     shadowOpacity: 0.65,
     shadowRadius: 3,
-
-    
   },
 
   elementIcon: {

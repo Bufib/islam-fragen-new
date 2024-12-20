@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useWindowDimensions } from "react-native";
 import { ThemedView } from "./ThemedView";
 import { Link } from "expo-router";
 import { Pressable } from "react-native";
@@ -12,6 +12,11 @@ import { useState } from "react";
 export default function QuestionLinksFirst() {
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
+  const { width } = useWindowDimensions();
+
+  // Dynamically calculate the size of each element based on screen width
+  const elementSize = width > 400 ? 200 : 160;
+  const fontSize = width > 400 ? 20 : 16;
 
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
 
@@ -59,10 +64,13 @@ export default function QuestionLinksFirst() {
               {
                 backgroundColor: category.backgroundColor,
                 shadowColor: colorScheme === "light" ? "black" : "white",
+                width: elementSize,
+                height: elementSize,
               },
               pressedIndex === index && { shadowOpacity: 0 },
 
               index === 2 && styles.askQuestionElement,
+              index === 2 && { width: elementSize * 2.1 },
             ]}
           >
             <Image
@@ -70,7 +78,9 @@ export default function QuestionLinksFirst() {
               source={category.image}
               contentFit="contain"
             />
-            <Text style={styles.elementText}>{category.name}</Text>
+            <Text style={[styles.elementText, { fontSize: fontSize }]}>
+              {category.name}
+            </Text>
           </Pressable>
         </Link>
       ))}
@@ -100,17 +110,14 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: "center",
     alignItems: "center",
-    width: 200,
-    height: 200,
     borderRadius: 30,
     borderWidth: 2,
     shadowOffset: { width: -2.5, height: 4 },
     shadowOpacity: 0.65,
     shadowRadius: 3,
-  
   },
+
   askQuestionElement: {
-    width: 420, // double with
     backgroundColor: "#f5f6fa",
   },
 
