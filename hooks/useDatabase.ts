@@ -1,11 +1,9 @@
 import * as SQLite from "expo-sqlite";
 import { supabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
-import { MMKV } from 'react-native-mmkv';
+import Storage from "expo-sqlite/kv-store";
 
-// Initialize MMKV
-const storage = new MMKV();
-const SETUP_KEY = 'database_initialized';
+const SETUP_KEY = "database_initialized";
 
 // Types
 export type AllTableNamesType = {
@@ -33,13 +31,15 @@ export type QuestionAnswerPerMarjaType = {
 };
 
 // Check if database is initialized in MMKV
-const isDatabaseInitialized = () => {
-  return storage.getBoolean(SETUP_KEY) || false;
+const isDatabaseInitialized = async () => {
+  const value = await Storage.getItem(SETUP_KEY);
+  return value === "true";
 };
 
 // Mark database as initialized in MMKV
-const markDatabaseInitialized = () => {
-  storage.set(SETUP_KEY, true);
+const markDatabaseInitialized = async () => {
+  console.log("Marking database as initialized...");
+  await Storage.setItem(SETUP_KEY, "true");
 };
 
 // Initialize database tables
@@ -76,7 +76,10 @@ const initDatabase = async (db: SQLite.SQLiteDatabase) => {
 };
 
 // Store table names in SQLite
-const storeTableNames = async (db: SQLite.SQLiteDatabase, data: AllTableNamesType[]) => {
+const storeTableNames = async (
+  db: SQLite.SQLiteDatabase,
+  data: AllTableNamesType[]
+) => {
   await db.withTransactionAsync(async () => {
     await db.runAsync("DELETE FROM AllTableNames;");
 
@@ -99,23 +102,43 @@ const storeQAData = async (
 ) => {
   await db.withTransactionAsync(async () => {
     if (isMarjaTable) {
-      await db.runAsync("DELETE FROM QuestionsMarjaAnswer WHERE tableName = ?;", [tableName]);
-      
+      await db.runAsync(
+        "DELETE FROM QuestionsMarjaAnswer WHERE tableName = ?;",
+        [tableName]
+      );
+
       for (const item of data as QuestionAnswerPerMarjaType[]) {
         await db.runAsync(
-          `INSERT INTO QuestionsMarjaAnswer 
+          `INSERT OR REPLACE INTO QuestionsMarjaAnswer 
           (id, tableName, category, question, answer_sistani, answer_khamenei, created_at) 
           VALUES (?, ?, ?, ?, ?, ?, ?);`,
-          [item.id, tableName, category, item.question, item.answer_sistani, item.answer_khamenei, item.created_at]
+          [
+            item.id,
+            tableName,
+            category,
+            item.question,
+            item.answer_sistani,
+            item.answer_khamenei,
+            item.created_at,
+          ]
         );
       }
     } else {
-      await db.runAsync("DELETE FROM QuestionsOneAnswer WHERE tableName = ?;", [tableName]);
-      
+      await db.runAsync("DELETE FROM QuestionsOneAnswer WHERE tableName = ?;", [
+        tableName,
+      ]);
+
       for (const item of data as QuestionOneAnswerType[]) {
         await db.runAsync(
-          "INSERT INTO QuestionsOneAnswer (id, tableName, category, question, answer, created_at) VALUES (?, ?, ?, ?, ?, ?);",
-          [item.id, tableName, category, item.question, item.answer, item.created_at]
+          "INSERT OR REPLACE INTO QuestionsOneAnswer (id, tableName, category, question, answer, created_at) VALUES (?, ?, ?, ?, ?, ?);",
+          [
+            item.id,
+            tableName,
+            category,
+            item.question,
+            item.answer,
+            item.created_at,
+          ]
         );
       }
     }
@@ -123,7 +146,10 @@ const storeQAData = async (
 };
 
 // Get tables for a specific category
-const getTableNamesByCategory = async (db: SQLite.SQLiteDatabase, category: string) => {
+const getTableNamesByCategory = async (
+  db: SQLite.SQLiteDatabase,
+  category: string
+) => {
   const tables = await db.getAllAsync<AllTableNamesType>(
     "SELECT * FROM AllTableNames WHERE category = ? ORDER BY tableName;",
     [category]
@@ -184,11 +210,11 @@ export const useQADatabase = () => {
         setLoading(true);
         const database = await SQLite.openDatabaseAsync("qaDatabase.db");
         setDb(database);
-        
+
         await initDatabase(database);
 
-        const isDbInitialized = isDatabaseInitialized();
-        
+        const isDbInitialized = await isDatabaseInitialized();
+
         if (!isDbInitialized) {
           console.log("First time setup - fetching from Supabase");
           const { data: allTableNames, error: tableError } = await supabase
@@ -208,7 +234,13 @@ export const useQADatabase = () => {
               .order("created_at", { ascending: true });
 
             if (qaError) throw qaError;
-            await storeQAData(database, table.tableName, table.category, isMarjaTable, qaData);
+            await storeQAData(
+              database,
+              table.tableName,
+              table.category,
+              isMarjaTable,
+              qaData
+            );
           }
 
           markDatabaseInitialized();
@@ -229,7 +261,9 @@ export const useQADatabase = () => {
 
     return () => {
       if (db) {
-        db.closeAsync();
+        db.closeAsync().catch((err) =>
+          console.error("Error closing database:", err)
+        );
       }
     };
   }, []);
@@ -260,7 +294,7 @@ export const useQADatabase = () => {
 
     const tableSubscriptions: any[] = [];
     const setupTableSubscription = async () => {
-      const tables = await getTableNamesByCategory(db, 'Rechtsfragen');
+      const tables = await getTableNamesByCategory(db, "Rechtsfragen");
       if (tables) {
         for (const table of tables) {
           const subscription = supabase
@@ -278,14 +312,23 @@ export const useQADatabase = () => {
                   if (error) throw error;
 
                   const isMarjaTable = table.category === "Rechtsfragen";
-                  await storeQAData(db, table.tableName, table.category, isMarjaTable, newData);
+                  await storeQAData(
+                    db,
+                    table.tableName,
+                    table.category,
+                    isMarjaTable,
+                    newData
+                  );
                 } catch (err) {
-                  console.error(`Error handling ${table.tableName} update:`, err);
+                  console.error(
+                    `Error handling ${table.tableName} update:`,
+                    err
+                  );
                 }
               }
             )
             .subscribe();
-          
+
           tableSubscriptions.push(subscription);
         }
       }
@@ -303,59 +346,6 @@ export const useQADatabase = () => {
     loading,
     error,
     getTablesByCategory,
-    getQuestionsForTable
+    getQuestionsForTable,
   };
 };
-
-
-// function RechtsfragenScreen() {
-//     const { getTablesByCategory, getQuestionsForTable, loading } = useQADatabase();
-//     const [tables, setTables] = useState<AllTableNamesType[]>([]);
-//     const [selectedTable, setSelectedTable] = useState<string | null>(null);
-//     const [questions, setQuestions] = useState<QuestionAnswerPerMarjaType[]>([]);
-  
-//     useEffect(() => {
-//       const loadTables = async () => {
-//         const tableData = await getTablesByCategory("Rechtsfragen");
-//         if (tableData) {
-//           setTables(tableData);
-//         }
-//       };
-//       loadTables();
-//     }, []);
-  
-//     const handleTableSelect = async (tableName: string) => {
-//       setSelectedTable(tableName);
-//       const questionData = await getQuestionsForTable(tableName, "Rechtsfragen");
-//       if (questionData) {
-//         setQuestions(questionData as QuestionAnswerPerMarjaType[]);
-//       }
-//     };
-  
-//     if (loading) return <LoadingComponent />;
-  
-//     return (
-//       <View>
-//         {tables.map(table => (
-//           <TouchableOpacity
-//             key={table.id}
-//             onPress={() => handleTableSelect(table.tableName)}
-//           >
-//             <Text>{table.tableName}</Text>
-//           </TouchableOpacity>
-//         ))}
-  
-//         {selectedTable && (
-//           <View>
-//             {questions.map(qa => (
-//               <View key={qa.id}>
-//                 <Text>{qa.question}</Text>
-//                 <Text>Sistani: {qa.answer_sistani}</Text>
-//                 <Text>Khamenei: {qa.answer_khamenei}</Text>
-//               </View>
-//             ))}
-//           </View>
-//         )}
-//       </View>
-//     );
-//   }
