@@ -49,7 +49,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="getCategories"
+        name="categories"
         options={{
           href: null,
         }}

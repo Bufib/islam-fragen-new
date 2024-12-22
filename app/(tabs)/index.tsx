@@ -12,11 +12,13 @@ import QuestionLinksFirst from "@/components/QuestionLinksFirst";
 import QuestionLinksSeconde from "@/components/QuestionLinksSeconde";
 import { useState } from "react";
 import { useColorScheme } from "react-native";
+import { fetchAllTableNames } from "@/components/fetchAllTableNames";
 
 export default function index() {
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
   const colorScheme = useColorScheme() ?? "light";
+  fetchAllTableNames();
 
   // Custom renderScene function
   const renderScene = ({ route }: any) => {
