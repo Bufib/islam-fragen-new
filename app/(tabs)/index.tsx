@@ -12,6 +12,8 @@ import QuestionLinksFirst from "@/components/QuestionLinksFirst";
 import QuestionLinksSeconde from "@/components/QuestionLinksSeconde";
 import { useState } from "react";
 import { useColorScheme } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function index() {
   const layout = useWindowDimensions();

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import { ThemedView } from "./ThemedView";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Pressable } from "react-native";
 import { Image } from "expo-image";
 import { useColorScheme } from "react-native";
@@ -44,42 +44,36 @@ export default function QuestionLinksFirst() {
   return (
     <ThemedView style={styles.container}>
       {categories.map((category, index) => (
-        <Link
+        <Pressable
           key={index}
-          href={
-            {
-              pathname: "",
-              params: {
-                category: category.name,
-              },
-            } as any
+          onPressIn={() => setPressedIndex(index)}
+          onPressOut={() => setPressedIndex(null)}
+          onPress={() =>
+            router.push({
+              pathname: "/(tabs)/renderItems/categories",
+              params: { category: category.name },
+            })
           }
-          //asChild
+          style={[
+            styles.element,
+            {
+              backgroundColor: category.backgroundColor,
+              shadowColor: colorScheme === "light" ? "black" : "white",
+              width: elementSize,
+              height: elementSize,
+            },
+            pressedIndex === index && { shadowOpacity: 0 },
+          ]}
         >
-          <Pressable
-            onPressIn={() => setPressedIndex(index)}
-            onPressOut={() => setPressedIndex(null)}
-            style={[
-              styles.element,
-              {
-                backgroundColor: category.backgroundColor,
-                shadowColor: colorScheme === "light" ? "black" : "white",
-                width: elementSize,
-                height: elementSize,
-              },
-              pressedIndex === index && { shadowOpacity: 0 },
-            ]}
-          >
-            <Image
-              style={styles.elementIcon}
-              source={category.image}
-              contentFit="contain"
-            />
-            <Text style={[styles.elementText, { fontSize: fontSize }]}>
-              {category.name}
-            </Text>
-          </Pressable>
-        </Link>
+          <Image
+            style={styles.elementIcon}
+            source={category.image}
+            contentFit="contain"
+          />
+          <Text style={[styles.elementText, { fontSize: fontSize }]}>
+            {category.name}
+          </Text>
+        </Pressable>
       ))}
     </ThemedView>
   );

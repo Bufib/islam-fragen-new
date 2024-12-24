@@ -7,6 +7,7 @@ import { Image } from "expo-image";
 import { useColorScheme } from "react-native";
 import { coustomTheme } from "./coustomTheme";
 import { Text } from "react-native";
+import { router } from "expo-router";
 import { useState } from "react";
 
 export default function QuestionLinksFirst() {
@@ -45,44 +46,39 @@ export default function QuestionLinksFirst() {
   return (
     <ThemedView style={styles.container}>
       {categories.map((category, index) => (
-        <Link
+        <Pressable
           key={index}
-          href={
-            {
-              pathname: category.path,
-              params: {
-                category: category.name,
-              },
-            } as any
+          onPressIn={() => setPressedIndex(index)}
+          onPressOut={() => setPressedIndex(null)}
+          onPress={() =>
+            router.push({
+              pathname: "/(tabs)/renderItems/categories",
+              params: { category: category.name },
+            })
           }
-        >
-          <Pressable
-            onPressIn={() => setPressedIndex(index)}
-            onPressOut={() => setPressedIndex(null)}
-            style={[
-              styles.element,
-              {
-                backgroundColor: category.backgroundColor,
-                shadowColor: colorScheme === "light" ? "black" : "white",
-                width: elementSize,
-                height: elementSize,
-              },
-              pressedIndex === index && { shadowOpacity: 0 },
+          style={[
+            styles.element,
+            {
+              backgroundColor: category.backgroundColor,
+              shadowColor: colorScheme === "light" ? "black" : "white",
+              width: elementSize,
+              height: elementSize,
+            },
+            pressedIndex === index && { shadowOpacity: 0 },
 
-              index === 2 && styles.askQuestionElement,
-              index === 2 && { width: elementSize * 2.1 },
-            ]}
-          >
-            <Image
-              style={styles.elementIcon}
-              source={category.image}
-              contentFit="contain"
-            />
-            <Text style={[styles.elementText, { fontSize: fontSize }]}>
-              {category.name}
-            </Text>
-          </Pressable>
-        </Link>
+            index === 2 && styles.askQuestionElement,
+            index === 2 && { width: elementSize * 2.1 },
+          ]}
+        >
+          <Image
+            style={styles.elementIcon}
+            source={category.image}
+            contentFit="contain"
+          />
+          <Text style={[styles.elementText, { fontSize: fontSize }]}>
+            {category.name}
+          </Text>
+        </Pressable>
       ))}
       <Link
         href={

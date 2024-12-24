@@ -15,6 +15,7 @@ const MAPPING = {
   "chevron.right": "chevron-right",
   "gear.circle": "settings",
   'magnifyingglass': "search",
+  'star.fill': "star",
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],
