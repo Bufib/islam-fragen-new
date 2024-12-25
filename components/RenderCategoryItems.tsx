@@ -35,6 +35,7 @@ function RenderCategoryItems() {
       const tableData = await getTablesByCategory(category);
       if (tableData) {
         setItems(tableData);
+        console.log(tableData)
       }
     };
     loadTables();

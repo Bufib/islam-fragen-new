@@ -20,11 +20,13 @@ type RenderSubcategoryItemsProps = {
   subcategory: string;
 };
 
-function RenderSubcategoryItems({}: RenderSubcategoryItemsProps) {
+function RenderSubcategoryItems() {  // Remove the empty props destructuring
   const { getQuestionsForTable, loading } = useQADatabase();
   const [questions, setQuestions] = useState<QuestionAnswerPerMarjaType[]>([]);
   const themeStyle = coustomTheme();
   const colorScheme = useColorScheme();
+  
+  // Get params from URL
   const { category, subcategory } = useLocalSearchParams<{
     category: string;
     subcategory: string;
@@ -33,26 +35,49 @@ function RenderSubcategoryItems({}: RenderSubcategoryItemsProps) {
   useEffect(() => {
     const handleSubcategorySelected = async () => {
       try {
+        console.log('Fetching with params:', { category, subcategory }); // Debug log
+        if (!category || !subcategory) {
+          console.log('Missing category or subcategory');
+          return;
+        }
+
         const data = await getQuestionsForTable(subcategory, category);
-        console.log(data);
-        if (data) {
+        console.log('Received data:', data); // Debug log
+
+        if (data && Array.isArray(data)) {
           setQuestions(data as QuestionAnswerPerMarjaType[]);
         } else {
           setQuestions([]);
         }
       } catch (error) {
         console.error("Error fetching questions:", error);
+        setQuestions([]); // Set empty array on error
       }
     };
 
     handleSubcategorySelected();
   }, [category, subcategory, getQuestionsForTable]);
 
-  // Display loading state
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
         <Text>Loading data...</Text>
+      </View>
+    );
+  }
+
+  if (!category || !subcategory) {
+    return (
+      <View style={styles.centeredContainer}>
+        <Text>Missing category or subcategory parameters</Text>
+      </View>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <View style={[styles.centeredContainer, themeStyle.defaultBackgorundColor]}>
+        <Text>No questions found</Text>
       </View>
     );
   }
@@ -70,7 +95,9 @@ function RenderSubcategoryItems({}: RenderSubcategoryItemsProps) {
             <ThemedView
               style={[styles.item, themeStyle.renderItemsBackgroundcolor]}
             >
-              <ThemedText style={styles.tableText}>{item.title}</ThemedText>
+              <ThemedText style={styles.tableText}>
+                {item.question} {/* Changed from item.title to item.question */}
+              </ThemedText>
               <Entypo
                 name="chevron-thin-right"
                 size={24}
