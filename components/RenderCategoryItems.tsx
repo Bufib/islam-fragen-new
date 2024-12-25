@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { View, Pressable, Text, StyleSheet, FlatList } from "react-native";
 import {
   useQADatabase,
-  QuestionAnswerPerMarjaType,
   AllTableNamesType,
-} from "@/hooks/useDatabase";
+  QuestionAnswerPerMarjaType,
+} from "@/hooks/useQandA";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { coustomTheme } from "@/components/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
@@ -13,15 +13,11 @@ import { ThemedView } from "@/components/ThemedView";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useColorScheme } from "react-native";
 import { router } from "expo-router";
-import  editTitle  from "./editTitle";
+import editTitle from "./editTitle";
 import { useLocalSearchParams } from "expo-router";
 
-
-
-
 function RenderCategoryItems() {
-  const { getTablesByCategory, getQuestionsForTable, loading } =
-    useQADatabase();
+  const { getTablesByCategory, loading } = useQADatabase();
   const { category } = useLocalSearchParams<{ category: string }>();
   const [items, setItems] = useState<AllTableNamesType[]>([]);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
@@ -35,13 +31,11 @@ function RenderCategoryItems() {
       const tableData = await getTablesByCategory(category);
       if (tableData) {
         setItems(tableData);
-        console.log(tableData)
+        console.log(tableData);
       }
     };
     loadTables();
   }, [getTablesByCategory]);
-
- 
 
   // Display loading state
   if (loading) {
@@ -62,11 +56,20 @@ function RenderCategoryItems() {
         style={themeStyle.defaultBackgorundColor}
         contentContainerStyle={styles.flatListStyle}
         renderItem={({ item }) => (
-          <Pressable onPress={() => router.push({ pathname: "/(tabs)/renderItems/subcategories", params: { category: category, subcategory: item.tableName } })}>
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/(tabs)/renderItems/subcategories",
+                params: { category: category, subcategory: item.tableName },
+              })
+            }
+          >
             <ThemedView
               style={[styles.item, themeStyle.renderItemsBackgroundcolor]}
             >
-              <ThemedText style={styles.tableText}>{editTitle(item.tableName)}</ThemedText>
+              <ThemedText style={styles.tableText}>
+                {editTitle(item.tableName)}
+              </ThemedText>
               <Entypo
                 name="chevron-thin-right"
                 size={24}
@@ -102,7 +105,7 @@ const styles = StyleSheet.create({
   tableText: {
     fontSize: 18,
     textAlign: "left",
-    fontWeight: 500
+    fontWeight: 500,
   },
 });
 

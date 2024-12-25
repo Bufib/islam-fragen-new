@@ -1429,14 +1429,489 @@
 // };
 
 
-import * as SQLite from "expo-sqlite";
-import { supabase } from "@/utils/supabase";
-import { useEffect, useState } from "react";
-import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+// import * as SQLite from "expo-sqlite";
+// import { supabase } from "@/utils/supabase";
+// import { useEffect, useState } from "react";
+// import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
 
-// Constants
-const SETUP_KEY = "database_initialized";
-const DATABASE_NAME = "qaDatabase.db";
+// // Constants
+// const SETUP_KEY = "database_initialized";
+// const DATABASE_NAME = "qaDatabase.db";
+
+// // Types
+// export type AllTableNamesType = {
+//   id: number;
+//   category: string;
+//   tableName: string;
+//   created_at: string;
+// };
+
+// export type QuestionOneAnswerType = {
+//   id: number;
+//   category: string;
+//   tableName: string;
+//   question: string;
+//   answer: string;
+//   created_at: string;
+// };
+
+// export type QuestionAnswerPerMarjaType = {
+//   id: number;
+//   category: string;
+//   tableName: string;
+//   question: string;
+//   answer_sistani: string;
+//   answer_khamenei: string;
+//   created_at: string;
+// };
+
+// // Database initialization function
+// async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
+//   const DATABASE_VERSION = 1;
+//   const { user_version: currentVersion } = await db.getFirstAsync<{ user_version: number }>(
+//     "PRAGMA user_version"
+//   );
+
+//   if (currentVersion < DATABASE_VERSION) {
+//     await db.execAsync(`
+//       PRAGMA journal_mode = WAL;
+
+//       CREATE TABLE IF NOT EXISTS AllTableNames (
+//         id INTEGER PRIMARY KEY,
+//         category TEXT,
+//         tableName TEXT,
+//         created_at TEXT
+//       );
+
+//       CREATE TABLE IF NOT EXISTS QuestionsOneAnswer (
+//         id INTEGER PRIMARY KEY,
+//         tableName TEXT,
+//         category TEXT,
+//         question TEXT,
+//         title TEXT,
+//         answer TEXT,
+//         created_at TEXT
+//       );
+
+//       CREATE TABLE IF NOT EXISTS QuestionsMarjaAnswer (
+//         id INTEGER PRIMARY KEY,
+//         tableName TEXT,
+//         category TEXT,
+//         question TEXT,
+//         title TEXT,
+//         answer_sistani TEXT,
+//         answer_khamenei TEXT,
+//         created_at TEXT
+//       );
+//     `);
+
+//     // Update database version
+//     await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+//   }
+// }
+
+// // Store table names
+// const storeTableNames = async (db: SQLite.SQLiteDatabase, data: AllTableNamesType[]) => {
+//   const statement = await db.prepareAsync("INSERT INTO AllTableNames (id, category, tableName, created_at) VALUES (?, ?, ?, ?)");
+//   try {
+//     await db.runAsync("DELETE FROM AllTableNames;");
+//     for (const item of data) {
+//       await statement.executeAsync([item.id, item.category, item.tableName, item.created_at]);
+//     }
+//   } finally {
+//     await statement.finalizeAsync();
+//   }
+// };
+
+// // Store Q&A data
+// const storeQAData = async (
+//   db: SQLite.SQLiteDatabase,
+//   tableName: string,
+//   category: string,
+//   isMarjaTable: boolean,
+//   data: QuestionOneAnswerType[] | QuestionAnswerPerMarjaType[]
+// ) => {
+//   await db.withTransactionAsync(async () => {
+//     if (isMarjaTable) {
+//       await db.runAsync("DELETE FROM QuestionsMarjaAnswer WHERE tableName = ?;", [tableName]);
+//       const statement = await db.prepareAsync(
+//         `INSERT OR REPLACE INTO QuestionsMarjaAnswer 
+//         (id, tableName, category, question, title, answer_sistani, answer_khamenei, created_at) 
+//         VALUES (?, ?, ?, ?, ?, ?, ?, ?);`
+//       );
+//       try {
+//         for (const item of data as QuestionAnswerPerMarjaType[]) {
+//           await statement.executeAsync([
+//             item.id,
+//             tableName,
+//             category,
+//             item.question,
+//             item.answer_sistani,
+//             item.answer_khamenei,
+//             item.created_at,
+//           ]);
+//         }
+//       } finally {
+//         await statement.finalizeAsync();
+//       }
+//     } else {
+//       await db.runAsync("DELETE FROM QuestionsOneAnswer WHERE tableName = ?;", [tableName]);
+//       const statement = await db.prepareAsync(
+//         `INSERT OR REPLACE INTO QuestionsOneAnswer 
+//         (id, tableName, category, question, title, answer, created_at) 
+//         VALUES (?, ?, ?, ?, ?, ?, ?);`
+//       );
+//       try {
+//         for (const item of data as QuestionOneAnswerType[]) {
+//           await statement.executeAsync([
+//             item.id,
+//             tableName,
+//             category,
+//             item.question,
+//             item.answer,
+//             item.created_at,
+//           ]);
+//         }
+//       } finally {
+//         await statement.finalizeAsync();
+//       }
+//     }
+//   });
+// };
+
+// // React hook to use the database
+// export const useQADatabase = () => {
+//   const db = useSQLiteContext();
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<Error | null>(null);
+
+//   const getTablesByCategory = async (category: string) => {
+//     try {
+//       return await db.getAllAsync<AllTableNamesType>(
+//         "SELECT * FROM AllTableNames WHERE category = ? ORDER BY tableName;",
+//         [category]
+//       );
+//     } catch (err) {
+//       console.error("Error getting tables by category:", err);
+//       throw err;
+//     }
+//   };
+
+//   const getQuestionsForTable = async (tableName: string, category: string) => {
+//     const isMarjaTable = category === "Rechtsfragen";
+//     try {
+//       return await db.getAllAsync<QuestionOneAnswerType | QuestionAnswerPerMarjaType>(
+//         `SELECT * FROM ${
+//           isMarjaTable ? "QuestionsMarjaAnswer" : "QuestionsOneAnswer"
+//         } WHERE tableName = ? ORDER BY created_at;`,
+//         [tableName]
+//       );
+//     } catch (err) {
+//       console.error("Error getting questions for table:", err);
+//       throw err;
+//     }
+//   };
+
+//   useEffect(() => {
+//     const initializeDatabase = async () => {
+//       try {
+//         setLoading(true);
+//         const { data: allTableNames, error: tableError } = await supabase
+//           .from("AllTableNames")
+//           .select("*")
+//           .order("category", { ascending: true });
+
+//         if (tableError) throw tableError;
+
+//         await storeTableNames(db, allTableNames);
+
+//         for (const table of allTableNames) {
+//           const isMarjaTable = table.category === "Rechtsfragen";
+//           const { data: qaData, error: qaError } = await supabase
+//             .from(table.tableName)
+//             .select("*")
+//             .order("created_at", { ascending: true });
+
+//           if (qaError) throw qaError;
+//           await storeQAData(db, table.tableName, table.category, isMarjaTable, qaData);
+//         }
+//       } catch (err) {
+//         console.error("Error initializing database:", err);
+//         setError(err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     initializeDatabase();
+//   }, [db]);
+
+//   return { loading, error, getTablesByCategory, getQuestionsForTable };
+// };
+
+
+// import { SQLiteDatabase } from 'expo-sqlite';
+// import { supabase } from "@/utils/supabase";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// // Types
+// export type AllTableNamesType = {
+//   id: number;
+//   category: string;
+//   tableName: string;
+//   created_at: string;
+// };
+
+// export type QuestionOneAnswerType = {
+//   id: number;
+//   tableName: string;
+//   category: string;
+//   question: string;
+//   title: string;
+//   answer: string;
+//   created_at: string;
+// };
+
+// export type QuestionAnswerPerMarjaType = {
+//   id: number;
+//   tableName: string;
+//   category: string;
+//   question: string;
+//   title: string;
+//   answer_sistani: string;
+//   answer_khamenei: string;
+//   created_at: string;
+// };
+
+// const DB_VERSION_KEY = 'db_version';
+
+// export async function migrateDbIfNeeded(db: SQLiteDatabase) {
+//   const DATABASE_VERSION = 1;
+//   const { user_version: currentVersion } = await db.getFirstAsync<{ user_version: number }>(
+//     'PRAGMA user_version'
+//   );
+
+//   if (currentVersion < DATABASE_VERSION) {
+//     await db.execAsync(`
+//       PRAGMA journal_mode = WAL;
+
+//       CREATE TABLE IF NOT EXISTS AllTableNames (
+//         id INTEGER PRIMARY KEY,
+//         category TEXT,
+//         tableName TEXT,
+//         created_at TEXT
+//       );
+
+//       CREATE TABLE IF NOT EXISTS QuestionsOneAnswer (
+//         id INTEGER PRIMARY KEY,
+//         tableName TEXT,
+//         category TEXT,
+//         question TEXT,
+//         title TEXT,
+//         answer TEXT,
+//         created_at TEXT
+//       );
+
+//       CREATE TABLE IF NOT EXISTS QuestionsMarjaAnswer (
+//         id INTEGER PRIMARY KEY,
+//         tableName TEXT,
+//         category TEXT,
+//         question TEXT,
+//         title TEXT,
+//         answer_sistani TEXT,
+//         answer_khamenei TEXT,
+//         created_at TEXT
+//       );
+
+//       CREATE TABLE IF NOT EXISTS Version (
+//         version TEXT PRIMARY KEY
+//       );
+//     `);
+
+//     await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+//   }
+// }
+
+// export class DatabaseService {
+//   private db: SQLiteDatabase;
+//   private subscriptions: { [key: string]: any } = {};
+
+//   constructor(db: SQLiteDatabase) {
+//     this.db = db;
+//   }
+
+//   async initialize() {
+//     const shouldSync = await this.shouldSyncDatabase();
+//     if (shouldSync) {
+//       await this.syncDatabase();
+//       await this.setupSubscriptions();
+//     }
+//   }
+
+//   private async shouldSyncDatabase(): Promise<boolean> {
+//     try {
+//       const storedVersion = await AsyncStorage.getItem(DB_VERSION_KEY);
+//       const { data: versionData, error } = await supabase
+//         .from('Version')
+//         .select('version')
+//         .single();
+
+//       if (error) throw error;
+//       return !storedVersion || storedVersion !== versionData?.version;
+//     } catch (error) {
+//       console.error('Error checking database version:', error);
+//       return true; // Sync on error to be safe
+//     }
+//   }
+
+//   private async syncDatabase() {
+//     await this.db.withTransactionAsync(async () => {
+//       try {
+//         const { data: allTableNames, error: tableError } = await supabase
+//           .from("AllTableNames")
+//           .select("*")
+//           .order("category");
+
+//         if (tableError) throw tableError;
+//         if (!allTableNames) return;
+
+//         // Clear existing data
+//         await this.db.execAsync('DELETE FROM AllTableNames');
+//         await this.db.execAsync('DELETE FROM QuestionsOneAnswer');
+//         await this.db.execAsync('DELETE FROM QuestionsMarjaAnswer');
+
+//         // Store table names
+//         const tableStatement = await this.db.prepareAsync(
+//           'INSERT INTO AllTableNames (id, category, tableName, created_at) VALUES (?, ?, ?, ?)'
+//         );
+
+//         try {
+//           for (const item of allTableNames) {
+//             await tableStatement.executeAsync([item.id, item.category, item.tableName, item.created_at]);
+//           }
+//         } finally {
+//           await tableStatement.finalizeAsync();
+//         }
+
+//         // Store data for each table
+//         for (const table of allTableNames) {
+//           const { data: qaData, error: qaError } = await supabase
+//             .from(table.tableName)
+//             .select("*")
+//             .order("created_at");
+
+//           if (qaError) throw qaError;
+//           if (!qaData) continue;
+
+//           const isMarjaTable = table.category === "Rechtsfragen";
+//           const statement = await this.db.prepareAsync(
+//             isMarjaTable
+//               ? `INSERT INTO QuestionsMarjaAnswer 
+//                  (id, tableName, category, question, title, answer_sistani, answer_khamenei, created_at)
+//                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+//               : `INSERT INTO QuestionsOneAnswer 
+//                  (id, tableName, category, question, title, answer, created_at)
+//                  VALUES (?, ?, ?, ?, ?, ?, ?)`
+//           );
+
+//           try {
+//             for (const item of qaData) {
+//               if (isMarjaTable) {
+//                 await statement.executeAsync([
+//                   item.id,
+//                   table.tableName,
+//                   table.category,
+//                   item.question,
+//                   item.title,
+//                   item.answer_sistani,
+//                   item.answer_khamenei,
+//                   item.created_at,
+//                 ]);
+//               } else {
+//                 await statement.executeAsync([
+//                   item.id,
+//                   table.tableName,
+//                   table.category,
+//                   item.question,
+//                   item.title,
+//                   item.answer,
+//                   item.created_at,
+//                 ]);
+//               }
+//             }
+//           } finally {
+//             await statement.finalizeAsync();
+//           }
+//         }
+
+//         // Update version
+//         const { data: versionData } = await supabase.from('Version').select('version').single();
+//         if (versionData) {
+//           await AsyncStorage.setItem(DB_VERSION_KEY, versionData.version);
+//         }
+//       } catch (error) {
+//         console.error('Error syncing database:', error);
+//         throw error;
+//       }
+//     });
+//   }
+
+//   private async setupSubscriptions() {
+//     // Subscribe to Version table
+//     this.subscriptions.version = supabase
+//       .channel('version-changes')
+//       .on('postgres_changes', { event: '*', schema: 'public', table: 'Version' },
+//         async () => {
+//           await this.syncDatabase();
+//         })
+//       .subscribe();
+
+//     const { data: tables } = await supabase.from('AllTableNames').select('tableName');
+//     if (tables) {
+//       tables.forEach(({ tableName }) => {
+//         this.subscriptions[tableName] = supabase
+//           .channel(`${tableName}-changes`)
+//           .on('postgres_changes', { event: '*', schema: 'public', table: tableName },
+//             async () => {
+//               await this.syncDatabase();
+//             })
+//           .subscribe();
+//       });
+//     }
+//   }
+
+//   async getTablesByCategory(category: string): Promise<AllTableNamesType[]> {
+//     return await this.db.getAllAsync<AllTableNamesType>(
+//       'SELECT * FROM AllTableNames WHERE category = ? ORDER BY tableName',
+//       [category]
+//     );
+//   }
+
+//   async getQuestionsForTable(tableName: string, category: string) {
+//     const isMarjaTable = category === "Rechtsfragen";
+//     const table = isMarjaTable ? "QuestionsMarjaAnswer" : "QuestionsOneAnswer";
+    
+//     return await this.db.getAllAsync(
+//       `SELECT * FROM ${table} WHERE tableName = ? ORDER BY created_at`,
+//       [tableName]
+//     );
+//   }
+
+//   cleanup() {
+//     Object.values(this.subscriptions).forEach(subscription => {
+//       if (subscription?.unsubscribe) {
+//         subscription.unsubscribe();
+//       }
+//     });
+//   }
+// }
+// database-service.ts
+// database-service.ts
+
+// database.ts
+import { SQLiteDatabase } from 'expo-sqlite';
+import { supabase } from "@/utils/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Types
 export type AllTableNamesType = {
@@ -1448,203 +1923,328 @@ export type AllTableNamesType = {
 
 export type QuestionOneAnswerType = {
   id: number;
-  category: string;
   tableName: string;
+  category: string;
   question: string;
+  title: string;
   answer: string;
   created_at: string;
 };
 
 export type QuestionAnswerPerMarjaType = {
   id: number;
-  category: string;
   tableName: string;
+  category: string;
   question: string;
+  title: string;
   answer_sistani: string;
   answer_khamenei: string;
   created_at: string;
 };
 
-// Database initialization function
-async function migrateDbIfNeeded(db: SQLite.SQLiteDatabase) {
+// Constants
+const DB_VERSION_KEY = 'db_version';
+let subscriptions: { [key: string]: any } = {};
+
+// Schema migration
+export async function migrateDbIfNeeded(db: SQLiteDatabase) {
+  console.log('Checking database schema version...');
   const DATABASE_VERSION = 1;
+  
   const { user_version: currentVersion } = await db.getFirstAsync<{ user_version: number }>(
-    "PRAGMA user_version"
+    'PRAGMA user_version'
   );
 
   if (currentVersion < DATABASE_VERSION) {
+    console.log('Migrating database schema...');
     await db.execAsync(`
-      PRAGMA journal_mode = WAL;
+      PRAGMA foreign_keys = OFF;
+      BEGIN TRANSACTION;
 
-      CREATE TABLE IF NOT EXISTS AllTableNames (
+      DROP TABLE IF EXISTS AllTableNames;
+      DROP TABLE IF EXISTS QuestionsOneAnswer;
+      DROP TABLE IF EXISTS QuestionsMarjaAnswer;
+      DROP TABLE IF EXISTS Version;
+
+      CREATE TABLE AllTableNames (
         id INTEGER PRIMARY KEY,
-        category TEXT,
-        tableName TEXT,
-        created_at TEXT
+        category TEXT NOT NULL,
+        tableName TEXT NOT NULL UNIQUE,
+        created_at TEXT NOT NULL
       );
 
-      CREATE TABLE IF NOT EXISTS QuestionsOneAnswer (
+      CREATE TABLE QuestionsOneAnswer (
         id INTEGER PRIMARY KEY,
-        tableName TEXT,
-        category TEXT,
-        question TEXT,
-        title TEXT,
-        answer TEXT,
-        created_at TEXT
+        tableName TEXT NOT NULL,
+        category TEXT NOT NULL,
+        question TEXT NOT NULL,
+        title TEXT NOT NULL,
+        answer TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (tableName) REFERENCES AllTableNames(tableName) ON DELETE CASCADE
       );
 
-      CREATE TABLE IF NOT EXISTS QuestionsMarjaAnswer (
+      CREATE TABLE QuestionsMarjaAnswer (
         id INTEGER PRIMARY KEY,
-        tableName TEXT,
-        category TEXT,
-        question TEXT,
-        title TEXT,
-        answer_sistani TEXT,
-        answer_khamenei TEXT,
-        created_at TEXT
+        tableName TEXT NOT NULL,
+        category TEXT NOT NULL,
+        question TEXT NOT NULL,
+        title TEXT NOT NULL,
+        answer_sistani TEXT NOT NULL,
+        answer_khamenei TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        FOREIGN KEY (tableName) REFERENCES AllTableNames(tableName) ON DELETE CASCADE
       );
+
+      CREATE TABLE Version (
+        version TEXT PRIMARY KEY
+      );
+
+      PRAGMA user_version = ${DATABASE_VERSION};
+      COMMIT;
+      PRAGMA foreign_keys = ON;
     `);
-
-    // Update database version
-    await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
+    console.log('Schema migration complete');
   }
 }
 
-// Store table names
-const storeTableNames = async (db: SQLite.SQLiteDatabase, data: AllTableNamesType[]) => {
-  const statement = await db.prepareAsync("INSERT INTO AllTableNames (id, category, tableName, created_at) VALUES (?, ?, ?, ?)");
+// Check if database needs sync
+async function shouldSyncDatabase(): Promise<boolean> {
   try {
-    await db.runAsync("DELETE FROM AllTableNames;");
-    for (const item of data) {
-      await statement.executeAsync([item.id, item.category, item.tableName, item.created_at]);
-    }
-  } finally {
-    await statement.finalizeAsync();
-  }
-};
+    const storedVersion = await AsyncStorage.getItem(DB_VERSION_KEY);
+    const { data: versionData, error } = await supabase
+      .from('Version')
+      .select('version')
+      .single();
 
-// Store Q&A data
-const storeQAData = async (
-  db: SQLite.SQLiteDatabase,
-  tableName: string,
-  category: string,
-  isMarjaTable: boolean,
-  data: QuestionOneAnswerType[] | QuestionAnswerPerMarjaType[]
-) => {
-  await db.withTransactionAsync(async () => {
-    if (isMarjaTable) {
-      await db.runAsync("DELETE FROM QuestionsMarjaAnswer WHERE tableName = ?;", [tableName]);
-      const statement = await db.prepareAsync(
-        `INSERT OR REPLACE INTO QuestionsMarjaAnswer 
-        (id, tableName, category, question, title, answer_sistani, answer_khamenei, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?);`
+    if (error) throw error;
+    const needsSync = !storedVersion || storedVersion !== versionData?.version;
+    console.log(`Database sync needed: ${needsSync}`);
+    return needsSync;
+  } catch (error) {
+    console.error('Error checking database version:', error);
+    return true; // Sync on error to be safe
+  }
+}
+
+// Sync database
+async function syncDatabase(db: SQLiteDatabase) {
+  console.log('Starting database sync...');
+  try {
+    // Start Transaction
+    await db.execAsync('BEGIN TRANSACTION');
+
+    // Clear all existing data first
+    await db.execAsync('DELETE FROM AllTableNames');
+    await db.execAsync('DELETE FROM QuestionsOneAnswer');
+    await db.execAsync('DELETE FROM QuestionsMarjaAnswer');
+
+    // Fetch all tables
+    console.log('Fetching tables from Supabase...');
+    const { data: allTableNames, error: tableError } = await supabase
+      .from("AllTableNames")
+      .select("*")
+      .order("category");
+
+    if (tableError) throw tableError;
+    if (!allTableNames) {
+      console.log('No tables found in Supabase');
+      await db.execAsync('COMMIT');
+      return;
+    }
+
+    console.log(`Found ${allTableNames.length} tables in Supabase`);
+
+    // Store table names
+    for (const table of allTableNames) {
+      await db.runAsync(
+        'INSERT INTO AllTableNames (id, category, tableName, created_at) VALUES (?, ?, ?, ?)',
+        [table.id, table.category, table.tableName, table.created_at]
       );
-      try {
-        for (const item of data as QuestionAnswerPerMarjaType[]) {
-          await statement.executeAsync([
-            item.id,
-            tableName,
-            category,
-            item.question,
-            item.answer_sistani,
-            item.answer_khamenei,
-            item.created_at,
-          ]);
-        }
-      } finally {
-        await statement.finalizeAsync();
+    }
+    console.log('Table names stored in SQLite');
+
+    // Store Q&A data
+    for (const table of allTableNames) {
+      console.log(`Syncing data for ${table.tableName}...`);
+      
+      const { data: qaData, error: qaError } = await supabase
+        .from(table.tableName)
+        .select("*")
+        .order("created_at");
+
+      if (qaError) {
+        console.error(`Error fetching data for ${table.tableName}:`, qaError);
+        continue;
       }
-    } else {
-      await db.runAsync("DELETE FROM QuestionsOneAnswer WHERE tableName = ?;", [tableName]);
-      const statement = await db.prepareAsync(
-        `INSERT OR REPLACE INTO QuestionsOneAnswer 
-        (id, tableName, category, question, title, answer, created_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?);`
-      );
-      try {
-        for (const item of data as QuestionOneAnswerType[]) {
-          await statement.executeAsync([
-            item.id,
-            tableName,
-            category,
-            item.question,
-            item.answer,
-            item.created_at,
-          ]);
-        }
-      } finally {
-        await statement.finalizeAsync();
+
+      if (!qaData || qaData.length === 0) {
+        console.log(`No data found for ${table.tableName}`);
+        continue;
       }
+
+      const isMarjaTable = table.category === "Rechtsfragen";
+      
+      // For each table, first delete existing data
+      if (isMarjaTable) {
+        await db.runAsync('DELETE FROM QuestionsMarjaAnswer WHERE tableName = ?', [table.tableName]);
+      } else {
+        await db.runAsync('DELETE FROM QuestionsOneAnswer WHERE tableName = ?', [table.tableName]);
+      }
+
+      // Then insert new data
+      let insertedCount = 0;
+      for (const item of qaData) {
+        try {
+          if (isMarjaTable) {
+            await db.runAsync(
+              `INSERT INTO QuestionsMarjaAnswer 
+              (id, tableName, category, question, title, answer_sistani, answer_khamenei, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+              [
+                item.id,
+                table.tableName,
+                table.category,
+                item.question || '',
+                item.title || '',
+                item.answer_sistani || '',
+                item.answer_khamenei || '',
+                item.created_at,
+              ]
+            );
+          } else {
+            await db.runAsync(
+              `INSERT INTO QuestionsOneAnswer 
+              (id, tableName, category, question, title, answer, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?)`,
+              [
+                item.id,
+                table.tableName,
+                table.category,
+                item.question || '',
+                item.title || '',
+                item.answer || '',
+                item.created_at,
+              ]
+            );
+          }
+          insertedCount++;
+        } catch (insertError) {
+          console.error(`Error inserting data for ${table.tableName}:`, insertError);
+        }
+      }
+      console.log(`Successfully inserted ${insertedCount} records for ${table.tableName}`);
+    }
+
+    // Update version
+    const { data: versionData } = await supabase.from('Version').select('version').single();
+    if (versionData) {
+      await AsyncStorage.setItem(DB_VERSION_KEY, versionData.version);
+    }
+
+    // Commit transaction
+    await db.execAsync('COMMIT');
+    console.log('Database sync completed successfully');
+
+  } catch (error) {
+    // Rollback on error
+    console.error('Error during sync:', error);
+    await db.execAsync('ROLLBACK');
+    throw error;
+  }
+}
+
+// Setup Supabase subscriptions
+async function setupSubscriptions(db: SQLiteDatabase) {
+  console.log('Setting up Supabase subscriptions...');
+  cleanupSubscriptions();
+
+  // Subscribe to Version table
+  subscriptions.version = supabase
+    .channel('version-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'Version' },
+      async () => {
+        console.log('Version change detected, syncing database...');
+        await syncDatabase(db);
+      })
+    .subscribe();
+
+  // Subscribe to individual tables
+  const { data: tables } = await supabase.from('AllTableNames').select('tableName');
+  if (tables) {
+    tables.forEach(({ tableName }) => {
+      subscriptions[tableName] = supabase
+        .channel(`${tableName}-changes`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: tableName },
+          async () => {
+            console.log(`Change detected in ${tableName}, syncing database...`);
+            await syncDatabase(db);
+          })
+        .subscribe();
+    });
+  }
+}
+
+// Initialize database
+export async function initializeDatabase(db: SQLiteDatabase) {
+  console.log('Starting database initialization...');
+  
+  await migrateDbIfNeeded(db);
+  
+  const needsSync = await shouldSyncDatabase();
+  if (needsSync) {
+    await syncDatabase(db);
+    await setupSubscriptions(db);
+  }
+  
+  console.log('Database initialization complete');
+}
+
+// Get tables by category
+export async function getTablesByCategory(db: SQLiteDatabase, category: string): Promise<AllTableNamesType[]> {
+  console.log(`Getting tables for category: ${category}`);
+  
+  try {
+    const tables = await db.getAllAsync<AllTableNamesType>(
+      'SELECT * FROM AllTableNames WHERE category = ? ORDER BY tableName',
+      [category]
+    );
+    console.log(`Found ${tables.length} tables for ${category}`);
+    return tables;
+  } catch (error) {
+    console.error(`Error getting tables for ${category}:`, error);
+    return [];
+  }
+}
+
+// Get questions for table
+export async function getQuestionsForTable(db: SQLiteDatabase, tableName: string, category: string) {
+  console.log(`Getting questions for ${tableName} (${category})`);
+  
+  try {
+    const isMarjaTable = category === "Rechtsfragen";
+    const table = isMarjaTable ? "QuestionsMarjaAnswer" : "QuestionsOneAnswer";
+    
+    const questions = await db.getAllAsync(
+      `SELECT * FROM ${table} WHERE tableName = ? ORDER BY created_at`,
+      [tableName]
+    );
+    
+    console.log(`Found ${questions.length} questions for ${tableName}`);
+    return questions;
+  } catch (error) {
+    console.error(`Error getting questions for ${tableName}:`, error);
+    return [];
+  }
+}
+
+// Cleanup subscriptions
+export function cleanupSubscriptions() {
+  console.log('Cleaning up subscriptions...');
+  Object.values(subscriptions).forEach(subscription => {
+    if (subscription?.unsubscribe) {
+      subscription.unsubscribe();
     }
   });
-};
-
-// React hook to use the database
-export const useQADatabase = () => {
-  const db = useSQLiteContext();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  const getTablesByCategory = async (category: string) => {
-    try {
-      return await db.getAllAsync<AllTableNamesType>(
-        "SELECT * FROM AllTableNames WHERE category = ? ORDER BY tableName;",
-        [category]
-      );
-    } catch (err) {
-      console.error("Error getting tables by category:", err);
-      throw err;
-    }
-  };
-
-  const getQuestionsForTable = async (tableName: string, category: string) => {
-    const isMarjaTable = category === "Rechtsfragen";
-    try {
-      return await db.getAllAsync<QuestionOneAnswerType | QuestionAnswerPerMarjaType>(
-        `SELECT * FROM ${
-          isMarjaTable ? "QuestionsMarjaAnswer" : "QuestionsOneAnswer"
-        } WHERE tableName = ? ORDER BY created_at;`,
-        [tableName]
-      );
-    } catch (err) {
-      console.error("Error getting questions for table:", err);
-      throw err;
-    }
-  };
-
-  useEffect(() => {
-    const initializeDatabase = async () => {
-      try {
-        setLoading(true);
-        const { data: allTableNames, error: tableError } = await supabase
-          .from("AllTableNames")
-          .select("*")
-          .order("category", { ascending: true });
-
-        if (tableError) throw tableError;
-
-        await storeTableNames(db, allTableNames);
-
-        for (const table of allTableNames) {
-          const isMarjaTable = table.category === "Rechtsfragen";
-          const { data: qaData, error: qaError } = await supabase
-            .from(table.tableName)
-            .select("*")
-            .order("created_at", { ascending: true });
-
-          if (qaError) throw qaError;
-          await storeQAData(db, table.tableName, table.category, isMarjaTable, qaData);
-        }
-      } catch (err) {
-        console.error("Error initializing database:", err);
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeDatabase();
-  }, [db]);
-
-  return { loading, error, getTablesByCategory, getQuestionsForTable };
-};
+  subscriptions = {};
+}
