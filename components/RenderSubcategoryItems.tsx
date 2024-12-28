@@ -72,7 +72,7 @@ function RenderSubcategoryItems() {
           <Pressable
             onPress={() =>
               router.push({
-                pathname: "/(tabs)/renderItems/question",
+                pathname: "/(tabs)/renderQuestion/question",
                 params: {
                   questionId: item.id.toString(),
                   category,

@@ -231,6 +231,26 @@ export const getQuestionsForSubcategory = async (
   }
 };
 
+export const getQuestion = async (
+  categoryName: string,
+  subcategoryName: string,
+  questionId: number
+): Promise<QuestionType> => {
+  try {
+    const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+
+    // Query to fetch questions for the given subcategory
+    const rows = await db.getAllAsync<QuestionType>(
+      "SELECT * FROM question WHERE category_name = ? AND subcategory_name = ? AND id = ? LIMIT 1;",
+      [categoryName, subcategoryName, questionId,]
+    );
+    return rows[0]
+  } catch (error) {
+    console.error("Error fetching question:", error);
+    throw error;
+  }
+};
+
 export const searchQuestions = async (
   searchTerm: string
 ): Promise<

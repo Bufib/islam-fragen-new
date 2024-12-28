@@ -11,6 +11,7 @@ export const Colors = {
     contrast: "#FFFFFF",
     indicatorStyleTopBar: '#000000',
     backgroundColorTopBar: "#ecf0f1",
+    borderColor: "#000000",
   
 
 
@@ -55,6 +56,7 @@ export const Colors = {
     tabIconSelected: tintColorDark,
     indicatorStyleTopBar: '#ffffff',
     backgroundColorTopBar: "#242c40",
+    borderColor: "#d0d0c0",
 
 
 
