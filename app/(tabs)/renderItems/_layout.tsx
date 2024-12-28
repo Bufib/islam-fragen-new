@@ -36,6 +36,8 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen name="subcategories" options={{ headerShown: true }} />
+        <Stack.Screen name="question" options={{ headerShown: true }} />
+      
       </Stack>
     </ThemeProvider>
   );

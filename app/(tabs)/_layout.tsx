@@ -63,12 +63,7 @@ export default function TabLayout() {
           href: null,
         }}
       />
-      <Tabs.Screen
-        name="renderQuestion"
-        options={{
-          href: null,
-        }}
-      />
+      
     </Tabs>
   );
 }

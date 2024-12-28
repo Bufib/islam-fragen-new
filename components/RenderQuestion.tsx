@@ -11,15 +11,20 @@ import { useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
 import { Stack } from "expo-router";
 
-const question = () => {
+type RenderQuestionProps = {
+  category: string;
+  subcategory: string;
+  questionId: number;
+};
+
+const RenderQuestion = ({
+  category,
+  subcategory,
+  questionId,
+}: RenderQuestionProps) => {
   const themeStyles = coustomTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [question, setQuestion] = useState<QuestionType | null>(null);
-  const { category, subcategory, questionId } = useLocalSearchParams<{
-    category: string;
-    subcategory: string;
-    questionId: string;
-  }>();
 
   useEffect(() => {
     const loadQuestion = async () => {
@@ -30,11 +35,7 @@ const question = () => {
           console.log("Missing category or subcategory");
           return;
         }
-        const question = await getQuestion(
-          category,
-          subcategory,
-          parseInt(questionId)
-        );
+        const question = await getQuestion(category, subcategory, questionId);
 
         if (question) {
           setQuestion(question);
@@ -58,20 +59,15 @@ const question = () => {
       style={[styles.scrollViewStyles, themeStyles.defaultBackgorundColor]}
       contentContainerStyle={styles.scrollViewContent}
     >
-      {/* Set header title */}
-      <Stack.Screen
-        options={{
-          headerTitle: question?.title,
-        }}
-      />
-
       <View
         style={[
           styles.questionContainer,
           themeStyles.questionContainerBackground,
         ]}
       >
-        <ThemedText style={styles.questionText}>{question?.question}</ThemedText>
+        <ThemedText style={styles.questionText}>
+          {question?.question}
+        </ThemedText>
       </View>
 
       <View style={styles.answerContainer}>
@@ -90,7 +86,7 @@ const question = () => {
   );
 };
 
-export default question;
+export default RenderQuestion;
 
 const styles = StyleSheet.create({
   scrollViewStyles: {
@@ -114,10 +110,9 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontSize: 18,
-    textAlign: "center"
+    textAlign: "center",
   },
   answerText: {
     fontSize: 16,
-
   },
 });
