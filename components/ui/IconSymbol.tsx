@@ -16,6 +16,7 @@ const MAPPING = {
   "gear.circle": "settings",
   'magnifyingglass': "search",
   'star.fill': "star",
+  'newspaper':"newspaper"
 } as Partial<
   Record<
     import("expo-symbols").SymbolViewProps["name"],

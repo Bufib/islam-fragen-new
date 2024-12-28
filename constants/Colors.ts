@@ -12,6 +12,7 @@ export const Colors = {
     indicatorStyleTopBar: '#000000',
     backgroundColorTopBar: "#ecf0f1",
     borderColor: "#000000",
+    searchResultCategory: "#555",
   
 
 
@@ -57,7 +58,7 @@ export const Colors = {
     indicatorStyleTopBar: '#ffffff',
     backgroundColorTopBar: "#242c40",
     borderColor: "#d0d0c0",
-
+    searchResultCategory: "#d0d0c0",
 
 
 

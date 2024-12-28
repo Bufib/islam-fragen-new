@@ -83,7 +83,7 @@ function RenderSubcategoryItems() {
             }
           >
             <ThemedView
-              style={[styles.item, themeStyle.renderItemsBackgroundcolor]}
+              style={[styles.item, themeStyle.contrast]}
             >
               <View style={styles.questionContainer}>
                 <ThemedText style={styles.titleText}>{item.title}</ThemedText>

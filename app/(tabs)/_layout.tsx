@@ -17,6 +17,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
+        
       }}
     >
       <Tabs.Screen
@@ -30,9 +31,19 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="news"
+        options={{
+          title: "Neuigkeiten",
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={28} name="newspaper" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="search"
         options={{
           title: "Suche",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="magnifyingglass" color={color} />
           ),
@@ -63,7 +74,6 @@ export default function TabLayout() {
           href: null,
         }}
       />
-      
     </Tabs>
   );
 }

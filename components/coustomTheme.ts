@@ -6,18 +6,17 @@ export const lightTheme = {
     backgroundColor: Colors.light.background,
     borderColor: Colors.light.borderColor,
   },
-  renderItemsBackgroundcolor: {
+  contrast: {
     backgroundColor: Colors.light.contrast,
     borderColor: Colors.light.borderColor,
   },
-  questionContainerBackground: {
-    backgroundColor: Colors.light.contrast,
-    borderColor: Colors.light.borderColor,
+
+  searchBarText: {
+    color: Colors.light.text,
   },
-  answerContainerBackground: {
-    backgroundColor: Colors.light.contrast,
-    borderColor: Colors.light.borderColor,
-  }
+  searchResultCategory: {
+    color: Colors.light.searchResultCategory,
+  },
 };
 
 export const darkTheme = {
@@ -25,18 +24,16 @@ export const darkTheme = {
     backgroundColor: Colors.dark.background,
     borderColor: Colors.dark.borderColor,
   },
-  renderItemsBackgroundcolor: {
+  contrast: {
     backgroundColor: Colors.dark.contrast,
     borderColor: Colors.dark.borderColor,
   },
-  questionContainerBackground: {
-    backgroundColor: Colors.dark.contrast,
-    borderColor: Colors.dark.borderColor,
+  searchBarText: {
+    color: Colors.dark.text,
   },
-  answerContainerBackground: {
-    backgroundColor: Colors.dark.contrast,
-    borderColor: Colors.dark.borderColor,
-  }
+  searchResultCategory: {
+    color: Colors.dark.searchResultCategory,
+  },
 };
 
 export const coustomTheme = () => {

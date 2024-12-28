@@ -72,7 +72,7 @@ function RenderCategoryItems() {
             }
           >
             <ThemedView
-              style={[styles.item, themeStyle.renderItemsBackgroundcolor]}
+              style={[styles.item, themeStyle.contrast]}
             >
               <ThemedText style={styles.tableText}>{item}</ThemedText>
               <Entypo

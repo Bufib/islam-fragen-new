@@ -242,9 +242,9 @@ export const getQuestion = async (
     // Query to fetch questions for the given subcategory
     const rows = await db.getAllAsync<QuestionType>(
       "SELECT * FROM question WHERE category_name = ? AND subcategory_name = ? AND id = ? LIMIT 1;",
-      [categoryName, subcategoryName, questionId,]
+      [categoryName, subcategoryName, questionId]
     );
-    return rows[0]
+    return rows[0];
   } catch (error) {
     console.error("Error fetching question:", error);
     throw error;
@@ -254,23 +254,32 @@ export const getQuestion = async (
 export const searchQuestions = async (
   searchTerm: string
 ): Promise<
-  { category_name: string; subcategory_name: string; question: string }[]
+  {
+    id: number;
+    category_name: string;
+    subcategory_name: string;
+    question: string;
+    title: string;
+
+  }[]
 > => {
   try {
     const db = await SQLite.openDatabaseAsync("islam-fragen.db");
 
     // Perform a search query using the LIKE operator
     const rows = await db.getAllAsync<{
+      id: number;
       category_name: string;
       subcategory_name: string;
       question: string;
+      title: string;
     }>(
       `
-      SELECT category_name, subcategory_name, question
+      SELECT id, category_name, subcategory_name, question, title
       FROM question
-      WHERE question LIKE ?;
+      WHERE question LIKE ? OR title LIKE ?;
       `,
-      [`%${searchTerm}%`] // Surround the search term with % for pattern matching
+      [`%${searchTerm}%`, `%${searchTerm}%`]
     );
 
     return rows; // Return the matching rows

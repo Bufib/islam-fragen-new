@@ -45,9 +45,7 @@ export function Collapsible({
         <ThemedText type="defaultSemiBold">{title}</ThemedText>
       </TouchableOpacity>
       {isOpen && (
-        <ThemedView
-          style={[styles.content, themeStyles.answerContainerBackground]}
-        >
+        <ThemedView style={[styles.content, themeStyles.contrast]}>
           {children}
         </ThemedView>
       )}
@@ -66,9 +64,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     padding: 12,
     borderTopWidth: 2,
-   borderBottomRightRadius: 8,
-   borderBottomLeftRadius: 8
-   
+    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 8,
   },
   image: {
     width: 100,

@@ -59,28 +59,33 @@ const RenderQuestion = ({
       style={[styles.scrollViewStyles, themeStyles.defaultBackgorundColor]}
       contentContainerStyle={styles.scrollViewContent}
     >
-      <View
-        style={[
-          styles.questionContainer,
-          themeStyles.questionContainerBackground,
-        ]}
-      >
+      <View style={[styles.questionContainer, themeStyles.contrast]}>
         <ThemedText style={styles.questionText}>
           {question?.question}
         </ThemedText>
       </View>
 
       <View style={styles.answerContainer}>
-        <Collapsible title="Sayid al-Khamenei" marja="khamenei">
-          <ThemedText style={styles.answerText}>
-            {question?.answer_khamenei}
-          </ThemedText>
-        </Collapsible>
-        <Collapsible title="Sayid as-Sistani" marja="sistani">
-          <ThemedText style={styles.answerText}>
-            {question?.answer_sistani}
-          </ThemedText>
-        </Collapsible>
+        {question?.answer ? (
+          <ThemedView style={[styles.singleAnswer, themeStyles.contrast]}>
+            <ThemedText style={styles.answerText}>
+              {question?.answer}
+            </ThemedText>
+          </ThemedView>
+        ) : (
+          <>
+            <Collapsible title="Sayid al-Khamenei" marja="khamenei">
+              <ThemedText style={styles.answerText}>
+                {question?.answer_khamenei}
+              </ThemedText>
+            </Collapsible>
+            <Collapsible title="Sayid as-Sistani" marja="sistani">
+              <ThemedText style={styles.answerText}>
+                {question?.answer_sistani}
+              </ThemedText>
+            </Collapsible>
+          </>
+        )}
       </View>
     </ScrollView>
   );
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollViewContent: {
-    gap: 30,
+    gap: 20,
   },
   questionContainer: {
     padding: 15,
@@ -108,6 +113,14 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "transparent",
   },
+  singleAnswer: {
+    marginHorizontal: 5,
+    padding: 12,
+    borderTopWidth: 2,
+    borderBottomRightRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+
   questionText: {
     fontSize: 18,
     textAlign: "center",
