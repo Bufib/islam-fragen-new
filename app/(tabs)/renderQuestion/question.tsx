@@ -6,9 +6,10 @@ import { ThemedView } from "@/components/ThemedView";
 import { coustomTheme } from "@/components/coustomTheme";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
-import {QuestionType, getQuestion } from "@/components/initializeDatabase";
+import { QuestionType, getQuestion } from "@/components/initializeDatabase";
 import { useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
+import { Stack } from "expo-router";
 
 const question = () => {
   const themeStyles = coustomTheme();
@@ -39,11 +40,11 @@ const question = () => {
           setQuestion(question);
         } else {
           console.log("Invalid data format received");
-          setQuestion(null)
+          setQuestion(null);
         }
       } catch (error) {
         console.error("Error loading question:", error);
-        setQuestion(null)
+        setQuestion(null);
       } finally {
         setIsLoading(false);
       }
@@ -57,13 +58,20 @@ const question = () => {
       style={[styles.scrollViewStyles, themeStyles.defaultBackgorundColor]}
       contentContainerStyle={styles.scrollViewContent}
     >
+      {/* Set header title */}
+      <Stack.Screen
+        options={{
+          headerTitle: question?.title,
+        }}
+      />
+
       <View
         style={[
           styles.questionContainer,
           themeStyles.questionContainerBackground,
         ]}
       >
-        <ThemedText>{question?.title}</ThemedText>
+        <ThemedText style={styles.questionText}>{question?.question}</ThemedText>
       </View>
 
       <View style={styles.answerContainer}>
@@ -73,7 +81,9 @@ const question = () => {
           </ThemedText>
         </Collapsible>
         <Collapsible title="Sayid as-Sistani" marja="sistani">
-          <ThemedText style={styles.answerText}>{question?.answer_sistani}</ThemedText>
+          <ThemedText style={styles.answerText}>
+            {question?.answer_sistani}
+          </ThemedText>
         </Collapsible>
       </View>
     </ScrollView>
@@ -102,5 +112,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     backgroundColor: "transparent",
   },
-  answerText: {},
+  questionText: {
+    fontSize: 18,
+    textAlign: "center"
+  },
+  answerText: {
+    fontSize: 16,
+
+  },
 });
