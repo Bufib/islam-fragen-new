@@ -1,11 +1,6 @@
 // Import required modules and hooks
 import { useEffect, useState } from "react";
 import { View, Pressable, Text, StyleSheet, FlatList } from "react-native";
-import {
-  useQADatabase,
-  AllTableNamesType,
-  QuestionAnswerPerMarjaType,
-} from "@/hooks/useQandA";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { coustomTheme } from "@/components/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
@@ -15,30 +10,42 @@ import { useColorScheme } from "react-native";
 import { router } from "expo-router";
 import editTitle from "./editTitle";
 import { useLocalSearchParams } from "expo-router";
+import { getSubcategoriesForCategory } from "./initializeDatabase";
 
 function RenderCategoryItems() {
-  const { getTablesByCategory, loading } = useQADatabase();
   const { category } = useLocalSearchParams<{ category: string }>();
-  const [items, setItems] = useState<AllTableNamesType[]>([]);
-  const [selectedTable, setSelectedTable] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<QuestionAnswerPerMarjaType[]>([]);
+  const [subcategories, setSubcategories] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const themeStyle = coustomTheme();
   const colorScheme = useColorScheme();
 
   // Fetch tables for "Rechtsfragen" category
+  // Fetch tables for "Rechtsfragen" category
   useEffect(() => {
-    const loadTables = async () => {
-      const tableData = await getTablesByCategory(category);
-      if (tableData) {
-        setItems(tableData);
-        console.log(tableData);
+    const loadSubcategories = async () => {
+      setIsLoading(true);
+      try {
+        const subcategories = await getSubcategoriesForCategory(category);
+        if (subcategories) {
+          setSubcategories(subcategories);
+          console.log(subcategories);
+        } else {
+          setSubcategories([]);
+          console.log("No subcategories found");
+        }
+      } catch (error) {
+        console.error("Error loading subcategories:", error);
+        setSubcategories([]);
+      } finally {
+        setIsLoading(false);
       }
     };
-    loadTables();
-  }, [getTablesByCategory]);
 
-  // Display loading state
-  if (loading) {
+    loadSubcategories();
+  }, [category]);
+
+  // // Display loading state
+  if (isLoading) {
     return (
       <View style={styles.centeredContainer}>
         <Text>Loading data...</Text>
@@ -50,8 +57,8 @@ function RenderCategoryItems() {
   return (
     <View style={[styles.container, themeStyle.defaultBackgorundColor]}>
       <FlatList
-        data={items}
-        keyExtractor={(item) => item.id.toString()}
+        data={subcategories}
+        keyExtractor={(item) => item.toString()}
         showsVerticalScrollIndicator={false}
         style={themeStyle.defaultBackgorundColor}
         contentContainerStyle={styles.flatListStyle}
@@ -60,16 +67,14 @@ function RenderCategoryItems() {
             onPress={() =>
               router.push({
                 pathname: "/(tabs)/renderItems/subcategories",
-                params: { category: category, subcategory: item.tableName },
+                params: { category: category, subcategory: item },
               })
             }
           >
             <ThemedView
               style={[styles.item, themeStyle.renderItemsBackgroundcolor]}
             >
-              <ThemedText style={styles.tableText}>
-                {editTitle(item.tableName)}
-              </ThemedText>
+              <ThemedText style={styles.tableText}>{item}</ThemedText>
               <Entypo
                 name="chevron-thin-right"
                 size={24}

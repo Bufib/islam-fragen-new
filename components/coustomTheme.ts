@@ -6,16 +6,16 @@ export const lightTheme = {
     backgroundColor: Colors.light.background,
   },
   renderItemsBackgroundcolor: {
-    backgroundColor: Colors.universal.white,
+    backgroundColor: Colors.light.contrast,
   }
 };
 
 export const darkTheme = {
   defaultBackgorundColor: {
-    backgroundColor: Colors.light.background,
+    backgroundColor: Colors.dark.background,
   },
   renderItemsBackgroundcolor: {
-    backgroundColor: Colors.universal.black,
+    backgroundColor: Colors.dark.contrast,
   }
 };
 

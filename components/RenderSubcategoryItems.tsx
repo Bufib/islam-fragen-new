@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
 import { View, Pressable, StyleSheet, FlatList } from "react-native";
-import {
-  useQADatabase,
-  QuestionAnswerPerMarjaType,
-  QuestionOneAnswerType,
-} from "@/hooks/useQandA";
 import { coustomTheme } from "@/components/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -12,16 +7,14 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useColorScheme } from "react-native";
 import { router } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
+import { getQuestionsForSubcategory, QuestionType } from "./initializeDatabase";
 
 function RenderSubcategoryItems() {
-  const { getQuestionsForTable, loading } = useQADatabase();
   const { category, subcategory } = useLocalSearchParams<{
     category: string;
     subcategory: string;
   }>();
-  const [questions, setQuestions] = useState<
-    (QuestionOneAnswerType | QuestionAnswerPerMarjaType)[]
-  >([]);
+  const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const themeStyle = coustomTheme();
   const colorScheme = useColorScheme();
@@ -30,22 +23,18 @@ function RenderSubcategoryItems() {
     const loadQuestions = async () => {
       try {
         setIsLoading(true);
-        console.log("Loading questions with params:", {
-          category,
-          subcategory,
-        });
 
         if (!category || !subcategory) {
           console.log("Missing category or subcategory");
           return;
         }
+        const questions = await getQuestionsForSubcategory(
+          category,
+          subcategory
+        );
 
-        console.log("Fetching questions...");
-        const data = await getQuestionsForTable(subcategory, category);
-        console.log("Received data:", data);
-
-        if (data && Array.isArray(data)) {
-          setQuestions(data);
+        if (questions) {
+          setQuestions(questions);
         } else {
           console.log("Invalid data format received");
           setQuestions([]);
@@ -62,35 +51,13 @@ function RenderSubcategoryItems() {
   }, [category, subcategory]);
 
   // Show loading state
-  if (loading || isLoading) {
+  if (isLoading) {
     return (
       <View style={styles.centeredContainer}>
         <ThemedText>Loading questions...</ThemedText>
       </View>
     );
   }
-
-  // Show error state if missing parameters
-  if (!category || !subcategory) {
-    return (
-      <View style={styles.centeredContainer}>
-        <ThemedText>Missing parameters</ThemedText>
-      </View>
-    );
-  }
-
-  // Show empty state
-  if (questions.length === 0) {
-    return (
-      <View
-        style={[styles.centeredContainer, themeStyle.defaultBackgorundColor]}
-      >
-        <ThemedText>No questions found for {subcategory}</ThemedText>
-      </View>
-    );
-  }
-
-  const isMarjaQuestion = category === "Rechtsfragen";
 
   // Main render with questions
   return (
@@ -110,7 +77,6 @@ function RenderSubcategoryItems() {
                   questionId: item.id.toString(),
                   category,
                   subcategory,
-                  type: isMarjaQuestion ? "marja" : "single",
                 },
               })
             }
@@ -119,10 +85,10 @@ function RenderSubcategoryItems() {
               style={[styles.item, themeStyle.renderItemsBackgroundcolor]}
             >
               <View style={styles.questionContainer}>
-                <ThemedText style={styles.questionText}>
-                  {item.title}
+                <ThemedText style={styles.titleText}>{item.title}</ThemedText>
+                <ThemedText style={styles.questionText} numberOfLines={1}>
+                  {item.question}
                 </ThemedText>
-                <ThemedText>{item.question}</ThemedText>
               </View>
               <Entypo
                 name="chevron-thin-right"
@@ -148,7 +114,7 @@ const styles = StyleSheet.create({
   },
   flatListStyle: {
     paddingTop: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
   },
   item: {
     flexDirection: "row",
@@ -161,16 +127,16 @@ const styles = StyleSheet.create({
   questionContainer: {
     flex: 1,
     marginRight: 10,
+    gap: 2,
+  },
+  titleText: {
+    fontSize: 18,
+    textAlign: "left",
+    fontWeight: "500",
   },
   questionText: {
     fontSize: 16,
     textAlign: "left",
-    fontWeight: "500",
-  },
-  marjaLabel: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 4,
   },
 });
 

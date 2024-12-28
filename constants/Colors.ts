@@ -11,6 +11,7 @@ export const Colors = {
     contrast: "#FFFFFF",
     indicatorStyleTopBar: '#000000',
     backgroundColorTopBar: "#ecf0f1",
+  
 
 
 
