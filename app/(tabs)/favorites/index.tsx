@@ -14,6 +14,7 @@ import { useColorScheme, Pressable } from "react-native";
 import { coustomTheme } from "@/components/coustomTheme";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
+import RenderFavoriteQuestions from "@/components/RenderFavorites";
 
 const favorites = () => {
   const colorScheme = useColorScheme();
@@ -29,6 +30,7 @@ const favorites = () => {
           Favoriten
         </ThemedText>
       </ThemedView>
+      <RenderFavoriteQuestions />
     </SafeAreaView>
   );
 };

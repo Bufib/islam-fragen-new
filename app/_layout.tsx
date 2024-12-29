@@ -12,6 +12,7 @@ import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useInitializeDatabase } from "@/hooks/useInitializeDatabase.ts";
 import { SQLiteProvider } from "expo-sqlite";
+import Toast from 'react-native-toast-message';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -43,6 +44,7 @@ export default function RootLayout() {
         </Stack>
         <StatusBar style="auto" />
       </SQLiteProvider>
+      <Toast />
     </ThemeProvider>
   );
 }

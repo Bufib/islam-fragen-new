@@ -11,6 +11,10 @@ import {
   removeQuestionFromFavorite,
 } from "@/components/initializeDatabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import Toast from "react-native-toast-message";
+import { removeFavoriteToast, addFavoriteToast } from "@/constants/messages";
+import { useRefreshFavorites } from "@/hooks/useRefreshFavoritesStore";
+
 export default function categories() {
   const { category, subcategory, questionId, questionTitle } =
     useLocalSearchParams<{
@@ -20,6 +24,7 @@ export default function categories() {
       questionTitle: string;
     }>();
   const [isFavorite, setIsFavorite] = useState(false);
+  const { triggerRefreshFavorites } = useRefreshFavorites();
 
   // Check if question is favorite
   useEffect(() => {
@@ -47,7 +52,9 @@ export default function categories() {
       const id = parseInt(questionId, 10);
       if (!isNaN(id)) {
         await addQuestionToFavorite(id);
-        setIsFavorite(true); 
+        setIsFavorite(true);
+        addFavoriteToast();
+        triggerRefreshFavorites();
       }
     } catch (error) {
       console.error("Error adding question to favorites:", error);
@@ -59,7 +66,9 @@ export default function categories() {
       const id = parseInt(questionId, 10);
       if (!isNaN(id)) {
         await removeQuestionFromFavorite(id);
-        setIsFavorite(false); 
+        setIsFavorite(false);
+        removeFavoriteToast();
+        triggerRefreshFavorites();
       }
     } catch (error) {
       console.error("Error removing question from favorites:", error);
