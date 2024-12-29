@@ -12,7 +12,7 @@ import {
   QuestionType,
   getFavoriteQuestions,
 } from "./initializeDatabase";
-import { useRefreshFavorites } from "@/hooks/useRefreshFavoritesStore";
+import { useRefreshFavorites } from "@/stores/refreshFavoriteStore";
 
 function RenderFavoriteQuestions() {
   const { category, subcategory } = useLocalSearchParams<{

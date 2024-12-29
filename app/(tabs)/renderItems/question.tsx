@@ -12,9 +12,9 @@ import {
 } from "@/components/initializeDatabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { removeFavoriteToast, addFavoriteToast } from "@/constants/messages";
-import { useRefreshFavorites } from "@/hooks/useRefreshFavoritesStore";
-
-export default function categories() {
+import { useRefreshFavorites } from "@/stores/refreshFavoriteStore";
+import FontSizePickerModal from "@/components/FontSizePickerModal";
+export default function question() {
   const { category, subcategory, questionId, questionTitle } =
     useLocalSearchParams<{
       category: string;
@@ -25,6 +25,8 @@ export default function categories() {
   const [isFavorite, setIsFavorite] = useState(false);
   const { triggerRefreshFavorites } = useRefreshFavorites();
   const colorScheme = useColorScheme();
+  const [modalVisible, setModalVisible] = useState(false);
+
   // Check if question is favorite
   useEffect(() => {
     const checkIfFavorite = async () => {
@@ -85,6 +87,7 @@ export default function categories() {
                 name="text"
                 size={25}
                 color={colorScheme === "light" ? "black" : "white"}
+                onPress={() => setModalVisible(true)} // Open modal
               />
               {isFavorite ? (
                 <Ionicons
@@ -109,6 +112,11 @@ export default function categories() {
         category={category}
         subcategory={subcategory}
         questionId={parseInt(questionId, 10)}
+      />
+      {/* FontSizePickerModal */}
+      <FontSizePickerModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)} // Close modal
       />
     </View>
   );

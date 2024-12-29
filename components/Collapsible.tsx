@@ -7,6 +7,7 @@ import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Image } from "expo-image";
 import { coustomTheme } from "./coustomTheme";
+import { useFontSizeStore } from "@/stores/fontSizeStore";
 
 export function Collapsible({
   children,
@@ -16,6 +17,7 @@ export function Collapsible({
   const [isOpen, setIsOpen] = useState(false);
   const theme = useColorScheme() ?? "light";
   const themeStyles = coustomTheme();
+  const { fontSize } = useFontSizeStore();
 
   return (
     <ThemedView>
@@ -42,7 +44,9 @@ export function Collapsible({
             style={styles.image}
           />
         )}
-        <ThemedText type="defaultSemiBold">{title}</ThemedText>
+        <ThemedText type="defaultSemiBold" style={{ fontSize }}>
+          {title}
+        </ThemedText>
       </TouchableOpacity>
       {isOpen && (
         <ThemedView style={[styles.content, themeStyles.contrast]}>

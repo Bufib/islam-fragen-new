@@ -10,6 +10,7 @@ import { QuestionType, getQuestion } from "@/components/initializeDatabase";
 import { useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
 import { Stack } from "expo-router";
+import { useFontSizeStore } from "@/stores/fontSizeStore";
 
 type RenderQuestionProps = {
   category: string;
@@ -25,6 +26,7 @@ const RenderQuestion = ({
   const themeStyles = coustomTheme();
   const [isLoading, setIsLoading] = useState(true);
   const [question, setQuestion] = useState<QuestionType | null>(null);
+  const { fontSize, lineHeight } = useFontSizeStore();
 
   useEffect(() => {
     const loadQuestion = async () => {
@@ -60,7 +62,7 @@ const RenderQuestion = ({
       contentContainerStyle={styles.scrollViewContent}
     >
       <View style={[styles.questionContainer, themeStyles.contrast]}>
-        <ThemedText style={styles.questionText}>
+        <ThemedText style={[styles.questionText, { fontSize, lineHeight }]}>
           {question?.question}
         </ThemedText>
       </View>
@@ -68,19 +70,19 @@ const RenderQuestion = ({
       <View style={styles.answerContainer}>
         {question?.answer ? (
           <ThemedView style={[styles.singleAnswer, themeStyles.contrast]}>
-            <ThemedText style={styles.answerText}>
+            <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
               {question?.answer}
             </ThemedText>
           </ThemedView>
         ) : (
           <>
             <Collapsible title="Sayid al-Khamenei" marja="khamenei">
-              <ThemedText style={styles.answerText}>
+              <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
                 {question?.answer_khamenei}
               </ThemedText>
             </Collapsible>
             <Collapsible title="Sayid as-Sistani" marja="sistani">
-              <ThemedText style={styles.answerText}>
+              <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
                 {question?.answer_sistani}
               </ThemedText>
             </Collapsible>
@@ -122,10 +124,7 @@ const styles = StyleSheet.create({
   },
 
   questionText: {
-    fontSize: 18,
     textAlign: "center",
   },
-  answerText: {
-    fontSize: 16,
-  },
+  answerText: {},
 });

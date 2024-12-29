@@ -20,6 +20,7 @@ export const lightTheme = {
   markdownText: {
     color: Colors.light.text,
   },
+ 
 };
 
 export const darkTheme = {
@@ -40,6 +41,7 @@ export const darkTheme = {
   markdownText: {
     color: Colors.dark.text,
   },
+
 };
 
 export const coustomTheme = () => {
