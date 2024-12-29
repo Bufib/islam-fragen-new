@@ -83,6 +83,9 @@ const fetchQuestionsFromSupabase = async () => {
       );
     `);
 
+    // Create the favorites table
+    await createFavoritesTable();
+
     // Use an exclusive transaction for batch insertion
     // !! Maybe change -> withTransactionAsync instead of withExclusiveTransactionAsync
     await db.withExclusiveTransactionAsync(async (txn) => {
@@ -186,6 +189,89 @@ const syncSingleQuestion = async (question: QuestionType) => {
   );
   console.log("Question synced:", question.id);
 };
+
+const createFavoritesTable = async () => {
+  const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+  await db.execAsync(`
+    PRAGMA journal_mode = WAL;
+    CREATE TABLE IF NOT EXISTS favorites (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      question_id INTEGER NOT NULL UNIQUE,
+      added_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (question_id) REFERENCES question(id) ON DELETE CASCADE
+    );
+  `);
+};
+
+export const addQuestionToFavorite = async (questionId: number): Promise<void> => {
+  try {
+    const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+    await db.runAsync(
+      `
+      INSERT OR IGNORE INTO favorites (question_id) VALUES (?);
+      `,
+      [questionId]
+    );
+    console.log(`Question ${questionId} added to favorites.`);
+  } catch (error) {
+    console.error("Error adding favorite:", error);
+    throw error;
+  }
+};
+
+export const removeQuestionFromFavorite = async (questionId: number): Promise<void> => {
+  try {
+    const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+    await db.runAsync(
+      `
+      DELETE FROM favorites WHERE question_id = ?;
+      `,
+      [questionId]
+    );
+    console.log(`Question ${questionId} removed from favorites.`);
+  } catch (error) {
+    console.error("Error removing favorite:", error);
+    throw error;
+  }
+};
+
+export const isQuestionInFavorite = async (questionId: number): Promise<boolean> => {
+  try {
+    const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+    const result = await db.getFirstAsync<{ count: number }>(
+      `
+      SELECT COUNT(*) as count FROM favorites WHERE question_id = ?;
+      `,
+      [questionId]
+    );
+    if (result && result.count !== undefined) {
+      return result.count > 0;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error checking favorite status:", error);
+    throw error;
+  }
+};
+
+export const getFavoriteQuestions = async (): Promise<QuestionType[]> => {
+  try {
+    const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+    const rows = await db.getAllAsync<QuestionType>(
+      `
+      SELECT q.*
+      FROM question q
+      INNER JOIN favorites f ON q.id = f.question_id
+      ORDER BY f.added_at DESC;
+      `
+    );
+    return rows;
+  } catch (error) {
+    console.error("Error retrieving favorite questions:", error);
+    throw error;
+  }
+};
+
 
 const deleteQuestionFromSQLite = async (questionId: number) => {
   const db = await SQLite.openDatabaseAsync("islam-fragen.db");

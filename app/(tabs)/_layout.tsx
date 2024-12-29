@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-
+import { router } from "expo-router";
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
@@ -17,11 +17,10 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: "Home",
           tabBarIcon: ({ color }) => (
@@ -61,6 +60,7 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="settings"
+        
         options={{
           title: "settings",
           tabBarIcon: ({ color }) => (
@@ -70,6 +70,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="renderItems"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
         options={{
           href: null,
         }}

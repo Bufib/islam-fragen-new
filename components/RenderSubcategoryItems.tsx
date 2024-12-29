@@ -77,14 +77,12 @@ function RenderSubcategoryItems() {
                   category,
                   subcategory,
                   questionId: item.id.toString(),
-                  questionTitle: item.title
+                  questionTitle: item.title,
                 },
               })
             }
           >
-            <ThemedView
-              style={[styles.item, themeStyle.contrast]}
-            >
+            <ThemedView style={[styles.item, themeStyle.contrast]}>
               <View style={styles.questionContainer}>
                 <ThemedText style={styles.titleText}>{item.title}</ThemedText>
                 <ThemedText style={styles.questionText} numberOfLines={1}>

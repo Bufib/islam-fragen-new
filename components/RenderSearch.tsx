@@ -53,7 +53,7 @@ const RenderSearch = () => {
     <Pressable
       style={[styles.resultItem, themeStyles.contrast]}
       onPress={() =>
-        router.replace({
+        router.push({
           pathname: "/(tabs)/renderItems/question",
           params: {
             questionId: item.id.toString(),

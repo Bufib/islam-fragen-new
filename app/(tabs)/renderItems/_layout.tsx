@@ -19,8 +19,9 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen
-          name="categories"
+          name="category"
           options={{
+            
             headerShown: true,
             headerLeft: () => {
               return (
@@ -35,12 +36,13 @@ export default function RootLayout() {
             },
           }}
         />
-        <Stack.Screen name="subcategories" options={{ headerShown: true }} />
         <Stack.Screen
+          name="subcategory"
+          options={{ headerShown: true, }}
+        />
+         <Stack.Screen
           name="question"
-          options={{
-            headerShown: true,
-          }}
+          options={{ headerShown: true, }}
         />
       </Stack>
     </ThemeProvider>

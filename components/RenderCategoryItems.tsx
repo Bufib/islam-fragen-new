@@ -28,7 +28,6 @@ function RenderCategoryItems() {
         const subcategories = await getSubcategoriesForCategory(category);
         if (subcategories) {
           setSubcategories(subcategories);
-          console.log(subcategories);
         } else {
           setSubcategories([]);
           console.log("No subcategories found");
@@ -66,14 +65,12 @@ function RenderCategoryItems() {
           <Pressable
             onPress={() =>
               router.push({
-                pathname: "/(tabs)/renderItems/subcategories",
+                pathname: "/(tabs)/renderItems/subcategory",
                 params: { category: category, subcategory: item },
               })
             }
           >
-            <ThemedView
-              style={[styles.item, themeStyle.contrast]}
-            >
+            <ThemedView style={[styles.item, themeStyle.contrast]}>
               <ThemedText style={styles.tableText}>{item}</ThemedText>
               <Entypo
                 name="chevron-thin-right"

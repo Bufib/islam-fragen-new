@@ -49,8 +49,8 @@ export default function QuestionLinksFirst() {
           onPressIn={() => setPressedIndex(index)}
           onPressOut={() => setPressedIndex(null)}
           onPress={() =>
-            router.push({
-              pathname: "/(tabs)/renderItems/categories",
+            router.replace({
+              pathname: "/(tabs)/renderItems/category",
               params: { category: category.name },
             })
           }
