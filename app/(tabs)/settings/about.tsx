@@ -8,7 +8,7 @@ export default function Modal() {
     <View style={styles.container}>
       <Text>Modal screen</Text>
       {!isPresented && <Link href="../">Dismiss modal</Link>}
-      {/** */}
+      {/* Ios makes statusbar (time and wifi) dark on default so we need to adapt  */}
       <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />
     </View>
   );

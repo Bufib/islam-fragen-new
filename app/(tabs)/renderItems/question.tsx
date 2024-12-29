@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, useColorScheme } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { Stack } from "expo-router";
@@ -11,7 +11,6 @@ import {
   removeQuestionFromFavorite,
 } from "@/components/initializeDatabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import Toast from "react-native-toast-message";
 import { removeFavoriteToast, addFavoriteToast } from "@/constants/messages";
 import { useRefreshFavorites } from "@/hooks/useRefreshFavoritesStore";
 
@@ -25,7 +24,7 @@ export default function categories() {
     }>();
   const [isFavorite, setIsFavorite] = useState(false);
   const { triggerRefreshFavorites } = useRefreshFavorites();
-
+  const colorScheme = useColorScheme();
   // Check if question is favorite
   useEffect(() => {
     const checkIfFavorite = async () => {
@@ -80,22 +79,30 @@ export default function categories() {
       <Stack.Screen
         options={{
           headerTitle: questionTitle,
-          headerRight: () =>
-            isFavorite ? (
+          headerRight: () => (
+            <View style={styles.headerRightContainer}>
               <Ionicons
-                name="star"
-                size={28}
-                color={Colors.universal.favoriteIcon}
-                onPress={() => handleRemoveFavorite()}
+                name="text"
+                size={25}
+                color={colorScheme === "light" ? "black" : "white"}
               />
-            ) : (
-              <Ionicons
-                name="star-outline"
-                size={28}
-                color={Colors.universal.favoriteIcon}
-                onPress={() => handleAddFavorite()}
-              />
-            ),
+              {isFavorite ? (
+                <Ionicons
+                  name="star"
+                  size={28}
+                  color={Colors.universal.favoriteIcon}
+                  onPress={() => handleRemoveFavorite()}
+                />
+              ) : (
+                <Ionicons
+                  name="star-outline"
+                  size={28}
+                  color={Colors.universal.favoriteIcon}
+                  onPress={() => handleAddFavorite()}
+                />
+              )}
+            </View>
+          ),
         }}
       />
       <RenderQuestion
@@ -110,5 +117,11 @@ export default function categories() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  headerRightContainer: {
+    flexDirection: "row",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: 10,
   },
 });
