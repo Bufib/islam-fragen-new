@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { View, Pressable, StyleSheet, FlatList } from "react-native";
 import { coustomTheme } from "@/components/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
@@ -23,9 +23,9 @@ function RenderFavoriteQuestions() {
   const [isLoading, setIsLoading] = useState(true);
   const themeStyle = coustomTheme();
   const colorScheme = useColorScheme();
-  const {refreshTriggerFavorites } = useRefreshFavorites();
+  const { refreshTriggerFavorites } = useRefreshFavorites();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const loadQuestions = async () => {
       try {
         setIsLoading(true);

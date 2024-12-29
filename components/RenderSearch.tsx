@@ -15,6 +15,7 @@ import { coustomTheme } from "./coustomTheme";
 import Feather from "@expo/vector-icons/Feather";
 import { searchQuestions } from "./initializeDatabase";
 import { router } from "expo-router";
+import { Keyboard } from "react-native";
 
 type SearchResults = {
   id: number;
@@ -69,7 +70,10 @@ const RenderSearch = () => {
       >
         {item.category_name} {">"} {item.subcategory_name}
       </ThemedText>
-      <ThemedText style={styles.resultQuestion}>{item.title}</ThemedText>
+      <ThemedText style={styles.resultQuestionTitle}>{item.title}</ThemedText>
+      <ThemedText style={styles.resultQuestionQuestion} numberOfLines={1}>
+        {item.question}
+      </ThemedText>
     </Pressable>
   );
 
@@ -111,6 +115,8 @@ const RenderSearch = () => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
+            keyboardDismissMode="on-drag"
+            keyboardShouldPersistTaps="handled"
             ListEmptyComponent={
               searchText.trim() && !loading ? (
                 <ThemedText style={styles.noResultsText}>
@@ -130,7 +136,7 @@ export default RenderSearch;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 15,
+    gap: 10,
   },
   headerContainer: {
     flexDirection: "column",
@@ -170,9 +176,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#555",
   },
-  resultQuestion: {
+  resultQuestionTitle: {
     fontSize: 16,
     fontWeight: "600",
+  },
+  resultQuestionQuestion: {
+    fontSize: 14,
+    fontWeight: "400",
   },
   noResultsText: {
     textAlign: "center",

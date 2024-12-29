@@ -17,6 +17,9 @@ export const lightTheme = {
   searchResultCategory: {
     color: Colors.light.searchResultCategory,
   },
+  markdownText: {
+    color: Colors.light.text,
+  },
 };
 
 export const darkTheme = {
@@ -33,6 +36,9 @@ export const darkTheme = {
   },
   searchResultCategory: {
     color: Colors.dark.searchResultCategory,
+  },
+  markdownText: {
+    color: Colors.dark.text,
   },
 };
 

@@ -1,23 +1,31 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  FlatList,
-  ActivityIndicator,
-} from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import { StyleSheet, Text, View, Switch, Appearance } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useColorScheme } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme, Pressable } from "react-native";
 import { coustomTheme } from "@/components/coustomTheme";
-import Feather from "@expo/vector-icons/Feather";
+import Storage from "expo-sqlite/kv-store";
+import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
-
-const settings = () => {
+import { Linking } from "react-native";
+const Settings = () => {
   const colorScheme = useColorScheme();
+  const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const themeStyles = coustomTheme();
+
+  useEffect(() => {
+    const savedColorSetting = Storage.getItemSync("isDarkMode");
+    Appearance.setColorScheme(savedColorSetting === "true" ? "dark" : "light");
+  }, [isDarkMode]);
+
+  // Function to handle colorswitch
+  const toggleDarkMode = async () => {
+    Appearance.setColorScheme(isDarkMode ? "light" : "dark");
+    setIsDarkMode((prev) => !prev);
+    // isDarkMode changes after re-rendering (state) so I have to set it !isDarkMode
+    Storage.setItemSync("isDarkMode", `${!isDarkMode}`);
+  };
 
   return (
     <SafeAreaView
@@ -29,22 +37,94 @@ const settings = () => {
           Einstellungen
         </ThemedText>
       </ThemedView>
+
+      <ThemedView style={styles.contentContainer}>
+        <View style={styles.row}>
+          <ThemedText style={styles.label}>Dunkelmodus</ThemedText>
+          <Switch
+            value={isDarkMode}
+            onValueChange={toggleDarkMode}
+            trackColor={{
+              false: Colors.light.trackColor,
+              true: Colors.dark.trackColor,
+            }}
+            thumbColor={
+              isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
+            }
+          />
+        </View>
+
+        {/* Push everything down */}
+        <View style={{ flexGrow: 1 }} />
+
+        {/* Legal Links */}
+        <ThemedView style={styles.legalLinksContainer}>
+          <ThemedText
+            style={styles.linkText}
+            onPress={() =>
+              Linking.openURL(
+                "https://bufib.github.io/Islam-Fragen-App-rechtliches/datenschutz"
+              )
+            }
+          >
+            Datenschutz
+          </ThemedText>
+          <ThemedText
+            style={styles.linkText}
+            onPress={() => router.push("/settings/about")}
+          >
+            Über die App
+          </ThemedText>
+          <ThemedText
+            style={styles.linkText}
+            onPress={() => router.push("/settings/impressum")}
+          >
+            Impressum
+          </ThemedText>
+        </ThemedView>
+      </ThemedView>
     </SafeAreaView>
   );
 };
 
-export default settings;
+export default Settings;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 15,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   headerContainer: {
-    flexDirection: "column",
-    marginBottom: 10,
+    marginBottom: 20,
   },
   headerText: {
-    margin: 15,
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  contentContainer: {
+    flex: 1,
+    marginTop: 20,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.universal.borderBottomToggleSettings,
+  },
+  label: {
+    fontSize: 18,
+  },
+  legalLinksContainer: {
+    marginTop: 40,
+    alignItems: "center",
+  },
+  linkText: {
+    color: Colors.universal.link,
+    fontSize: 18,
+    marginBottom: 10,
+    textDecorationLine: "underline",
   },
 });

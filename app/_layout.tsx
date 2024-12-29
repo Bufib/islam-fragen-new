@@ -12,7 +12,9 @@ import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useInitializeDatabase } from "@/hooks/useInitializeDatabase.ts";
 import { SQLiteProvider } from "expo-sqlite";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
+import { Appearance } from "react-native";
+import { Storage } from "expo-sqlite/kv-store";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -24,6 +26,12 @@ export default function RootLayout() {
   });
   // Initialize database
   const dbInitialized = useInitializeDatabase();
+
+  // Musst be before 'if (!loaded || !dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
+  useEffect(() => {
+    const savedColorScheme = Storage.getItemSync("isDarkMode");
+    Appearance.setColorScheme(savedColorScheme === "true" ? "dark" : "light");
+  }, []);
 
   useEffect(() => {
     if (loaded && dbInitialized) {

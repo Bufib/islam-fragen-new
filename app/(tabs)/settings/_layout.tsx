@@ -18,9 +18,12 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
-       
         <Stack.Screen name="index" options={{ headerShown: false }} />
-      
+        <Stack.Screen
+          name="impressum"
+          options={{ headerShown: true, headerBackTitle: "Einstellungen" }}
+        />
+        <Stack.Screen name="about" options={{ presentation: "modal", headerTitle: "Über die App" }} />
       </Stack>
     </ThemeProvider>
   );

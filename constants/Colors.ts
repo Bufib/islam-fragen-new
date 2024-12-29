@@ -13,7 +13,8 @@ export const Colors = {
     backgroundColorTopBar: "#ecf0f1",
     borderColor: "#000000",
     searchResultCategory: "#555",
-  
+    trackColor: "#767577",
+    thumbColor: "#f4f3f4",
 
 
 
@@ -59,7 +60,8 @@ export const Colors = {
     backgroundColorTopBar: "#242c40",
     borderColor: "#d0d0c0",
     searchResultCategory: "#d0d0c0",
-
+    trackColor: "#81b0ff",
+    thumbColor: "#f4f3f4",
 
 
 
@@ -105,5 +107,6 @@ export const Colors = {
     favoriteIcon: "#fbc531",
     modalQuestionBlurredBackground: "rgba(0, 0, 0, 0.5)",
     arrowUp: "#2980b9",
+    borderBottomToggleSettings: '#ccc'
   }
 };
