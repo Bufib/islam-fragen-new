@@ -8,16 +8,16 @@ export default function useFetchNews() {
   const [updated, setUpdated] = useState(false); // Tracks if there's an update
 
   type NewsType = {
-    id: number; 
-    created_at: string; 
-    title: string; 
-    body_text: string; 
-    imageLink?: string | null; 
-    external_link?: string | null; 
-    internal_link?: string | null; 
-    is_pinned?: boolean | null; 
+    id: number;
+    created_at: string;
+    title: string;
+    body_text: string;
+    imageLink?: string | null;
+    external_link?: string | null;
+    internal_link?: string | null;
+    is_pinned?: boolean | null;
   };
-  
+
   // Fetch news from Supabase
   const fetchNewsFromSupabase = async () => {
     try {
@@ -27,7 +27,8 @@ export default function useFetchNews() {
       const { data: newsData, error } = await supabase
         .from("news")
         .select("*")
-        .limit(5);
+        .limit(5)
+        .order("created_at", { ascending: false });
 
       if (error) {
         setError(error.message);

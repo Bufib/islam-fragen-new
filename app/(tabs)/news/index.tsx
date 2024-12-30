@@ -1,64 +1,39 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  ActivityIndicator,
-  Pressable,
-} from "react-native";
-import React, { useState, useEffect } from "react";
+import { StyleSheet, FlatList, ActivityIndicator, Button } from "react-native";
+import React, { useState } from "react";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
 import { coustomTheme } from "@/components/coustomTheme";
-import Feather from "@expo/vector-icons/Feather";
-const newsData = [
-  {
-    id: "1",
-    title: "Neues Update veröffentlicht",
-    content:
-      "Wir haben einige aufregende neue Funktionen hinzugefügt. Schau sie dir an!",
-    date: "2024-12-30",
-  },
-  {
-    id: "2",
-    title: "Wartungsarbeiten geplant",
-    content:
-      "Am 02.01.2025 wird die App zwischen 00:00 und 03:00 Uhr nicht verfügbar sein.",
-    date: "2024-12-29",
-  },
-  {
-    id: "3",
-    title: "Community-Meilenstein erreicht",
-    content:
-      "Wir haben 10.000 aktive Nutzer erreicht! Vielen Dank für eure Unterstützung.",
-    date: "2024-12-28",
-  },
-];
+import useFetchNews from "@/hooks/useFetchNews";
 
-const NewsItem = ({ title, content, date }) => {
+const NewsItem = ({ title, body_text, created_at }) => {
   const themeStyles = coustomTheme();
+  const formattedDate = new Date(created_at).toISOString().split("T")[0]; // Format to "YYYY-MM-DD"
   return (
     <ThemedView style={[styles.newsItem, themeStyles.contrast]}>
       <ThemedText style={styles.newsTitle} type="defaultSemiBold">
         {title}
       </ThemedText>
-      <ThemedText style={styles.newsContent}>{content}</ThemedText>
-      <ThemedText style={styles.newsDate}>{date}</ThemedText>
+      <ThemedText style={styles.newsContent}>{body_text}</ThemedText>
+      <ThemedText style={styles.newsDate}>{formattedDate}</ThemedText>
     </ThemedView>
   );
 };
 
 const News = () => {
-  const colorScheme = useColorScheme();
+  const { news, loading, error, updated, refetch } = useFetchNews();
   const themeStyles = coustomTheme();
-  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 1;
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 10); // Simulating data loading
-    return () => clearTimeout(timer);
-  }, []);
+  const paginatedNews = news.slice(0, currentPage * itemsPerPage); // Limit displayed news
+
+  const loadMore = () => {
+    if (paginatedNews.length < news.length) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
 
   if (loading) {
     return (
@@ -71,28 +46,49 @@ const News = () => {
     );
   }
 
+  if (error) {
+    return (
+      <SafeAreaView
+        style={[styles.container, themeStyles.defaultBackgorundColor]}
+        edges={["top"]}
+      >
+        <ThemedText style={styles.errorText}>{error}</ThemedText>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView
       style={[styles.container, themeStyles.defaultBackgorundColor]}
       edges={["top"]}
     >
+      {updated && (
+        <ThemedView style={styles.updateContainer}>
+          <Button title="Neue Updates verfügbar" onPress={refetch} />
+        </ThemedView>
+      )}
       <ThemedView style={styles.headerContainer}>
         <ThemedText style={styles.headerText} type="title">
           Neuigkeiten
         </ThemedText>
       </ThemedView>
       <FlatList
-        data={newsData}
-        keyExtractor={(item) => item.id}
+        data={paginatedNews}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <NewsItem
             title={item.title}
-            content={item.content}
-            date={item.date}
+            body_text={item.body_text}
+            created_at={item.created_at}
           />
         )}
         contentContainerStyle={styles.newsList}
       />
+      {paginatedNews.length < news.length && (
+        <ThemedView style={styles.loadMoreContainer}>
+          <Button title="Mehr laden" onPress={loadMore} />
+        </ThemedView>
+      )}
     </SafeAreaView>
   );
 };
@@ -137,5 +133,18 @@ const styles = StyleSheet.create({
   newsDate: {
     fontSize: 12,
     color: "#888",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    margin: 20,
+  },
+  updateContainer: {
+    padding: 10,
+    marginBottom: 10,
+    alignItems: "center",
+  },
+  loadMoreContainer: {
+    alignItems: "center",
   },
 });
