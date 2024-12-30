@@ -11,6 +11,9 @@ import { useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
 import { Stack } from "expo-router";
 import { useFontSizeStore } from "@/stores/fontSizeStore";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import * as Clipboard from "expo-clipboard";
+import Feather from "@expo/vector-icons/Feather";
 
 type RenderQuestionProps = {
   category: string;
@@ -27,6 +30,10 @@ const RenderQuestion = ({
   const [isLoading, setIsLoading] = useState(true);
   const [question, setQuestion] = useState<QuestionType | null>(null);
   const { fontSize, lineHeight } = useFontSizeStore();
+  const colorScheme = useColorScheme();
+  const [hasCopiedSingleAnswer, setHasCopiedSingleAnswer] = useState(false);
+  const [hasCopiedKhamenei, setHasCopiedKhamenei] = useState(false);
+  const [hasCopiedSistani, setHasCopiedSistani] = useState(false);
 
   useEffect(() => {
     const loadQuestion = async () => {
@@ -56,6 +63,53 @@ const RenderQuestion = ({
     loadQuestion();
   }, [category, subcategory]);
 
+  const copyToClipboardMarja = async (
+    answer: string | undefined,
+    marja: string
+  ) => {
+    if (answer) {
+      if (marja === "khamenei") {
+        await Clipboard.setStringAsync(
+          `Gemäß der Ansicht von Sayid Khamenei: ${answer}`
+        );
+      } else {
+        await Clipboard.setStringAsync(
+          `Gemäß der Ansicht von Sayid Sistani: ${answer}`
+        );
+      }
+    } else {
+      console.warn("No text to copy");
+    }
+  };
+
+  const copyToClipboardSingleAnswer = async (answer: string | undefined) => {
+    if (answer) {
+      await Clipboard.setStringAsync(answer);
+    } else {
+      console.warn("No text to copy");
+    }
+  };
+
+  const copyIconChangeMarja = (marja: string) => {
+    if (marja === "khamenei") {
+      setHasCopiedKhamenei(true);
+      setTimeout(() => {
+        setHasCopiedKhamenei(false);
+      }, 1000);
+    } else {
+      setHasCopiedSistani(true);
+      setTimeout(() => {
+        setHasCopiedSistani(false);
+      }, 1000);
+    }
+  };
+
+  const copyIconChangeSingleAnswer = () => {
+    setHasCopiedSingleAnswer(true);
+    setTimeout(() => {
+      setHasCopiedSingleAnswer(false);
+    }, 1000);
+  };
   return (
     <ScrollView
       style={[styles.scrollViewStyles, themeStyles.defaultBackgorundColor]}
@@ -70,21 +124,97 @@ const RenderQuestion = ({
       <View style={styles.answerContainer}>
         {question?.answer ? (
           <ThemedView style={[styles.singleAnswer, themeStyles.contrast]}>
-            <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
-              {question?.answer}
-            </ThemedText>
+            <View style={styles.textIconContainer}>
+              {hasCopiedSingleAnswer ? (
+                <View style={styles.hasCopiedContainer}>
+                  <Feather
+                    name="check"
+                    size={24}
+                    color={colorScheme === "dark" ? "white" : "black"}
+                  />
+                  <ThemedText>Kopiert!</ThemedText>
+                </View>
+              ) : (
+                <AntDesign
+                  name="copy1"
+                  size={24}
+                  color={colorScheme === "dark" ? "white" : "black"}
+                  style={styles.copyIcon}
+                  onPress={() => {
+                    copyToClipboardSingleAnswer(question?.answer);
+                    copyIconChangeSingleAnswer();
+                  }}
+                />
+              )}
+              <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
+                {question?.answer}
+              </ThemedText>
+            </View>
           </ThemedView>
         ) : (
           <>
             <Collapsible title="Sayid al-Khamenei" marja="khamenei">
-              <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
-                {question?.answer_khamenei}
-              </ThemedText>
+              <View style={styles.textIconContainer}>
+                {hasCopiedKhamenei ? (
+                  <View style={styles.hasCopiedContainer}>
+                    <Feather
+                      name="check"
+                      size={24}
+                      color={colorScheme === "dark" ? "white" : "black"}
+                    />
+                    <ThemedText>Kopiert!</ThemedText>
+                  </View>
+                ) : (
+                  <AntDesign
+                    name="copy1"
+                    size={24}
+                    color={colorScheme === "dark" ? "white" : "black"}
+                    style={styles.copyIcon}
+                    onPress={() => {
+                      copyToClipboardMarja(
+                        question?.answer_khamenei,
+                        "khamenei"
+                      );
+                      copyIconChangeMarja("khamenei");
+                    }}
+                  />
+                )}
+                <ThemedText
+                  style={[styles.answerText, { fontSize, lineHeight }]}
+                >
+                  {question?.answer_khamenei}
+                </ThemedText>
+              </View>
             </Collapsible>
             <Collapsible title="Sayid as-Sistani" marja="sistani">
-              <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
-                {question?.answer_sistani}
-              </ThemedText>
+              <View style={styles.textIconContainer}>
+                {hasCopiedSistani ? (
+                  <View style={styles.hasCopiedContainer}>
+                    <Feather
+                      name="check"
+                      size={24}
+                      color={colorScheme === "dark" ? "white" : "black"}
+                    />
+                    <ThemedText>Kopiert!</ThemedText>
+                  </View>
+                ) : (
+                  <AntDesign
+                    name="copy1"
+                    size={24}
+                    color={colorScheme === "dark" ? "white" : "black"}
+                    style={styles.copyIcon}
+                    onPress={() => {
+                      copyToClipboardMarja(question?.answer_sistani, "sistani");
+                      copyIconChangeMarja("sistani");
+                    }}
+                  />
+                )}
+                <ThemedText
+                  style={[styles.answerText, { fontSize, lineHeight }]}
+                >
+                  {question?.answer_sistani}
+                </ThemedText>
+              </View>
             </Collapsible>
           </>
         )}
@@ -122,9 +252,21 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 8,
     borderBottomLeftRadius: 8,
   },
-
   questionText: {
     textAlign: "center",
   },
   answerText: {},
+  textIconContainer: {
+    flexDirection: "column",
+    gap: 10,
+  },
+  hasCopiedContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 7,
+    backgroundColor: "transparent",
+  },
+  copyIcon: {
+    alignSelf: "flex-end",
+  },
 });

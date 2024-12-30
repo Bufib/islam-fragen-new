@@ -1,5 +1,5 @@
 import { PropsWithChildren, useState } from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
@@ -18,6 +18,7 @@ export function Collapsible({
   const theme = useColorScheme() ?? "light";
   const themeStyles = coustomTheme();
   const { fontSize } = useFontSizeStore();
+  const colorScheme = useColorScheme();
 
   return (
     <ThemedView>
@@ -44,6 +45,7 @@ export function Collapsible({
             style={styles.image}
           />
         )}
+
         <ThemedText type="defaultSemiBold" style={{ fontSize }}>
           {title}
         </ThemedText>
