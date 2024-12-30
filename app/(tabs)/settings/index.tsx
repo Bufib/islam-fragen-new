@@ -98,10 +98,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     marginBottom: 20,
   },
-  headerText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
+  headerText: {},
   contentContainer: {
     flex: 1,
     marginTop: 20,
@@ -125,6 +122,5 @@ const styles = StyleSheet.create({
     color: Colors.universal.link,
     fontSize: 18,
     marginBottom: 10,
-    textDecorationLine: "underline",
   },
 });

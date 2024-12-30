@@ -15,10 +15,11 @@ import { SQLiteProvider } from "expo-sqlite";
 import Toast from "react-native-toast-message";
 import { Appearance } from "react-native";
 import { Storage } from "expo-sqlite/kv-store";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
+const queryClient = new QueryClient();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
@@ -45,6 +46,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <QueryClientProvider client={queryClient}>
       <SQLiteProvider databaseName="islam-fragen.db">
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -52,6 +54,7 @@ export default function RootLayout() {
         </Stack>
         <StatusBar style="auto" />
       </SQLiteProvider>
+      </QueryClientProvider>
       <Toast />
     </ThemeProvider>
   );
