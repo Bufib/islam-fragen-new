@@ -47,7 +47,7 @@ export default function impressum() {
   const themeStyles = coustomTheme();
 
   return (
-    <ThemedView style={[styles.container, themeStyles.defaultBackgorundColor]} edges={["top"]}>
+    <ThemedView style={[styles.container, themeStyles.defaultBackgorundColor]}>
       <ScrollView style={styles.textContainer}>
         <Markdown
           style={{

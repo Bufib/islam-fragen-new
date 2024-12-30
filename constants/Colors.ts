@@ -1,5 +1,5 @@
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const tintColorLight = "#0a7ea4";
+const tintColorDark = "#fff";
 
 export const Colors = {
   light: {
@@ -9,12 +9,14 @@ export const Colors = {
     tabIconDefault: "#ccc",
     tabIconSelected: tintColorLight,
     contrast: "#FFFFFF",
-    indicatorStyleTopBar: '#000000',
+    indicatorStyleTopBar: "#000000",
     backgroundColorTopBar: "#ecf0f1",
     borderColor: "#000000",
     searchResultCategory: "#555",
     trackColor: "#767577",
     thumbColor: "#f4f3f4",
+    modalQuestionText: "#000000",
+
 
 
 
@@ -42,26 +44,27 @@ export const Colors = {
     downloadIcon: "#000000",
     fontSizeIcon: "#000000",
     modalQuestion: "#FFFFFF",
-    modalQuestionText: "#000000",
-    modalQuestionBlurredBackground: "rgba(0, 0, 0, 0.5)",  // Delete
+    modalQuestionBlurredBackground: "rgba(0, 0, 0, 0.5)", // Delete
     inverseText: "#000000",
-    inverseTextIndex:  "#FFFFFF",
-    inverseTextPicker:  "#FFFFFF",
+    inverseTextIndex: "#FFFFFF",
+    inverseTextPicker: "#FFFFFF",
     inverseQuestionText: "rgba(0, 0, 0, 1)",
-    pickerContainerBorder: "#000000"
+    pickerContainerBorder: "#000000",
   },
   dark: {
     text: "#d0d0c0",
     background: "#242c40",
+    contrast: "#34495e",
     tint: tintColorDark,
     tabIconDefault: "#ccc",
     tabIconSelected: tintColorDark,
-    indicatorStyleTopBar: '#ffffff',
+    indicatorStyleTopBar: "#ffffff",
     backgroundColorTopBar: "#242c40",
     borderColor: "#d0d0c0",
     searchResultCategory: "#d0d0c0",
     trackColor: "#81b0ff",
     thumbColor: "#f4f3f4",
+    modalQuestionText: "#d0d0c0",
 
 
 
@@ -75,7 +78,7 @@ export const Colors = {
     favoriteIcon: "#fbc531",
     black: "#000000",
     link: "rgb(10, 132, 255)", // Delete
-    contrast: "#34495e",
+    
     addNewsButton: "#d0d0c0",
     tabbarIcon: "##000000",
     categorieBackground: "#96BFCC",
@@ -92,13 +95,12 @@ export const Colors = {
     downloadIcon: "#FFFFFF",
     fontSizeIcon: "#FFFFFF",
     modalQuestion: "#34495e",
-    modalQuestionText: "#FFFFFF",
     modalQuestionBlurredBackground: "rgba(0, 0, 0, 0.5)", // Delete
     inverseText: "#FFFFFF",
     inverseTextIndex: "#000000",
-    inverseTextPicker:  "#000000",
+    inverseTextPicker: "#000000",
     inverseQuestionText: "rgba(255, 255, 255, 1)",
-    pickerContainerBorder: "#FFFFFF"
+    pickerContainerBorder: "#FFFFFF",
   },
   universal: {
     white: "#ffffff",
@@ -107,6 +109,6 @@ export const Colors = {
     favoriteIcon: "#fbc531",
     modalQuestionBlurredBackground: "rgba(0, 0, 0, 0.5)",
     arrowUp: "#2980b9",
-    borderBottomToggleSettings: '#ccc'
-  }
+    borderBottomToggleSettings: "#ccc",
+  },
 };

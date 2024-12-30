@@ -14,6 +14,7 @@ import { useFontSizeStore } from "@/stores/fontSizeStore";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as Clipboard from "expo-clipboard";
 import Feather from "@expo/vector-icons/Feather";
+import Markdown from "react-native-markdown-display";
 
 type RenderQuestionProps = {
   category: string;
@@ -146,9 +147,17 @@ const RenderQuestion = ({
                   }}
                 />
               )}
-              <ThemedText style={[styles.answerText, { fontSize, lineHeight }]}>
-                {question?.answer}
-              </ThemedText>
+              <Markdown
+                style={{
+                  body: {
+                    ...themeStyles.markdownText,
+                    fontSize: fontSize,
+                    lineHeight: lineHeight,
+                  },
+                }}
+              >
+                {question?.answer || "Antwort wird geladen"}
+              </Markdown>
             </View>
           </ThemedView>
         ) : (
@@ -179,11 +188,17 @@ const RenderQuestion = ({
                     }}
                   />
                 )}
-                <ThemedText
-                  style={[styles.answerText, { fontSize, lineHeight }]}
-                >
-                  {question?.answer_khamenei}
-                </ThemedText>
+                <Markdown
+                style={{
+                  body: {
+                    ...themeStyles.markdownText,
+                    fontSize: fontSize,
+                    lineHeight: lineHeight,
+                  },
+                }}
+              >
+                {question?.answer_khamenei || "Antwort wird geladen"}
+              </Markdown>
               </View>
             </Collapsible>
             <Collapsible title="Sayid as-Sistani" marja="sistani">
@@ -209,11 +224,17 @@ const RenderQuestion = ({
                     }}
                   />
                 )}
-                <ThemedText
-                  style={[styles.answerText, { fontSize, lineHeight }]}
-                >
-                  {question?.answer_sistani}
-                </ThemedText>
+                <Markdown
+                style={{
+                  body: {
+                    ...themeStyles.markdownText,
+                    fontSize: fontSize,
+                    lineHeight: lineHeight,
+                  },
+                }}
+              >
+                {question?.answer_sistani || "Antwort wird geladen"}
+              </Markdown>
               </View>
             </Collapsible>
           </>
