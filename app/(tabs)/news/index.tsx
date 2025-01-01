@@ -1,10 +1,5 @@
 import React, { useRef } from "react";
-import {
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  Button,
-} from "react-native";
+import { StyleSheet, FlatList, ActivityIndicator, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -71,8 +66,8 @@ export default function NewsFeed() {
     >
       {updated && (
         <ThemedView style={styles.updateContainer}>
-          <Button 
-            title="Neuer Beitrag verfügbar" 
+          <Button
+            title="Neuer Beitrag verfügbar"
             onPress={handleRefreshAndScroll}
           />
         </ThemedView>
@@ -90,8 +85,12 @@ export default function NewsFeed() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <NewsItem
+            id={item.id}
             title={item.title ?? ""}
             body_text={item.body_text ?? ""}
+            image_url={item.image_url ?? []}
+            external_url={item.external_url ?? []}
+            internal_url={item.internal_url ?? []}
             created_at={item.created_at}
           />
         )}
@@ -130,6 +129,5 @@ const styles = StyleSheet.create({
   loadMoreContainer: {
     alignItems: "center",
   },
-  footerComponent: {
-  },
+  footerComponent: {},
 });

@@ -110,5 +110,7 @@ export const Colors = {
     modalQuestionBlurredBackground: "rgba(0, 0, 0, 0.5)",
     arrowUp: "#2980b9",
     borderBottomToggleSettings: "#ccc",
+    created_atTextColor: "#888",
+
   },
 };
