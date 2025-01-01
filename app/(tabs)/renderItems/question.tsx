@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { Stack } from "expo-router";
 import RenderQuestion from "@/components/RenderQuestion";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Colors } from "@/constants/Colors";
 import {
   isQuestionInFavorite,

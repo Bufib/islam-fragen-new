@@ -1,14 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Pressable } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
 import { NewsItemType } from "@/hooks/useFetchNews";
 import { Colors } from "@/constants/Colors";
-import { formateDate } from "./FormateDate";
-import * as WebBrowser from "expo-web-browser";
-import Feather from "@expo/vector-icons/Feather";
+import { formateDate } from "./formateDate";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
+import RenderLinkNewsItem from "@/components/RenderLinkNewsItem";
 
 export const NewsItem = ({
   id,
@@ -22,14 +21,6 @@ export const NewsItem = ({
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
 
-  const handleOpenLink = async (url: string) => {
-    try {
-      await WebBrowser.openBrowserAsync(url);
-    } catch (error) {
-      console.error("Error opening URL:", error);
-    }
-  };
-
   return (
     <ThemedView style={[styles.newsItem, themeStyles.contrast]}>
       {title && title.trim() !== "" && (
@@ -41,28 +32,31 @@ export const NewsItem = ({
         <ThemedText style={styles.newsContent}>{body_text}</ThemedText>
       )}
 
-      {external_url && external_url.length > 0 ? (
+      {external_url && external_url.length > 0 && (
         <ThemedView style={styles.linksContainer}>
           {external_url.map((url, index) => (
-            <Pressable
+            <RenderLinkNewsItem
               key={index}
-              style={({ pressed }) => [
-                styles.linkButton,
-                pressed && styles.linkButtonPressed,
-              ]}
-              onPress={() => handleOpenLink(url)}
-            >
-              <Feather
-                name="external-link"
-                size={14}
-                color={colorScheme === "dark" ? "white" : "black"}
-                style={{ paddingRight: 5 }}
-              />
-              <ThemedText style={styles.linkText}>{url}</ThemedText>
-            </Pressable>
+              url={url}
+              index={index}
+              isExternal={true}
+            />
           ))}
         </ThemedView>
-      ) : null}
+      )}
+
+      {internal_url && internal_url.length > 0 && (
+        <ThemedView style={styles.linksContainer}>
+          {internal_url.map((url, index) => (
+            <RenderLinkNewsItem
+              key={index}
+              url={url}
+              index={index}
+              isExternal={false}
+            />
+          ))}
+        </ThemedView>
+      )}
       <ThemedText style={styles.newsDate}>{formateDate(created_at)}</ThemedText>
     </ThemedView>
   );
@@ -100,5 +94,6 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 14,
     color: Colors.universal.link,
+    flex: 1,
   },
 });

@@ -203,7 +203,9 @@ const createFavoritesTable = async () => {
   `);
 };
 
-export const addQuestionToFavorite = async (questionId: number): Promise<void> => {
+export const addQuestionToFavorite = async (
+  questionId: number
+): Promise<void> => {
   try {
     const db = await SQLite.openDatabaseAsync("islam-fragen.db");
     await db.runAsync(
@@ -219,7 +221,9 @@ export const addQuestionToFavorite = async (questionId: number): Promise<void> =
   }
 };
 
-export const removeQuestionFromFavorite = async (questionId: number): Promise<void> => {
+export const removeQuestionFromFavorite = async (
+  questionId: number
+): Promise<void> => {
   try {
     const db = await SQLite.openDatabaseAsync("islam-fragen.db");
     await db.runAsync(
@@ -235,7 +239,9 @@ export const removeQuestionFromFavorite = async (questionId: number): Promise<vo
   }
 };
 
-export const isQuestionInFavorite = async (questionId: number): Promise<boolean> => {
+export const isQuestionInFavorite = async (
+  questionId: number
+): Promise<boolean> => {
   try {
     const db = await SQLite.openDatabaseAsync("islam-fragen.db");
     const result = await db.getFirstAsync<{ count: number }>(
@@ -271,7 +277,6 @@ export const getFavoriteQuestions = async (): Promise<QuestionType[]> => {
     throw error;
   }
 };
-
 
 const deleteQuestionFromSQLite = async (questionId: number) => {
   const db = await SQLite.openDatabaseAsync("islam-fragen.db");
@@ -337,6 +342,24 @@ export const getQuestion = async (
   }
 };
 
+export const getQuestionInternalURL = async (
+  questionTitle: string
+): Promise<QuestionType> => {
+  try {
+    const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+
+    // Query to fetch questions for the given subcategory
+    const rows = await db.getAllAsync<QuestionType>(
+      "SELECT * FROM question WHERE title = ?;",
+      [questionTitle]
+    );
+    return rows[0];
+  } catch (error) {
+    console.error("Error fetching question:", error);
+    throw error;
+  }
+};
+
 export const searchQuestions = async (
   searchTerm: string
 ): Promise<
@@ -346,7 +369,6 @@ export const searchQuestions = async (
     subcategory_name: string;
     question: string;
     title: string;
-
   }[]
 > => {
   try {
