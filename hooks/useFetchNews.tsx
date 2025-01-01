@@ -1,95 +1,91 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/utils/supabase";
+import { useState, useEffect } from 'react';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/utils/supabase';
 
-export default function useFetchNews() {
-  const [news, setNews] = useState<NewsType[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [updated, setUpdated] = useState(false); // Tracks if there's an update
+export type NewsItemType = { 
+id: number;
+created_at: string;
+title?: string;
+body_text? :string;
+image_url?: string[];
+external_url?: string[];
+internal_url?: string[];
+is_pinned?: boolean;
 
-  type NewsType = {
-    id: number;
-    created_at: string;
-    title: string;
-    body_text: string;
-    imageLink?: string | null;
-    external_link?: string | null;
-    internal_link?: string | null;
-    is_pinned?: boolean | null;
-  };
+}
+const PAGE_SIZE = 5;
 
-  // Fetch news from Supabase
-  const fetchNewsFromSupabase = async () => {
-    try {
-      setLoading(true);
-      setError("");
+export const useFetchNews = () => {
+  const queryClient = useQueryClient();
+  const [showUpdateButton, setShowUpdateButton] = useState<boolean>(false);
+  const [hasNewData, setHasNewData] = useState<boolean>(false);
+  
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    refetch
+  } = useInfiniteQuery({
+    queryKey: ['news'],
+    queryFn: async ({ pageParam = 0 }): Promise<NewsItemType[]> => {
+      const { data, error } = await supabase
+        .from('news')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .range(pageParam * PAGE_SIZE, (pageParam + 1) * PAGE_SIZE - 1);
 
-      const { data: newsData, error } = await supabase
-        .from("news")
-        .select("*")
-        .limit(5)
-        .order("created_at", { ascending: false });
+        console.log(data?.length)
+      if (error) throw error;
+      return data as NewsItemType[];
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages): number | undefined => {
+      return lastPage.length === PAGE_SIZE ? allPages.length : undefined;
+    },
+    staleTime: 86400,
+    gcTime: Infinity,
+  });
 
-      if (error) {
-        setError(error.message);
-        console.error("Error fetching news from Supabase:", error.message);
-        return;
-      }
-
-      if (!newsData || newsData.length === 0) {
-        console.log("No news found in Supabase.");
-        setNews([]);
-        return;
-      }
-
-      setNews(newsData);
-    } catch (err) {
-      console.error("Error in fetching news:", err);
-      setError("Error in fetching news.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Setup Supabase subscriptions
-  const setupSubscriptions = () => {
-    const subscription = supabase
-      .channel("news")
+  useEffect(() => {
+    const channel = supabase
+      .channel('news_changes')
       .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "news" },
-        async (payload) => {
-          console.log("Change received!", payload);
-
-          // Notify about updates
-          setUpdated(true);
-
-          // Refetch news after an update
-          await fetchNewsFromSupabase();
-
-          // Reset the update flag after notifying
-          setTimeout(() => setUpdated(false), 3000); // Notify for 3 seconds
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'news'
+        },
+        () => {
+          setHasNewData(true);
+          setShowUpdateButton(true);
         }
       )
       .subscribe();
 
-    // Cleanup subscription on unmount
     return () => {
-      supabase.removeChannel(subscription);
-    };
-  };
-
-  // Use useEffect for initialization
-  useEffect(() => {
-    fetchNewsFromSupabase();
-    const unsubscribe = setupSubscriptions();
-
-    // Cleanup on unmount
-    return () => {
-      unsubscribe();
+      channel.unsubscribe();
     };
   }, []);
 
-  // Return the state and a refetch function
-  return { news, loading, error, updated, refetch: fetchNewsFromSupabase };
-}
+  const handleRefresh = async (): Promise<void> => {
+    await queryClient.resetQueries({ queryKey: ['news'] });
+    await refetch();
+    setShowUpdateButton(false);
+    setHasNewData(false);
+  };
+
+  const allNews = data?.pages.flatMap(page => page) ?? [];
+
+  return {
+    allNews,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    showUpdateButton,
+    hasNewData,
+    handleRefresh
+  };
+};
