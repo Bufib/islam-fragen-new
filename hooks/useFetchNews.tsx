@@ -2,31 +2,33 @@ import { useState, useEffect } from 'react';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/utils/supabase';
 
-export type NewsItemType = { 
-id: number;
-created_at: string;
-title?: string;
-body_text? :string;
-image_url?: string[];
-external_url?: string[];
-internal_url?: string[];
-is_pinned?: boolean;
-
+export type NewsItemType = {
+  id: number;
+  created_at: string;
+  title?: string;
+  body_text?: string;
+  image_url?: string[];
+  external_url?: string[];
+  internal_url?: string[];
+  is_pinned?: boolean;
 }
+
 const PAGE_SIZE = 5;
+const MAX_PAGES = 4; // This will store up to 20 news items (4 pages * 5 items)
 
 export const useFetchNews = () => {
   const queryClient = useQueryClient();
   const [showUpdateButton, setShowUpdateButton] = useState<boolean>(false);
   const [hasNewData, setHasNewData] = useState<boolean>(false);
-  
+
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-    refetch
+    refetch,
+    isRefetching,
   } = useInfiniteQuery({
     queryKey: ['news'],
     queryFn: async ({ pageParam = 0 }): Promise<NewsItemType[]> => {
@@ -36,7 +38,6 @@ export const useFetchNews = () => {
         .order('created_at', { ascending: false })
         .range(pageParam * PAGE_SIZE, (pageParam + 1) * PAGE_SIZE - 1);
 
-        console.log(data?.length)
       if (error) throw error;
       return data as NewsItemType[];
     },
@@ -44,7 +45,8 @@ export const useFetchNews = () => {
     getNextPageParam: (lastPage, allPages): number | undefined => {
       return lastPage.length === PAGE_SIZE ? allPages.length : undefined;
     },
-    staleTime: 86400,
+    maxPages: MAX_PAGES, // New option in v5
+    staleTime: 86400, // 24 hours
     gcTime: Infinity,
   });
 
@@ -71,8 +73,13 @@ export const useFetchNews = () => {
   }, []);
 
   const handleRefresh = async (): Promise<void> => {
-    await queryClient.resetQueries({ queryKey: ['news'] });
-    await refetch();
+    if (hasNewData) {
+      // Only invalidate the first page when new data arrives
+      await queryClient.invalidateQueries({ 
+        queryKey: ['news'],
+        refetchType: 'all' 
+      });
+    }
     setShowUpdateButton(false);
     setHasNewData(false);
   };
@@ -86,6 +93,7 @@ export const useFetchNews = () => {
     fetchNextPage,
     showUpdateButton,
     hasNewData,
-    handleRefresh
+    handleRefresh,
+    isRefetching,
   };
 };

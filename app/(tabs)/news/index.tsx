@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
   Button,
-  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
@@ -12,6 +11,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
 import { useFetchNews } from "@/hooks/useFetchNews";
 import { NewsItem } from "@/components/NewsItem";
+
 export default function NewsFeed() {
   const {
     allNews: news,
@@ -20,15 +20,20 @@ export default function NewsFeed() {
     fetchNextPage,
     showUpdateButton: updated,
     handleRefresh: refetch,
+    isRefetching,
   } = useFetchNews();
 
   const themeStyles = coustomTheme();
+  const flatListRef = useRef<FlatList>(null);
+
+  const handleRefreshAndScroll = async () => {
+    await refetch();
+    // Scroll to top after refetch
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  };
 
   const ListFooter = () => {
-    // Only show footer if there's more content to load
-    if (!hasNextPage) {
-      return null;
-    }
+    if (!hasNextPage) return null;
 
     return (
       <ThemedView style={styles.loadMoreContainer}>
@@ -66,7 +71,10 @@ export default function NewsFeed() {
     >
       {updated && (
         <ThemedView style={styles.updateContainer}>
-          <Button title="Neuer Beitrag verfügbar" onPress={refetch} />
+          <Button 
+            title="Neuer Beitrag verfügbar" 
+            onPress={handleRefreshAndScroll}
+          />
         </ThemedView>
       )}
 
@@ -77,6 +85,7 @@ export default function NewsFeed() {
       </ThemedView>
 
       <FlatList
+        ref={flatListRef}
         data={news}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
@@ -97,7 +106,7 @@ export default function NewsFeed() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 10, // distance between header and news list
+    gap: 10,
   },
   headerContainer: {
     flexDirection: "column",
