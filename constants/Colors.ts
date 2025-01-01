@@ -16,7 +16,7 @@ export const Colors = {
     trackColor: "#767577",
     thumbColor: "#f4f3f4",
     modalQuestionText: "#000000",
-
+    activityIndicator: "#000000",
 
 
 
@@ -35,7 +35,6 @@ export const Colors = {
     indexBorderDash: "#DDC092",
     backgroundIndexHeader: "#59aabf",
     shadowColor: "#000000",
-    activityIndicator: "#009432",
     arrowUp: "#2980b9", // Delete
     trashIcon: "#BA2F16",
     characterCountNewsImage: "#000000",
@@ -65,6 +64,8 @@ export const Colors = {
     trackColor: "#81b0ff",
     thumbColor: "#f4f3f4",
     modalQuestionText: "#d0d0c0",
+    activityIndicator: "#ffffff",
+
 
 
 
@@ -86,7 +87,6 @@ export const Colors = {
     indexBorderDash: "#DDC092",
     backgroundIndexHeader: "#59aabf",
     shadowColor: "#FFFFFF",
-    activityIndicator: "#009432",
     arrowUp: "#2980b9", // Delete
     trashIcon: "#D63031",
     characterCountNewsImage: "#FFFFFF",

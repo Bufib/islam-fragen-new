@@ -20,6 +20,10 @@ export const lightTheme = {
   markdownText: {
     color: Colors.light.text,
   },
+  activityIndicator: {
+    color: Colors.light.activityIndicator,
+  }
+
  
 };
 
@@ -41,7 +45,9 @@ export const darkTheme = {
   markdownText: {
     color: Colors.dark.text,
   },
-
+  activityIndicator: {
+    color: Colors.dark.activityIndicator,
+  }
 };
 
 export const coustomTheme = () => {

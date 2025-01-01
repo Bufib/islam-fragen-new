@@ -1,13 +1,18 @@
 import React from "react";
-import { StyleSheet, FlatList, ActivityIndicator, Button } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Button,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
 import { useFetchNews } from "@/hooks/useFetchNews";
 import { NewsItem } from "@/components/NewsItem";
-
-export default function () {
+export default function NewsFeed() {
   const {
     allNews: news,
     isFetchingNextPage,
@@ -19,13 +24,37 @@ export default function () {
 
   const themeStyles = coustomTheme();
 
+  const ListFooter = () => {
+    // Only show footer if there's more content to load
+    if (!hasNextPage) {
+      return null;
+    }
+
+    return (
+      <ThemedView style={styles.loadMoreContainer}>
+        {isFetchingNextPage ? (
+          <ActivityIndicator
+            size="small"
+            color={themeStyles.activityIndicator.color}
+          />
+        ) : (
+          <Button title="Mehr laden" onPress={() => fetchNextPage()} />
+        )}
+      </ThemedView>
+    );
+  };
+
   if (!news || news.length === 0) {
     return (
       <SafeAreaView
         style={[styles.container, themeStyles.defaultBackgorundColor]}
         edges={["top"]}
       >
-        <ActivityIndicator size="large" color="#0000ff" style={styles.loader} />
+        <ActivityIndicator
+          size="large"
+          color={themeStyles.activityIndicator.color}
+          style={styles.loader}
+        />
       </SafeAreaView>
     );
   }
@@ -37,7 +66,7 @@ export default function () {
     >
       {updated && (
         <ThemedView style={styles.updateContainer}>
-          <Button title="Neue Updates verfügbar" onPress={refetch} />
+          <Button title="Neuer Beitrag verfügbar" onPress={refetch} />
         </ThemedView>
       )}
 
@@ -58,23 +87,9 @@ export default function () {
           />
         )}
         contentContainerStyle={styles.newsList}
-        onEndReached={() => {
-          if (hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-          }
-        }}
-        onEndReachedThreshold={0.5}
+        ListFooterComponent={ListFooter}
+        ListFooterComponentStyle={styles.footerComponent}
       />
-
-      {hasNextPage && (
-        <ThemedView style={styles.loadMoreContainer}>
-          <Button
-            title="Mehr laden"
-            onPress={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-          />
-        </ThemedView>
-      )}
     </SafeAreaView>
   );
 }
@@ -82,14 +97,14 @@ export default function () {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 15,
+    gap: 10, // distance between header and news list
   },
   headerContainer: {
     flexDirection: "column",
-    marginBottom: 10,
   },
   headerText: {
-    margin: 15,
+    marginTop: 15,
+    marginHorizontal: 15,
   },
   loader: {
     flex: 1,
@@ -99,17 +114,13 @@ const styles = StyleSheet.create({
   newsList: {
     padding: 15,
   },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    margin: 20,
-  },
   updateContainer: {
     padding: 10,
-    marginBottom: 10,
     alignItems: "center",
   },
   loadMoreContainer: {
     alignItems: "center",
+  },
+  footerComponent: {
   },
 });
