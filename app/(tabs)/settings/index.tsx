@@ -9,11 +9,13 @@ import Storage from "expo-sqlite/kv-store";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 import { Linking } from "react-native";
-import Entypo from '@expo/vector-icons/Entypo';
+import Entypo from "@expo/vector-icons/Entypo";
+import { useAuthStore } from "@/components/authStore";
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const themeStyles = coustomTheme();
+  const { isLoggedIn, restoreSession, clearSession } = useAuthStore();
 
   useEffect(() => {
     const savedColorSetting = Storage.getItemSync("isDarkMode");
@@ -37,8 +39,21 @@ const Settings = () => {
         <ThemedText style={styles.headerText} type="title">
           Einstellungen
         </ThemedText>
-        <Entypo name="login" size={24} color="black" onPress={() => router.push("/(tabs)/renderItems/login")}/>
-        <Entypo name="log-out" size={24} color="black" />
+
+        {isLoggedIn ? (
+          <Entypo
+            name="log-out"
+            size={24}
+            color={colorScheme === "dark" ? "white" : "black"}
+          />
+        ) : (
+          <Entypo
+            name="login"
+            size={24}
+            color={colorScheme === "dark" ? "white" : "black"}
+            onPress={() => router.push("/(tabs)/renderItems/login")}
+          />
+        )}
       </ThemedView>
 
       <ThemedView style={styles.contentContainer}>
@@ -102,7 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center"
+    alignItems: "center",
   },
   headerText: {},
   contentContainer: {
