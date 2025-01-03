@@ -14,6 +14,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuthStore } from "@/components/authStore";
 import { coustomTheme } from "@/components/coustomTheme";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type LoginFormValues = {
   email: string;
@@ -42,9 +43,10 @@ export default function LoginScreen() {
 
     if (error) {
       Alert.alert("Login Error", error.message);
-    } else {
+    } else if (data.session) {
+      setSession(data.session);
       if (stayLoggedIn) {
-        setSession(data.session);
+        await AsyncStorage.setItem("supabase_session", JSON.stringify(data.session));
       }
       Alert.alert("Success", "Welcome back!");
     }

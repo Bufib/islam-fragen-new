@@ -11,6 +11,8 @@ import { router } from "expo-router";
 import { Linking } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuthStore } from "@/components/authStore";
+import handleLogout from "@/components/handleLogout";
+
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
@@ -30,6 +32,7 @@ const Settings = () => {
     Storage.setItemSync("isDarkMode", `${!isDarkMode}`);
   };
 
+  
   return (
     <SafeAreaView
       style={[styles.container, themeStyles.defaultBackgorundColor]}
@@ -45,6 +48,8 @@ const Settings = () => {
             name="log-out"
             size={24}
             color={colorScheme === "dark" ? "white" : "black"}
+            onPress={handleLogout}
+
           />
         ) : (
           <Entypo

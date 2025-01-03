@@ -15,7 +15,8 @@ import { SQLiteProvider } from "expo-sqlite";
 import Toast from "react-native-toast-message";
 import { Appearance } from "react-native";
 import { Storage } from "expo-sqlite/kv-store";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useAuthStore } from "@/components/authStore";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -27,12 +28,16 @@ export default function RootLayout() {
   });
   // Initialize database
   const dbInitialized = useInitializeDatabase();
-
+  const { restoreSession } = useAuthStore();
   // Musst be before 'if (!loaded || !dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
   useEffect(() => {
     const savedColorScheme = Storage.getItemSync("isDarkMode");
     Appearance.setColorScheme(savedColorScheme === "true" ? "dark" : "light");
   }, []);
+
+  useEffect(() => {
+    restoreSession(); // Automatically restore session
+  }, [restoreSession]);
 
   useEffect(() => {
     if (loaded && dbInitialized) {
@@ -47,13 +52,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
-      <SQLiteProvider databaseName="islam-fragen.db">
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </SQLiteProvider>
+        <SQLiteProvider databaseName="islam-fragen.db">
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </SQLiteProvider>
       </QueryClientProvider>
       <Toast />
     </ThemeProvider>
