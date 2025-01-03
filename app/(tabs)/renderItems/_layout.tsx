@@ -44,7 +44,16 @@ export default function RootLayout() {
           name="question"
           options={{ headerShown: true, }}
         />
+        <Stack.Screen
+          name="login"
+          options={{ headerShown: true, }}
+        />
+        <Stack.Screen
+          name="signup"
+          options={{ headerShown: true, }}
+        />
       </Stack>
+      
     </ThemeProvider>
   );
 }

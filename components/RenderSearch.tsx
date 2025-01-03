@@ -88,7 +88,7 @@ const RenderSearch = () => {
         </ThemedText>
         <ThemedView style={[styles.searchBarContainer, themeStyles.contrast]}>
           <TextInput
-            style={[styles.searchBarInput, themeStyles.searchBarText]}
+            style={[styles.searchBarInput, themeStyles.text]}
             onChangeText={handleSearch}
             value={searchText}
             placeholder="Suche nach einer Frage die dich interessiert"

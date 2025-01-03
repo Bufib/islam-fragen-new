@@ -11,20 +11,16 @@ export const lightTheme = {
     borderColor: Colors.light.borderColor,
   },
 
-  searchBarText: {
+  text: {
     color: Colors.light.text,
   },
   searchResultCategory: {
     color: Colors.light.searchResultCategory,
   },
-  markdownText: {
-    color: Colors.light.text,
-  },
+
   activityIndicator: {
     color: Colors.light.activityIndicator,
-  }
-
- 
+  },
 };
 
 export const darkTheme = {
@@ -36,18 +32,16 @@ export const darkTheme = {
     backgroundColor: Colors.dark.contrast,
     borderColor: Colors.dark.borderColor,
   },
-  searchBarText: {
+  text: {
     color: Colors.dark.text,
   },
   searchResultCategory: {
     color: Colors.dark.searchResultCategory,
   },
-  markdownText: {
-    color: Colors.dark.text,
-  },
+
   activityIndicator: {
     color: Colors.dark.activityIndicator,
-  }
+  },
 };
 
 export const coustomTheme = () => {

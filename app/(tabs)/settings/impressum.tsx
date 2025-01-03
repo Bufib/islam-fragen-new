@@ -52,7 +52,7 @@ export default function impressum() {
         <Markdown
           style={{
             body: {
-              ...themeStyles.markdownText,
+              ...themeStyles.text,
               textAlign: "justify",
               fontSize: 16,
               lineHeight: 40,
@@ -69,7 +69,7 @@ export default function impressum() {
           <Markdown
             style={{
               body: {
-                ...themeStyles.markdownText,
+                ...themeStyles.text,
                 textAlign: "justify",
                 fontSize: 16,
                 lineHeight: 40,
@@ -85,7 +85,7 @@ export default function impressum() {
           <Markdown
             style={{
               body: {
-                ...themeStyles.markdownText,
+                ...themeStyles.text,
                 textAlign: "justify",
                 fontSize: 18,
                 lineHeight: 40,

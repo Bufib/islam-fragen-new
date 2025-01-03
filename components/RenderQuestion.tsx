@@ -150,7 +150,7 @@ const RenderQuestion = ({
               <Markdown
                 style={{
                   body: {
-                    ...themeStyles.markdownText,
+                    ...themeStyles.text,
                     fontSize: fontSize,
                     lineHeight: lineHeight,
                   },
@@ -191,7 +191,7 @@ const RenderQuestion = ({
                 <Markdown
                 style={{
                   body: {
-                    ...themeStyles.markdownText,
+                    ...themeStyles.text,
                     fontSize: fontSize,
                     lineHeight: lineHeight,
                   },
@@ -227,7 +227,7 @@ const RenderQuestion = ({
                 <Markdown
                 style={{
                   body: {
-                    ...themeStyles.markdownText,
+                    ...themeStyles.text,
                     fontSize: fontSize,
                     lineHeight: lineHeight,
                   },
