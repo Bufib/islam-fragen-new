@@ -38,6 +38,7 @@ export const useFetchNews = () => {
         .order('created_at', { ascending: false })
         .range(pageParam * PAGE_SIZE, (pageParam + 1) * PAGE_SIZE - 1);
 
+      
       if (error) throw error;
       return data as NewsItemType[];
     },

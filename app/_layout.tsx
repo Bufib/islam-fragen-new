@@ -7,7 +7,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useInitializeDatabase } from "@/hooks/useInitializeDatabase.ts";
@@ -29,25 +29,34 @@ export default function RootLayout() {
   // Initialize database
   const dbInitialized = useInitializeDatabase();
   const { restoreSession } = useAuthStore();
+  const [isSessionRestored, setIsSessionRestored] = useState(false);
   // Musst be before 'if (!loaded || !dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
   useEffect(() => {
     const savedColorScheme = Storage.getItemSync("isDarkMode");
     Appearance.setColorScheme(savedColorScheme === "true" ? "dark" : "light");
   }, []);
 
+  // Session restoration effect
   useEffect(() => {
-    restoreSession(); // Automatically restore session
-  }, [restoreSession]);
+    const initSession = async () => {
+      await restoreSession();
+      setIsSessionRestored(true);
+    };
+    initSession();
+  }, []);
 
+
+  // Hide splash screen when everything is ready
   useEffect(() => {
-    if (loaded && dbInitialized) {
+    if (loaded && dbInitialized && isSessionRestored) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, dbInitialized]);
+  }, [loaded, dbInitialized, isSessionRestored]);
 
-  if (!loaded || !dbInitialized) {
-    return null; // Wait until fonts and database initialization are complete
+  if (!loaded || !dbInitialized || !isSessionRestored) {
+    return null;
   }
+
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

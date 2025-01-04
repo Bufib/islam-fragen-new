@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import {
   View,
-  Text,
   TextInput,
   Button,
   Switch,
   Alert,
   StyleSheet,
+  Text,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { supabase } from "@/utils/supabase";
@@ -14,7 +14,6 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuthStore } from "@/components/authStore";
 import { coustomTheme } from "@/components/coustomTheme";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type LoginFormValues = {
   email: string;
@@ -26,34 +25,45 @@ export default function LoginScreen() {
     control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<LoginFormValues>();
+
   const { setSession, restoreSession } = useAuthStore();
   const [stayLoggedIn, setStayLoggedIn] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const themeStyles = coustomTheme();
 
-  useEffect(() => {
-    restoreSession();
-  }, [restoreSession]);
-
   const loginWithSupabase = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      Alert.alert("Login Error", error.message);
-    } else if (data.session) {
-      setSession(data.session);
-      if (stayLoggedIn) {
-        await AsyncStorage.setItem("supabase_session", JSON.stringify(data.session));
+      if (error) throw error;
+
+      if (data.session) {
+        await setSession(data.session, stayLoggedIn);
+
+        // Clear form after successful login
+        reset();
+
+        const isAdmin = data.session.user.app_metadata.role === "admin";
+        Alert.alert("Success", `Welcome back${isAdmin ? " admin" : ""}!`);
       }
-      Alert.alert("Success", "Welcome back!");
+    } catch (error: any) {
+      Alert.alert(
+        "Login Error",
+        error.message || "An error occurred during login"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const onSubmit = (data: LoginFormValues) => {
-    loginWithSupabase(data.email, data.password);
+  const onSubmit = async (data: LoginFormValues) => {
+    await loginWithSupabase(data.email, data.password);
   };
 
   return (

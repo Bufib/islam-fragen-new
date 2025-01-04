@@ -1,11 +1,20 @@
 import React, { useRef } from "react";
-import { StyleSheet, FlatList, ActivityIndicator, Button } from "react-native";
+import {
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  Button,
+  useColorScheme,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
 import { useFetchNews } from "@/hooks/useFetchNews";
 import { NewsItem } from "@/components/NewsItem";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useAuthStore } from "@/components/authStore";
+import { router } from "expo-router";
 
 export default function NewsFeed() {
   const {
@@ -20,12 +29,13 @@ export default function NewsFeed() {
 
   const themeStyles = coustomTheme();
   const flatListRef = useRef<FlatList>(null);
-
+  const colorScheme = useColorScheme();
   const handleRefreshAndScroll = async () => {
     await refetch();
     // Scroll to top after refetch
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
+  const isAdmin = useAuthStore((state) => state.isAdmin);
 
   const ListFooter = () => {
     if (!hasNextPage) return null;
@@ -77,6 +87,15 @@ export default function NewsFeed() {
         <ThemedText style={styles.headerText} type="title">
           Neuigkeiten
         </ThemedText>
+        {isAdmin && (
+          <Ionicons
+            name="add-circle-outline"
+            size={35}
+            color={colorScheme === "dark" ? "white" : "black"}
+            style={styles.addIcon}
+            onPress={() => router.push("/news/addNews")}
+          />
+        )}
       </ThemedView>
 
       <FlatList
@@ -108,11 +127,16 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   headerContainer: {
-    flexDirection: "column",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   headerText: {
     marginTop: 15,
     marginHorizontal: 15,
+  },
+  addIcon: {
+    marginRight: 15,
   },
   loader: {
     flex: 1,
