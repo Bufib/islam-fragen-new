@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { StyleSheet, Pressable } from "react-native";
+import React, { useState, useRef } from "react";
+import { StyleSheet, Pressable, View } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
@@ -8,7 +8,9 @@ import { Colors } from "@/constants/Colors";
 import { formateDate } from "./formateDate";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import RenderLinkNewsItem from "@/components/RenderLinkNewsItem";
-
+import { useAuthStore } from "./authStore";
+import Entypo from "@expo/vector-icons/Entypo";
+import NewsMenu from "./NewsMenu";
 export const NewsItem = ({
   id,
   title,
@@ -20,9 +22,15 @@ export const NewsItem = ({
 }: NewsItemType) => {
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
+  const isAdmin = useAuthStore((state) => state.isAdmin);
 
   return (
-    <ThemedView style={[styles.newsItem, themeStyles.contrast]}>
+    <View style={[styles.newsItem, themeStyles.contrast]}>
+      {isAdmin && (
+        <ThemedView style={styles.newsMenu}>
+          <NewsMenu id={id}/>
+        </ThemedView>
+      )}
       {title && title.trim() !== "" && (
         <ThemedText style={styles.newsTitle} type="defaultSemiBold">
           {title}
@@ -58,7 +66,7 @@ export const NewsItem = ({
         </ThemedView>
       )}
       <ThemedText style={styles.newsDate}>{formateDate(created_at)}</ThemedText>
-    </ThemedView>
+    </View>
   );
 };
 
@@ -68,6 +76,11 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderRadius: 8,
     gap: 10,
+  },
+  newsMenu: {
+    backgroundColor: "transparent",
+    flex: 1,
+    alignSelf: "flex-end",
   },
   newsTitle: {
     fontSize: 20,

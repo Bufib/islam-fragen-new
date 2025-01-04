@@ -21,6 +21,15 @@ export const lightTheme = {
   activityIndicator: {
     color: Colors.light.activityIndicator,
   },
+  newsMenuFixieren:{
+    color: Colors.light.newsMenuFixieren,
+  },
+  newsMenuBearbeiten:{
+    color: Colors.light.newsMenuBearbeiten,
+  },
+  newsMenuLoeschen:{
+    color: Colors.light.newsMenuLoeschen,
+  }
 };
 
 export const darkTheme = {
@@ -42,6 +51,15 @@ export const darkTheme = {
   activityIndicator: {
     color: Colors.dark.activityIndicator,
   },
+  newsMenuFixieren:{
+    color: Colors.dark.newsMenuFixieren,
+  },
+  newsMenuBearbeiten:{
+    color: Colors.dark.newsMenuBearbeiten,
+  },
+  newsMenuLoeschen:{
+    color: Colors.dark.newsMenuLoeschen,
+  }
 };
 
 export const coustomTheme = () => {

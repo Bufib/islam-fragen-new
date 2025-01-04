@@ -17,6 +17,9 @@ export const Colors = {
     thumbColor: "#f4f3f4",
     modalQuestionText: "#000000",
     activityIndicator: "#000000",
+    newsMenuFixieren:"#388e3c",
+    newsMenuBearbeiten:"#2563EB",
+    newsMenuLoeschen:"#DC2626",
 
 
 
@@ -65,7 +68,9 @@ export const Colors = {
     thumbColor: "#f4f3f4",
     modalQuestionText: "#d0d0c0",
     activityIndicator: "#ffffff",
-
+    newsMenuFixieren:"#4caf50",
+    newsMenuBearbeiten:"#60A5FA",
+    newsMenuLoeschen:"#EF4444",
 
 
 
