@@ -35,7 +35,9 @@ export const useFetchNews = () => {
       const { data, error } = await supabase
         .from('news')
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('is_pinned', { ascending: true }) // Pinned items first
+        .order('pinned_at', { ascending: false }) // Sort pinned items by pinned date (add this column if needed)
+        .order('created_at', { ascending: true }) // Non-pinned items by creation date
         .range(pageParam * PAGE_SIZE, (pageParam + 1) * PAGE_SIZE - 1);
 
       

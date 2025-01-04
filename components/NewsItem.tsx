@@ -28,7 +28,7 @@ export const NewsItem = ({
     <View style={[styles.newsItem, themeStyles.contrast]}>
       {isAdmin && (
         <ThemedView style={styles.newsMenu}>
-          <NewsMenu id={id}/>
+          <NewsMenu id={id} />
         </ThemedView>
       )}
       {title && title.trim() !== "" && (
@@ -44,7 +44,7 @@ export const NewsItem = ({
         <ThemedView style={styles.linksContainer}>
           {external_url.map((url, index) => (
             <RenderLinkNewsItem
-              key={index}
+              key={`${external_url}-${index}`}
               url={url}
               index={index}
               isExternal={true}
@@ -57,7 +57,7 @@ export const NewsItem = ({
         <ThemedView style={styles.linksContainer}>
           {internal_url.map((url, index) => (
             <RenderLinkNewsItem
-              key={index}
+              key={`${internal_url}-${index}`}
               url={url}
               index={index}
               isExternal={false}

@@ -10,7 +10,8 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { coustomTheme } from "./coustomTheme";
-
+import { deleteNewsItem } from "./deleteNewsItem";
+import { toggleIsPinnedStatus } from "./toggleIsPinnedStatus";
 export default function NewsMenu({ id }: { id: number }) {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
@@ -37,7 +38,7 @@ export default function NewsMenu({ id }: { id: number }) {
             optionText: styles.optionText,
           }}
         >
-          <MenuOption onSelect={() => Alert.alert("Fixieren")}>
+          <MenuOption onSelect={() => toggleIsPinnedStatus(id)}>
             <Text style={[themeStyles.newsMenuFixieren, styles.optionText]}>
               Fixieren
             </Text>
@@ -47,7 +48,7 @@ export default function NewsMenu({ id }: { id: number }) {
               Bearbeiten
             </Text>
           </MenuOption>
-          <MenuOption onSelect={() => Alert.alert("Löschen")} disabled>
+          <MenuOption onSelect={() => deleteNewsItem(id)}>
             <Text style={[themeStyles.newsMenuLoeschen, styles.optionText]}>
               Löschen
             </Text>
