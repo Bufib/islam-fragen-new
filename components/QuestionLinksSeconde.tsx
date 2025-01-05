@@ -25,20 +25,17 @@ export default function QuestionLinksFirst() {
     {
       name: "Ethik",
       image: require("@/assets/images/ethik.png"),
-      path: "getSuperCategories/[getSuperCategories]",
       backgroundColor: "#8c7ae6",
     },
 
     {
       name: "Ratschläge",
       image: require("@/assets/images/ratschlaege.png"),
-      path: "getSuperCategories/[getSuperCategories]",
       backgroundColor: "#487eb0",
     },
     {
       name: "Frage stellen",
       image: require("@/assets/images/ratschlaege.png"),
-      path: "getSuperCategories/[getSuperCategories]",
       backgroundColor: "#487eb0",
     },
   ];
@@ -51,10 +48,17 @@ export default function QuestionLinksFirst() {
           onPressIn={() => setPressedIndex(index)}
           onPressOut={() => setPressedIndex(null)}
           onPress={() =>
-            router.replace({
-              pathname: "/(tabs)/renderItems/category",
-              params: { category: category.name },
-            })
+            router.replace(
+              category.name === "Frage stellen"
+                ? {
+                    pathname: "/(tabs)/renderItems/askQuestion",
+                    params: { category: category.name },
+                  }
+                : {
+                    pathname: "/(tabs)/renderItems/category",
+                    params: { category: category.name },
+                  }
+            )
           }
           style={[
             styles.element,
@@ -80,13 +84,6 @@ export default function QuestionLinksFirst() {
           </Text>
         </Pressable>
       ))}
-      <Link
-        href={
-          {
-            pathname: "",
-          } as any
-        }
-      ></Link>
     </ThemedView>
   );
 }
