@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { StyleSheet, Pressable, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, View, Dimensions } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
@@ -9,14 +9,13 @@ import { formateDate } from "./formateDate";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import RenderLinkNewsItem from "@/components/RenderLinkNewsItem";
 import { useAuthStore } from "./authStore";
-import Entypo from "@expo/vector-icons/Entypo";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import NewsMenu from "./NewsMenu";
-import { Dimensions } from "react-native";
 import { Image } from "expo-image";
-import PagerView from "react-native-pager-view";
+import PagerView from 'react-native-pager-view';
 
 const screenWidth = Dimensions.get("window").width;
+const imageHeight = screenWidth * 1.2;
 
 export const NewsItem = ({
   id,
@@ -31,7 +30,7 @@ export const NewsItem = ({
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
   const isAdmin = useAuthStore((state) => state.isAdmin);
-  console.log(is_pinned);
+  const [currentPage, setCurrentPage] = useState(0);
 
   return (
     <View style={[styles.newsItem, themeStyles.contrast]}>
@@ -84,16 +83,38 @@ export const NewsItem = ({
         </ThemedView>
       )}
       {image_url && image_url.length > 0 && (
-        <View style={styles.imageCarouselContainer}>
-          <PagerView style={styles.pagerView} initialPage={0}>
+        <View>
+          <PagerView
+            style={{ height: imageHeight }}
+            initialPage={0}
+            scrollEnabled={true} // Allow horizontal scrolling only within the PagerView
+            onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
+          >
             {image_url.map((url, index) => (
-              <View style={styles.page} key={index}>
-                <Image source={{ uri: url }} style={styles.image} contentFit="cover" />
+              <View key={index} style={styles.imageContainer}>
+                <Image
+                  source={{ uri: url }}
+                  style={styles.image}
+                  contentFit="cover"
+                />
               </View>
             ))}
           </PagerView>
+          {/* Dots Pagination */}
+          <View style={styles.dotsContainer}>
+            {image_url.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  currentPage === index ? styles.activeDot : styles.inactiveDot,
+                ]}
+              />
+            ))}
+          </View>
         </View>
       )}
+
       <ThemedText style={styles.newsDate}>{formateDate(created_at)}</ThemedText>
     </View>
   );
@@ -123,44 +144,40 @@ const styles = StyleSheet.create({
   newsContent: {
     fontSize: 18,
   },
-  newsDate: {
-    fontSize: 14,
-    color: Colors.universal.created_atTextColor,
-  },
+
   linksContainer: {
     backgroundColor: "transparent",
   },
-  linkButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 6,
-  },
-  linkButtonPressed: {
-    opacity: 0.7,
-  },
-  linkText: {
-    fontSize: 14,
-    color: Colors.universal.link,
-    flex: 1,
-  },
-
-  imageCarouselContainer: {
-    width: "100%",
-    height: 300,
+  image: {
+    width: screenWidth,
+    height: imageHeight,
     borderRadius: 10,
-    overflow: "hidden",
-    marginVertical: 10,
   },
-  pagerView: {
-    flex: 1,
-  },
-  page: {
+  imageContainer: {
+    width: screenWidth,
+    height: imageHeight,
     justifyContent: "center",
     alignItems: "center",
   },
-  image: {
-    width: screenWidth - 40,
-    height: "100%",
-    borderRadius: 10,
+  dotsContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: "black",
+  },
+  inactiveDot: {
+    backgroundColor: "gray",
+  },
+  newsDate: {
+    fontSize: 14,
+    color: Colors.universal.created_atTextColor,
   },
 });

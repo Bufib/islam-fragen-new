@@ -117,6 +117,7 @@ export default function NewsFeed() {
         contentContainerStyle={styles.newsList}
         onRefresh={refetch} // Trigger `refetch` when pulling down
         refreshing={isRefetching} // Show a loader when refreshing
+        nestedScrollEnabled={true}
         ListFooterComponent={ListFooter}
         ListFooterComponentStyle={styles.footerComponent}
       />

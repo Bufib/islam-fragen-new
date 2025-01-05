@@ -45,7 +45,6 @@ export default function RootLayout() {
     initSession();
   }, []);
 
-
   // Hide splash screen when everything is ready
   useEffect(() => {
     if (loaded && dbInitialized && isSessionRestored) {
@@ -56,7 +55,6 @@ export default function RootLayout() {
   if (!loaded || !dbInitialized || !isSessionRestored) {
     return null;
   }
-
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
