@@ -1,5 +1,11 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Dimensions } from "react-native";
+import React, { useState, useRef } from "react";
+import {
+  StyleSheet,
+  View,
+  Dimensions,
+  FlatList,
+  Pressable,
+} from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
@@ -12,7 +18,6 @@ import { useAuthStore } from "./authStore";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import NewsMenu from "./NewsMenu";
 import { Image } from "expo-image";
-import PagerView from 'react-native-pager-view';
 
 const screenWidth = Dimensions.get("window").width;
 const imageHeight = screenWidth * 1.2;
@@ -31,6 +36,21 @@ export const NewsItem = ({
   const themeStyles = coustomTheme();
   const isAdmin = useAuthStore((state) => state.isAdmin);
   const [currentPage, setCurrentPage] = useState(0);
+  const flatListRef = useRef<FlatList<string>>(null);
+
+  const handleScrollEnd = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const pageIndex = Math.round(offsetX / screenWidth);
+    setCurrentPage(pageIndex);
+  };
+
+  const handleDotPress = (index: number) => {
+    flatListRef.current?.scrollToOffset({
+      offset: index * screenWidth,
+      animated: true,
+    });
+    setCurrentPage(index);
+  };
 
   return (
     <View style={[styles.newsItem, themeStyles.contrast]}>
@@ -84,32 +104,41 @@ export const NewsItem = ({
       )}
       {image_url && image_url.length > 0 && (
         <View>
-          <PagerView
-            style={{ height: imageHeight }}
-            initialPage={0}
-            scrollEnabled={true} // Allow horizontal scrolling only within the PagerView
-            onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
-          >
-            {image_url.map((url, index) => (
-              <View key={index} style={styles.imageContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={image_url}
+            horizontal
+            pagingEnabled
+            snapToInterval={screenWidth} // Ensure snapping aligns with image width
+            snapToAlignment="center"
+            decelerationRate="fast" 
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleScrollEnd}
+            keyExtractor={(item, index) => `${item}-${index}`}
+            renderItem={({ item }) => (
+              <View style={styles.imageContainer}>
                 <Image
-                  source={{ uri: url }}
+                  source={{ uri: item }}
                   style={styles.image}
                   contentFit="cover"
                 />
               </View>
-            ))}
-          </PagerView>
+            )}
+          />
           {/* Dots Pagination */}
           <View style={styles.dotsContainer}>
             {image_url.map((_, index) => (
-              <View
+              <Pressable
                 key={index}
-                style={[
-                  styles.dot,
-                  currentPage === index ? styles.activeDot : styles.inactiveDot,
-                ]}
-              />
+                onPress={() => handleDotPress(index)}
+              >
+                <View
+                  style={[
+                    styles.dot,
+                    currentPage === index ? styles.activeDot : styles.inactiveDot,
+                  ]}
+                />
+              </Pressable>
             ))}
           </View>
         </View>
@@ -144,7 +173,6 @@ const styles = StyleSheet.create({
   newsContent: {
     fontSize: 18,
   },
-
   linksContainer: {
     backgroundColor: "transparent",
   },
