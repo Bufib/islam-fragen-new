@@ -48,7 +48,8 @@ export default function AddNews() {
 
   const pickImages = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Permission Denied",
@@ -58,17 +59,17 @@ export default function AddNews() {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ['images'],
         allowsMultipleSelection: true,
         quality: 0.8,
         base64: true,
-        selectionLimit: 5,
+        selectionLimit: 10,
       });
 
       if (!result.canceled && result.assets) {
         const images = result.assets.map((asset) => ({
           uri: asset.uri,
-          base64: asset.base64,
+          base64: asset.base64 ?? null
         }));
         setSelectedImages((prev) => [...prev, ...images]);
       }
@@ -87,16 +88,21 @@ export default function AddNews() {
       if (!base64) continue;
 
       try {
-        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.png`;
-        
+        const fileName = `${Date.now()}_${Math.random()
+          .toString(36)
+          .slice(2)}.png`;
+        const fileType = uri.split(".").pop(); // Get file extension
+        const contentType = `image/${fileType}`; // Construct MIME type (e.g., image/png, image/jpeg)
+
         // Use decode from base64-arraybuffer directly on the base64 string
         const arrayBuffer = decode(base64);
 
         const { data, error } = await supabase.storage
           .from("news_bucket")
           .upload(`images/${fileName}`, arrayBuffer, {
-            contentType: "image/png",
+            contentType: contentType,
             cacheControl: "3600",
+            upsert: true,
           });
 
         if (error) {
@@ -282,22 +288,22 @@ export default function AddNews() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 20, 
-    backgroundColor: "#f9f9f9" 
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f9f9f9",
   },
-  header: { 
-    fontSize: 24, 
-    fontWeight: "bold", 
-    marginBottom: 20, 
-    color: "#333" 
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
   },
-  label: { 
-    fontSize: 16, 
-    marginBottom: 5, 
-    fontWeight: "bold", 
-    color: "#555" 
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: "bold",
+    color: "#555",
   },
   input: {
     borderWidth: 1,
@@ -307,16 +313,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "#fff",
   },
-  errorInput: { 
-    borderColor: "#ff4d4f" 
+  errorInput: {
+    borderColor: "#ff4d4f",
   },
-  errorText: { 
-    color: "#ff4d4f", 
-    marginBottom: 10 
+  errorText: {
+    color: "#ff4d4f",
+    marginBottom: 10,
   },
-  textArea: { 
-    height: 100, 
-    textAlignVertical: "top" 
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
   },
   imagePicker: {
     padding: 15,
@@ -325,20 +331,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  imagePickerText: { 
-    color: "#fff", 
-    fontWeight: "bold" 
+  imagePickerText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
-  imageContainer: { 
+  imageContainer: {
     marginRight: 10,
-    marginBottom: 10, 
-    alignItems: "center" 
+    marginBottom: 10,
+    alignItems: "center",
   },
-  imagePreview: { 
-    width: 100, 
-    height: 100, 
-    borderRadius: 8, 
-    marginBottom: 5 
+  imagePreview: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    marginBottom: 5,
   },
   submitButton: {
     padding: 15,
@@ -347,11 +353,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  disabledButton: { 
-    backgroundColor: "#aaa" 
+  disabledButton: {
+    backgroundColor: "#aaa",
   },
-  submitButtonText: { 
-    color: "#fff", 
-    fontWeight: "bold" 
+  submitButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
