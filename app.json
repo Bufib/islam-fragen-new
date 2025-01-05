@@ -36,6 +36,12 @@
         }
       ],
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to let you share them."
+        }
+      ],
+      [
         "expo-sqlite",
         {
           "enableFTS": true,
