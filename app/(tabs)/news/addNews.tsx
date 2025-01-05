@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
-  Button,
+  Pressable,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +16,11 @@ import { useForm, Controller } from "react-hook-form";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "@/utils/supabase";
 import { decode } from "base64-arraybuffer";
-
+import { Linking } from "react-native";
+import { ThemedText } from "@/components/ThemedText";
+import { coustomTheme } from "@/components/coustomTheme";
+import { ScrollView } from "react-native";
+import { Colors } from "@/constants/Colors";
 type NewsFormValues = {
   title: string;
   body_text: string;
@@ -45,31 +49,80 @@ export default function AddNews() {
     { uri: string; base64: string | null }[]
   >([]);
   const [uploading, setUploading] = useState(false);
-
+  const themeStyles = coustomTheme();
   const pickImages = async () => {
     try {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== "granted") {
+      // Check media library permission
+      const { status: mediaStatus, canAskAgain: canAskMediaAgain } =
+        await ImagePicker.getMediaLibraryPermissionsAsync();
+
+      if (mediaStatus !== "granted" && canAskMediaAgain) {
+        const { status: newMediaStatus } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (newMediaStatus !== "granted") {
+          Alert.alert(
+            "Permission Denied",
+            "We need access to your media library to select images."
+          );
+          return;
+        }
+      } else if (mediaStatus !== "granted" && !canAskMediaAgain) {
         Alert.alert(
           "Permission Denied",
-          "You need to grant permission to access photos to use this feature."
+          "You have permanently denied media library access. Please enable permissions in your device settings.",
+          [
+            {
+              text: "Go to Settings",
+              onPress: () => Linking.openSettings(),
+            },
+            { text: "Cancel", style: "cancel" },
+          ]
         );
         return;
       }
 
+      // Optional: Handle camera permission if needed
+      const { status: cameraStatus, canAskAgain: canAskCameraAgain } =
+        await ImagePicker.getCameraPermissionsAsync();
+
+      if (cameraStatus !== "granted" && canAskCameraAgain) {
+        const { status: newCameraStatus } =
+          await ImagePicker.requestCameraPermissionsAsync();
+        if (newCameraStatus !== "granted") {
+          Alert.alert(
+            "Permission Denied",
+            "We need access to your camera to take photos."
+          );
+          return;
+        }
+      } else if (cameraStatus !== "granted" && !canAskCameraAgain) {
+        Alert.alert(
+          "Permission Denied",
+          "You have permanently denied camera access. Please enable permissions in your device settings.",
+          [
+            {
+              text: "Go to Settings",
+              onPress: () => Linking.openSettings(),
+            },
+            { text: "Cancel", style: "cancel" },
+          ]
+        );
+        return;
+      }
+
+      // Launch image picker
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         allowsMultipleSelection: true,
         quality: 0.8,
         base64: true,
-        selectionLimit: 10,
+        selectionLimit: 5,
       });
 
       if (!result.canceled && result.assets) {
         const images = result.assets.map((asset) => ({
           uri: asset.uri,
-          base64: asset.base64 ?? null
+          base64: asset.base64 ?? null, // Ensure `base64` is null if undefined
         }));
         setSelectedImages((prev) => [...prev, ...images]);
       }
@@ -88,10 +141,20 @@ export default function AddNews() {
       if (!base64) continue;
 
       try {
+        const fileType = uri.split(".").pop()?.toLowerCase(); // Get file extension (e.g., "png", "jpg")
+
+        // Validate the file type
+        if (fileType && !["jpg", "jpeg", "png", "gif"].includes(fileType)) {
+          console.error("Unsupported file type:", fileType);
+          Alert.alert(
+            "Error",
+            `Invalid or unsupported file type (${fileType || "unknown"}).`
+          );
+          continue; // Skip this file and move to the next one
+        }
         const fileName = `${Date.now()}_${Math.random()
           .toString(36)
-          .slice(2)}.png`;
-        const fileType = uri.split(".").pop(); // Get file extension
+          .slice(2)}.${fileType}`; // Use dynamic file extension
         const contentType = `image/${fileType}`; // Construct MIME type (e.g., image/png, image/jpeg)
 
         // Use decode from base64-arraybuffer directly on the base64 string
@@ -134,6 +197,19 @@ export default function AddNews() {
   };
 
   const onSubmit = async (formData: NewsFormValues) => {
+    if (
+      !formData.title.trim() &&
+      !formData.body_text.trim() &&
+      !formData.external_url?.trim() &&
+      !formData.internal_url?.trim() &&
+      selectedImages.length === 0
+    ) {
+      Alert.alert(
+        "Error",
+        "The news content cannot be empty. Please fill in at least one field or add an image."
+      );
+      return; // Exit without submitting
+    }
     setUploading(true);
     try {
       const uploadedImageUrls = await uploadImages(selectedImages);
@@ -173,116 +249,132 @@ export default function AddNews() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.header}>Add News</Text>
-
-      <Text style={styles.label}>Title</Text>
-      <Controller
-        control={control}
-        name="title"
-        rules={{ required: "Title is required." }}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={[styles.input, errors.title && styles.errorInput]}
-            onChangeText={onChange}
-            value={value}
-            placeholder="Enter the title"
-          />
-        )}
-      />
-      {errors.title && (
-        <Text style={styles.errorText}>{errors.title.message}</Text>
-      )}
-
-      <Text style={styles.label}>Body Text</Text>
-      <Controller
-        control={control}
-        name="body_text"
-        rules={{ required: "Body text is required." }}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={[
-              styles.input,
-              styles.textArea,
-              errors.body_text && styles.errorInput,
-            ]}
-            onChangeText={onChange}
-            value={value}
-            placeholder="Enter the body text"
-            multiline
-          />
-        )}
-      />
-      {errors.body_text && (
-        <Text style={styles.errorText}>{errors.body_text.message}</Text>
-      )}
-
-      <Text style={styles.label}>External URL</Text>
-      <Controller
-        control={control}
-        name="external_url"
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={styles.input}
-            onChangeText={onChange}
-            value={value}
-            placeholder="Enter the external URL"
-          />
-        )}
-      />
-
-      <Text style={styles.label}>Internal URL</Text>
-      <Controller
-        control={control}
-        name="internal_url"
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={styles.input}
-            onChangeText={onChange}
-            value={value}
-            placeholder="Enter the internal URL"
-          />
-        )}
-      />
-
-      <Text style={styles.label}>Pin News</Text>
-      <Controller
-        control={control}
-        name="is_pinned"
-        render={({ field: { onChange, value } }) => (
-          <Switch onValueChange={onChange} value={value} />
-        )}
-      />
-
-      <TouchableOpacity style={styles.imagePicker} onPress={pickImages}>
-        <Text style={styles.imagePickerText}>
-          {selectedImages.length ? "Add More Images" : "Upload Images"}
-        </Text>
-      </TouchableOpacity>
-
-      <FlatList
-        data={selectedImages}
-        keyExtractor={(item) => item.uri}
-        renderItem={({ item }) => (
-          <View style={styles.imageContainer}>
-            <Image source={{ uri: item.uri }} style={styles.imagePreview} />
-            <Button title="Remove" onPress={() => removeImage(item.uri)} />
-          </View>
-        )}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={{ marginVertical: 10 }}
-      />
-
-      <TouchableOpacity
-        style={[styles.submitButton, uploading && styles.disabledButton]}
-        onPress={handleSubmit(onSubmit)}
-        disabled={uploading}
+    <SafeAreaView
+      style={[styles.container, themeStyles.defaultBackgorundColor]}
+      edges={["top"]}
+    >
+      <ScrollView
+        style={[styles.scrollViewStyle, themeStyles.defaultBackgorundColor]}
+        contentContainerStyle={styles.scrollViewContentContainer}
       >
-        <Text style={styles.submitButtonText}>
-          {uploading ? "Submitting..." : "Submit"}
-        </Text>
-      </TouchableOpacity>
+        <ThemedText style={styles.header} type="title">
+          Nachricht hinzufügen
+        </ThemedText>
+
+        <View style={[styles.card, themeStyles.contrast]}>
+          <ThemedText style={styles.label}>Title</ThemedText>
+          <Controller
+            control={control}
+            name="title"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={[
+                  styles.input,
+                  errors.title, //! Remove
+                  themeStyles.text,
+                ]}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Gib einen Titel ein"
+                placeholderTextColor="#888"
+              />
+            )}
+          />
+
+          <ThemedText style={styles.label}>Nachricht</ThemedText>
+          <Controller
+            control={control}
+            name="body_text"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={[styles.input, styles.textArea, themeStyles.text]}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Gib eine Nachricht ein"
+                multiline
+                placeholderTextColor="#888"
+              />
+            )}
+          />
+
+          <ThemedText style={styles.label}>Externe URL</ThemedText>
+          <Controller
+            control={control}
+            name="external_url"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={[styles.input, themeStyles.text]}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Gib eine vollständinge URL (mit http...) ein"
+                placeholderTextColor="#888"
+              />
+            )}
+          />
+          <ThemedText style={styles.label}>Verlinke eine Frage</ThemedText>
+          <Controller
+            control={control}
+            name="internal_url"
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={[styles.input, themeStyles.text]}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Gib den vollständingen Titel eine Frage an"
+                placeholderTextColor="#888"
+              />
+            )}
+          />
+
+          <ThemedText style={styles.label}>Nachricht fixieren?</ThemedText>
+          <Controller
+            control={control}
+            name="is_pinned"
+            render={({ field: { onChange, value } }) => (
+              <Switch onValueChange={onChange} value={value} />
+            )}
+          />
+        </View>
+
+        <Pressable style={styles.pickImageButton} onPress={pickImages}>
+          <Text style={styles.imagePickerText}>
+            {selectedImages.length
+              ? "Mehr Bilder auswählen"
+              : "Bilder hochladen"}
+          </Text>
+        </Pressable>
+
+        {selectedImages && (
+          <FlatList
+            data={selectedImages}
+            keyExtractor={(item) => item.uri}
+            renderItem={({ item }) => (
+              <View style={styles.imageContainer}>
+                <Image source={{ uri: item.uri }} style={styles.imagePreview} />
+                <Pressable
+                  style={styles.removeButton}
+                  onPress={() => removeImage(item.uri)}
+                >
+                  <Text style={styles.removeButtonText}>Entfernen</Text>
+                </Pressable>
+              </View>
+            )}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ marginVertical: 10 }}
+          />
+        )}
+
+        <Pressable
+          style={[styles.submitButton, uploading && styles.disabledButton]}
+          onPress={handleSubmit(onSubmit)}
+          disabled={uploading}
+        >
+          <Text style={styles.submitButtonText}>
+            {uploading ? "Wird hochgeladen..." : "Hochgeladen"}
+          </Text>
+        </Pressable>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -290,74 +382,88 @@ export default function AddNews() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollViewStyle: {
+    flex: 1,
     padding: 20,
-    backgroundColor: "#f9f9f9",
+  },
+  scrollViewContentContainer: {
+    paddingBottom: 20,
   },
   header: {
-    fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 20,
-    color: "#333",
+  },
+  card: {
+    borderRadius: 12,
+    padding: 20,
+    gap: 5,
   },
   label: {
     fontSize: 16,
+    fontWeight: "600",
     marginBottom: 5,
-    fontWeight: "bold",
-    color: "#555",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
     borderRadius: 8,
-    padding: 10,
+    padding: 12,
     marginBottom: 10,
-    backgroundColor: "#fff",
-  },
-  errorInput: {
-    borderColor: "#ff4d4f",
-  },
-  errorText: {
-    color: "#ff4d4f",
-    marginBottom: 10,
+    fontSize: 16,
   },
   textArea: {
-    height: 100,
-    textAlignVertical: "top",
+    height: 200,
   },
-  imagePicker: {
+
+  pickImageButton: {
     padding: 15,
-    borderRadius: 8,
-    backgroundColor: "#007bff",
+    borderRadius: 12,
+    backgroundColor: Colors.universal.pickImageButton,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 20,
   },
   imagePickerText: {
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "600",
+    fontSize: 16,
   },
   imageContainer: {
-    marginRight: 10,
-    marginBottom: 10,
+    marginRight: 15,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 2,
   },
   imagePreview: {
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  removeButton: {
+    backgroundColor: "#e74c3c",
     borderRadius: 8,
-    marginBottom: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  removeButtonText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
   },
   submitButton: {
     padding: 15,
-    borderRadius: 8,
-    backgroundColor: "#007bff",
+    borderRadius: 12,
+    backgroundColor: Colors.universal.submitButton,
     alignItems: "center",
-    marginTop: 20,
   },
   disabledButton: {
     backgroundColor: "#aaa",
   },
   submitButtonText: {
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "700",
+    fontSize: 16,
   },
 });

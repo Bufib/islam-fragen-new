@@ -78,6 +78,7 @@ export const Colors = {
 
 
 
+
     white: "#FFFFFF",
     error: "#BA2F16",
     indexCategoryTextBorder: "#808080",
@@ -116,6 +117,7 @@ export const Colors = {
     arrowUp: "#2980b9",
     borderBottomToggleSettings: "#ccc",
     created_atTextColor: "#888",
-
+    pickImageButton:  "#007bff",
+    submitButton: "#28a745",
   },
 };
