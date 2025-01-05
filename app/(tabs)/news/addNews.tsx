@@ -21,6 +21,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/components/coustomTheme";
 import { ScrollView } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { router } from "expo-router";
 type NewsFormValues = {
   title: string;
   body_text: string;
@@ -116,7 +117,7 @@ export default function AddNews() {
         allowsMultipleSelection: true,
         quality: 0.8,
         base64: true,
-        selectionLimit: 5,
+        selectionLimit: 10,
       });
 
       if (!result.canceled && result.assets) {
@@ -197,6 +198,11 @@ export default function AddNews() {
   };
 
   const onSubmit = async (formData: NewsFormValues) => {
+    // Prevent multiple submissions while an upload is in progress
+    if (uploading) {
+      return;
+    }
+    // Prevent empty submission
     if (
       !formData.title.trim() &&
       !formData.body_text.trim() &&
@@ -212,11 +218,16 @@ export default function AddNews() {
     }
     setUploading(true);
     try {
-      const uploadedImageUrls = await uploadImages(selectedImages);
-      if (!uploadedImageUrls) {
-        Alert.alert("Error", "Image upload failed. Please try again.");
-        setUploading(false);
-        return;
+      // Attempt to upload images only if there are selected images
+      let uploadedImageUrls: string[] | null = null;
+      if (selectedImages.length > 0) {
+        uploadedImageUrls = await uploadImages(selectedImages);
+
+        if (!uploadedImageUrls) {
+          Alert.alert("Error", "Image upload failed. Please try again.");
+          setUploading(false);
+          return;
+        }
       }
 
       const { error } = await supabase.from("news").insert([
@@ -236,6 +247,7 @@ export default function AddNews() {
       reset();
       setSelectedImages([]);
       Alert.alert("Success", "News added successfully!");
+      router.push("/(tabs)/news");
     } catch (error: any) {
       console.error("Error submitting news:", error.message);
       Alert.alert("Error", "An error occurred. Please try again.");
@@ -268,11 +280,7 @@ export default function AddNews() {
             name="title"
             render={({ field: { onChange, value } }) => (
               <TextInput
-                style={[
-                  styles.input,
-                  errors.title, //! Remove
-                  themeStyles.text,
-                ]}
+                style={[styles.input, themeStyles.text]}
                 onChangeText={onChange}
                 value={value}
                 placeholder="Gib einen Titel ein"
@@ -344,7 +352,7 @@ export default function AddNews() {
           </Text>
         </Pressable>
 
-        {selectedImages && (
+        {selectedImages.length > 0 && (
           <FlatList
             data={selectedImages}
             keyExtractor={(item) => item.uri}
@@ -420,6 +428,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.universal.pickImageButton,
     alignItems: "center",
     marginTop: 20,
+    marginBottom: 10,
   },
   imagePickerText: {
     color: "#fff",

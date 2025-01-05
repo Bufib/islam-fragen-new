@@ -1,7 +1,9 @@
 import { supabase } from "@/utils/supabase";
+import { Alert } from "react-native";
 
 export const deleteNewsItem = async (id: number) => {
   try {
+    
     const { data, error } = await supabase.from("news").delete().eq("id", id);
 
     if (error) {
