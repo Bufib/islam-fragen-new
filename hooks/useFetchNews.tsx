@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/utils/supabase';
+import { useState, useEffect } from "react";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/utils/supabase";
 
 export type NewsItemType = {
   id: number;
@@ -11,7 +11,7 @@ export type NewsItemType = {
   external_url?: string[];
   internal_url?: string[];
   is_pinned?: boolean;
-}
+};
 
 const PAGE_SIZE = 5;
 const MAX_PAGES = 4; // This will store up to 20 news items (4 pages * 5 items)
@@ -30,17 +30,16 @@ export const useFetchNews = () => {
     refetch,
     isRefetching,
   } = useInfiniteQuery({
-    queryKey: ['news'],
+    queryKey: ["news"],
     queryFn: async ({ pageParam = 0 }): Promise<NewsItemType[]> => {
       const { data, error } = await supabase
-        .from('news')
-        .select('*')
-        .order('is_pinned', { ascending: true }) // Pinned items first
-        .order('pinned_at', { ascending: false }) // Sort pinned items by pinned date (add this column if needed)
-        .order('created_at', { ascending: true }) // Non-pinned items by creation date
+        .from("news")
+        .select("*")
+        .order("is_pinned", { ascending: false }) // Pinned items first
+        .order("pinned_at", { ascending: false }) // Sort pinned items by pinned date (add this column if needed)
+        .order("created_at", { ascending: true }) // Non-pinned items by creation date
         .range(pageParam * PAGE_SIZE, (pageParam + 1) * PAGE_SIZE - 1);
 
-      
       if (error) throw error;
       return data as NewsItemType[];
     },
@@ -55,13 +54,13 @@ export const useFetchNews = () => {
 
   useEffect(() => {
     const channel = supabase
-      .channel('news_changes')
+      .channel("news_changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'news'
+          event: "*",
+          schema: "public",
+          table: "news",
         },
         () => {
           setHasNewData(true);
@@ -78,16 +77,24 @@ export const useFetchNews = () => {
   const handleRefresh = async (): Promise<void> => {
     if (hasNewData) {
       // Only invalidate the first page when new data arrives
-      await queryClient.invalidateQueries({ 
-        queryKey: ['news'],
-        refetchType: 'all' 
+      await queryClient.invalidateQueries({
+        queryKey: ["news"],
+        refetchType: "all",
       });
     }
     setShowUpdateButton(false);
     setHasNewData(false);
   };
 
-  const allNews = data?.pages.flatMap(page => page) ?? [];
+  const allNews: NewsItemType[] =
+    data?.pages
+      .flatMap((page) => page)
+      .reduce<NewsItemType[]>((unique, item) => {
+        if (!unique.some((existing) => existing.id === item.id)) {
+          unique.push(item);
+        }
+        return unique;
+      }, []) ?? [];
 
   return {
     allNews,

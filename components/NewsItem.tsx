@@ -10,7 +10,14 @@ import { useColorScheme } from "@/hooks/useColorScheme.web";
 import RenderLinkNewsItem from "@/components/RenderLinkNewsItem";
 import { useAuthStore } from "./authStore";
 import Entypo from "@expo/vector-icons/Entypo";
+import AntDesign from "@expo/vector-icons/AntDesign";
 import NewsMenu from "./NewsMenu";
+import { Dimensions } from "react-native";
+import { Image } from "expo-image";
+import PagerView from "react-native-pager-view";
+
+const screenWidth = Dimensions.get("window").width;
+
 export const NewsItem = ({
   id,
   title,
@@ -19,16 +26,27 @@ export const NewsItem = ({
   image_url,
   internal_url,
   external_url,
+  is_pinned,
 }: NewsItemType) => {
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
   const isAdmin = useAuthStore((state) => state.isAdmin);
+  console.log(is_pinned);
 
   return (
     <View style={[styles.newsItem, themeStyles.contrast]}>
+      {is_pinned && (
+        <AntDesign
+          name="pushpin"
+          size={24}
+          color={colorScheme === "dark" ? "white" : "black"}
+          style={styles.pinIconStyle}
+        />
+      )}
+
       {isAdmin && (
         <ThemedView style={styles.newsMenu}>
-          <NewsMenu id={id} />
+          <NewsMenu id={id} is_pinned={is_pinned || false} />
         </ThemedView>
       )}
       {title && title.trim() !== "" && (
@@ -65,6 +83,17 @@ export const NewsItem = ({
           ))}
         </ThemedView>
       )}
+      {image_url && image_url.length > 0 && (
+        <View style={styles.imageCarouselContainer}>
+          <PagerView style={styles.pagerView} initialPage={0}>
+            {image_url.map((url, index) => (
+              <View style={styles.page} key={index}>
+                <Image source={{ uri: url }} style={styles.image} contentFit="cover" />
+              </View>
+            ))}
+          </PagerView>
+        </View>
+      )}
       <ThemedText style={styles.newsDate}>{formateDate(created_at)}</ThemedText>
     </View>
   );
@@ -76,6 +105,11 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderRadius: 8,
     gap: 10,
+  },
+  pinIconStyle: {
+    flex: 1,
+    alignSelf: "flex-end",
+    transform: [{ rotateY: "180deg" }],
   },
   newsMenu: {
     backgroundColor: "transparent",
@@ -108,5 +142,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.universal.link,
     flex: 1,
+  },
+
+  imageCarouselContainer: {
+    width: "100%",
+    height: 300,
+    borderRadius: 10,
+    overflow: "hidden",
+    marginVertical: 10,
+  },
+  pagerView: {
+    flex: 1,
+  },
+  page: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    width: screenWidth - 40,
+    height: "100%",
+    borderRadius: 10,
   },
 });

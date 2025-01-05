@@ -12,7 +12,13 @@ import { Colors } from "@/constants/Colors";
 import { coustomTheme } from "./coustomTheme";
 import { deleteNewsItem } from "./deleteNewsItem";
 import { toggleIsPinnedStatus } from "./toggleIsPinnedStatus";
-export default function NewsMenu({ id }: { id: number }) {
+export default function NewsMenu({
+  id,
+  is_pinned,
+}: {
+  id: number;
+  is_pinned: boolean;
+}) {
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
   const themeStyles = coustomTheme();
@@ -40,7 +46,7 @@ export default function NewsMenu({ id }: { id: number }) {
         >
           <MenuOption onSelect={() => toggleIsPinnedStatus(id)}>
             <Text style={[themeStyles.newsMenuFixieren, styles.optionText]}>
-              Fixieren
+              {is_pinned ? "Nicht mehr fixieren" : "Fixieren"}
             </Text>
           </MenuOption>
           <MenuOption onSelect={() => Alert.alert("Bearbeiten")}>
@@ -48,7 +54,26 @@ export default function NewsMenu({ id }: { id: number }) {
               Bearbeiten
             </Text>
           </MenuOption>
-          <MenuOption onSelect={() => deleteNewsItem(id)}>
+          <MenuOption
+            onSelect={() => {
+              Alert.alert(
+                "Löschen Bestätigen", // Title
+                "Bist du sicher, dass du diesen Beitrag löschen möchtest?",
+                [
+                  {
+                    text: "Abbrechen",
+                    style: "cancel",
+                    onPress: () => console.log("Löschen Abgebrochen"),
+                  },
+                  {
+                    text: "Löschen",
+                    style: "destructive",
+                    onPress: async () => deleteNewsItem(id),
+                  },
+                ]
+              );
+            }}
+          >
             <Text style={[themeStyles.newsMenuLoeschen, styles.optionText]}>
               Löschen
             </Text>

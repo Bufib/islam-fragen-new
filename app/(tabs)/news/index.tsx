@@ -110,6 +110,7 @@ export default function NewsFeed() {
             image_url={item.image_url ?? []}
             external_url={item.external_url ?? []}
             internal_url={item.internal_url ?? []}
+            is_pinned={item.is_pinned}
             created_at={item.created_at}
           />
         )}
