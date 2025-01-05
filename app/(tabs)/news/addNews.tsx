@@ -22,6 +22,7 @@ import { coustomTheme } from "@/components/coustomTheme";
 import { ScrollView } from "react-native";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
+import { TitleSearchInput } from "@/hooks/TitleSearch";
 type NewsFormValues = {
   title: string;
   body_text: string;
@@ -202,6 +203,7 @@ export default function AddNews() {
     if (uploading) {
       return;
     }
+
     // Prevent empty submission
     if (
       !formData.title.trim() &&
@@ -216,6 +218,7 @@ export default function AddNews() {
       );
       return; // Exit without submitting
     }
+
     setUploading(true);
     try {
       // Attempt to upload images only if there are selected images
@@ -230,13 +233,21 @@ export default function AddNews() {
         }
       }
 
+      // Convert comma-separated strings into arrays
+      const internalUrlsArray = formData.internal_url
+        ? formData.internal_url.split(",").map((url) => url.trim())
+        : [];
+      const externalUrlsArray = formData.external_url
+        ? formData.external_url.split(",").map((url) => url.trim())
+        : [];
+
       const { error } = await supabase.from("news").insert([
         {
           title: formData.title,
           body_text: formData.body_text,
           image_url: uploadedImageUrls,
-          external_url: formData.external_url || null,
-          internal_url: formData.internal_url || null,
+          external_url: externalUrlsArray, // Pass as array
+          internal_url: internalUrlsArray, // Pass as array
           is_pinned: formData.is_pinned,
           pinned_at: formData.is_pinned ? new Date().toISOString() : null,
         },
@@ -288,7 +299,6 @@ export default function AddNews() {
               />
             )}
           />
-
           <ThemedText style={styles.label}>Nachricht</ThemedText>
           <Controller
             control={control}
@@ -304,7 +314,6 @@ export default function AddNews() {
               />
             )}
           />
-
           <ThemedText style={styles.label}>Externe URL</ThemedText>
           <Controller
             control={control}
@@ -319,21 +328,19 @@ export default function AddNews() {
               />
             )}
           />
+          // Replace the existing internal_url Controller with this:
           <ThemedText style={styles.label}>Verlinke eine Frage</ThemedText>
           <Controller
             control={control}
             name="internal_url"
             render={({ field: { onChange, value } }) => (
-              <TextInput
-                style={[styles.input, themeStyles.text]}
-                onChangeText={onChange}
+              <TitleSearchInput
                 value={value}
-                placeholder="Gib den vollständingen Titel eine Frage an"
-                placeholderTextColor="#888"
+                onChangeText={onChange}
+                themeStyles={themeStyles}
               />
             )}
           />
-
           <ThemedText style={styles.label}>Nachricht fixieren?</ThemedText>
           <Controller
             control={control}

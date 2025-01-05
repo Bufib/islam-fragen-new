@@ -37,7 +37,7 @@ export const useFetchNews = () => {
         .select("*")
         .order("is_pinned", { ascending: false }) // Pinned items first
         .order("pinned_at", { ascending: false }) // Sort pinned items by pinned date (add this column if needed)
-        .order("created_at", { ascending: true }) // Non-pinned items by creation date
+        .order("created_at", { ascending: false }) // Non-pinned items by creation date
         .range(pageParam * PAGE_SIZE, (pageParam + 1) * PAGE_SIZE - 1);
 
       if (error) throw error;
