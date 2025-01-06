@@ -733,14 +733,15 @@ import {
 } from "@/hooks/useGetUserQuestions";
 
 // Helper to map statuses to colors
-const getStatusColor = (status: QuestionFromUser["answer_status"]) => {
+const getStatusColor = (status: QuestionFromUser["status"]) => {
+  console.log(status);
   switch (status) {
     case "Beantwortung steht noch aus.":
-      return "#FFA500"; // Orange
-    case "Beantworted.":
-      return "#4CAF50"; // Green
+      return "#FFA500";
+    case "Beantwortet.":
+      return "#4CAF50";
     case "Abgelehnt.":
-      return "#F44336"; // Red
+      return "#F44336";
     default:
       return "#999";
   }
@@ -774,7 +775,7 @@ export default function QuestionsList() {
     <Link
       href={{
         pathname: "/(tabs)/renderItems/[questionId]",
-        // Make sure you match your file or parameter name 
+        // Make sure you match your file or parameter name
         params: { questionId: item.id },
       }}
       asChild
@@ -789,10 +790,10 @@ export default function QuestionsList() {
           <View
             style={[
               styles.statusBadge,
-              { backgroundColor: getStatusColor(item.answer_status) },
+              { backgroundColor: getStatusColor(item.status) },
             ]}
           >
-            <Text style={styles.statusText}>{item.answer_status}</Text>
+            <Text style={styles.statusText}>{item.status}</Text>
           </View>
         </View>
       </TouchableOpacity>

@@ -147,7 +147,7 @@ export type QuestionFromUser = {
   user_id: string;
   question_text: string;
   answer_text?: string;
-  status: "Beantworted." | "Beantwortung steht noch aus." | "Abgelehnt.";
+  status: "Beantwortet." | "Beantwortung steht noch aus." | "Abgelehnt.";
   marja: string;
   title: string;
   created_at: string;
@@ -161,7 +161,7 @@ export type AskQuestionFormData = {
 import { supabase } from "@/utils/supabase";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import type { QuestionFromUser } from "./types";
+
 
 const QUESTIONS_PER_PAGE = 5;
 

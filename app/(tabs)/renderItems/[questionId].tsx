@@ -8,18 +8,17 @@
 // export default function QuestionDetailScreen() {
 //     const { id } = useLocalSearchParams<{ id: string }>();
 //     const queryClient = useQueryClient();
-  
+
 //     // Get question from existing cache
 //     const data = queryClient.getQueriesData<{
 //       pages: { questions: QuestionFromUser[] }[];
 //     }>({ queryKey: ['questionsFromUser'] });
-  
 
 //     // Find the question in the cached pages
 //     const question = data[0]?.[1]?.pages
 //       .flatMap(page => page.questions)
 //       .find(q => q.id === id);
-  
+
 //     if (!question) {
 //       return (
 //         <View style={styles.centerContainer}>
@@ -27,7 +26,6 @@
 //         </View>
 //       );
 //     }
-  
 
 //   if (isLoading) {
 //     return (
@@ -179,35 +177,31 @@
 //   },
 // });
 
-
 // app/questions/[id].tsx
 import { View, Text, ScrollView, StyleSheet, SafeAreaView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/utils/supabase";
-import { QuestionFromUser } from "@/hooks/useGetUserQuestions";
+import { useGetUserQuestions, QuestionFromUser } from "@/hooks/useGetUserQuestions";
 
 export default function QuestionDetailScreen() {
-  const { questionId } = useLocalSearchParams<{ questionId: string }>();
+  const params = useLocalSearchParams();
+  const questionId = params.questionId; // Use questionId since that's what's in the params
 
-  // Fetch individual question
-  const { data: question, isLoading } = useQuery({
-    queryKey: ["question", questionId],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+  console.log("Route Params:", params);
+  console.log("QuestionId from params:", questionId);
 
-      const { data, error } = await supabase
-        .from("user_question")
-        .select("*")
-        .eq("id", questionId)
-        .eq("user_id", user.id)
-        .single();
+  const { data, isLoading } = useGetUserQuestions();
 
-      if (error) throw error;
-      return data as QuestionFromUser;
-    },
-  });
+  // Flatten and find the question, ensure we compare as strings
+  const allQuestions = data?.pages.flatMap((page) => page.questions) || [];
+  console.log(
+    "All Questions:",
+    allQuestions.map((q) => ({ id: q.id, title: q.title }))
+  );
+
+  const question = allQuestions.find(
+    (q) => String(q.id) === String(questionId)
+  );
+  console.log("Found Question:", question);
 
   if (isLoading) {
     return (
@@ -241,15 +235,15 @@ export default function QuestionDetailScreen() {
 
       <ScrollView style={styles.chatContainer}>
         <View style={styles.questionBubble}>
-          <Text style={styles.bubbleText}>{question.question_text}</Text>
+          <Text style={styles.bubbleText}>{question.question}</Text>
           <Text style={styles.timestamp}>
             {new Date(question.created_at).toLocaleDateString()}
           </Text>
         </View>
 
-        {question.answer_text ? (
+        {question.answer ? (
           <View style={styles.answerBubble}>
-            <Text style={styles.bubbleText}>{question.answer_text}</Text>
+            <Text style={styles.bubbleText}>{question.answer}</Text>
             <Text style={styles.statusLabel}>{question.status}</Text>
           </View>
         ) : (
@@ -261,11 +255,10 @@ export default function QuestionDetailScreen() {
     </SafeAreaView>
   );
 }
-
 // Helper function to map status strings to colors
 const getStatusColor = (status: QuestionFromUser["status"]) => {
   switch (status) {
-    case "Beantworted.":
+    case "Beantwortet.":
       return "#4CAF50"; // Green
     case "Beantwortung steht noch aus.":
       return "#FFA500"; // Orange
