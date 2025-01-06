@@ -21,7 +21,6 @@ export default function RootLayout() {
         <Stack.Screen
           name="category"
           options={{
-            
             headerShown: true,
             headerLeft: () => {
               return (
@@ -36,24 +35,13 @@ export default function RootLayout() {
             },
           }}
         />
-        <Stack.Screen
-          name="subcategory"
-          options={{ headerShown: true, }}
-        />
-         <Stack.Screen
-          name="question"
-          options={{ headerShown: true, }}
-        />
-        <Stack.Screen
-          name="login"
-          options={{ headerShown: true, }}
-        />
-        <Stack.Screen
-          name="signup"
-          options={{ headerShown: true, }}
-        />
+        <Stack.Screen name="subcategory" options={{ headerShown: true }} />
+        <Stack.Screen name="question" options={{ headerShown: true }} />
+        <Stack.Screen name="login" options={{ headerShown: true }} />
+        <Stack.Screen name="signup" options={{ headerShown: true }} />
+        <Stack.Screen name="userQuestions" options={{ headerShown: false }} />
+
       </Stack>
-      
     </ThemeProvider>
   );
 }

@@ -51,7 +51,7 @@ export default function QuestionLinksFirst() {
             router.replace(
               category.name === "Frage stellen"
                 ? {
-                    pathname: "/(tabs)/renderItems/askQuestion",
+                    pathname: "/(tabs)/renderItems/userQuestions",
                     params: { category: category.name },
                   }
                 : {
