@@ -178,40 +178,46 @@
 // });
 
 // app/questions/[id].tsx
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, Text, ScrollView, StyleSheet, SafeAreaView, ActivityIndicator } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
 import { useGetUserQuestions, QuestionFromUser } from "@/hooks/useGetUserQuestions";
+import { useAuthStore } from "@/components/authStore";
+import { useEffect } from "react";
 
 export default function QuestionDetailScreen() {
   const params = useLocalSearchParams();
-  const questionId = params.questionId; // Use questionId since that's what's in the params
-
-  console.log("Route Params:", params);
-  console.log("QuestionId from params:", questionId);
-
+  const questionId = params.questionId;
+  const { isLoggedIn, session } = useAuthStore();
   const { data, isLoading } = useGetUserQuestions();
 
-  // Flatten and find the question, ensure we compare as strings
-  const allQuestions = data?.pages.flatMap((page) => page.questions) || [];
-  console.log(
-    "All Questions:",
-    allQuestions.map((q) => ({ id: q.id, title: q.title }))
-  );
+  useEffect(() => {
+    if (!isLoggedIn) {
+      router.replace("/(tabs)/renderItems/login");
+    }
+  }, [isLoggedIn]);
 
-  const question = allQuestions.find(
-    (q) => String(q.id) === String(questionId)
-  );
-  console.log("Found Question:", question);
-
-  if (isLoading) {
+  // Show loading state while checking auth and fetching data
+  if (isLoading || !data) {
     return (
       <View style={styles.centerContainer}>
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Loading question...</Text>
       </View>
     );
   }
 
-  if (!question) {
+  // After loading, check auth status
+  if (!isLoggedIn || !session) {
+    return null; // useEffect will handle redirect
+  }
+
+  // Find the question only after we have data
+  const question = data.pages
+    .flatMap(page => page.questions)
+    .find(q => String(q.id) === String(questionId));
+
+  // Check if question exists and belongs to user
+  if (!question || question.user_id !== session.user.id) {
     return (
       <View style={styles.centerContainer}>
         <Text>Question not found</Text>
@@ -235,15 +241,15 @@ export default function QuestionDetailScreen() {
 
       <ScrollView style={styles.chatContainer}>
         <View style={styles.questionBubble}>
-          <Text style={styles.bubbleText}>{question.question}</Text>
+          <Text style={styles.bubbleText}>{question.question_text}</Text>
           <Text style={styles.timestamp}>
             {new Date(question.created_at).toLocaleDateString()}
           </Text>
         </View>
 
-        {question.answer ? (
+        {question.answer_text ? (
           <View style={styles.answerBubble}>
-            <Text style={styles.bubbleText}>{question.answer}</Text>
+            <Text style={styles.bubbleText}>{question.answer_text}</Text>
             <Text style={styles.statusLabel}>{question.status}</Text>
           </View>
         ) : (

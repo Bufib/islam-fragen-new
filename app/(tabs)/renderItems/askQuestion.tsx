@@ -731,6 +731,9 @@ import {
   useGetUserQuestions,
   QuestionFromUser,
 } from "@/hooks/useGetUserQuestions";
+import { useAuthStore } from "@/components/authStore";
+import { router } from "expo-router";
+import { useEffect } from "react";
 
 // Helper to map statuses to colors
 const getStatusColor = (status: QuestionFromUser["status"]) => {
@@ -760,6 +763,14 @@ export default function QuestionsList() {
 
   // Flatten all pages data into a single array
   const questions = data?.pages.flatMap((page) => page.questions) ?? [];
+  const { isLoggedIn, session } = useAuthStore();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      // Redirect to login if not authenticated
+      router.replace("/(tabs)/renderItems/login");
+    }
+  }, [isLoggedIn]);
 
   // Loading state when fetching for the first time
   if (isLoading) {
@@ -769,6 +780,12 @@ export default function QuestionsList() {
       </View>
     );
   }
+
+    // If somehow we get here without being logged in
+    if (!isLoggedIn || !session) {
+      return null; // The useEffect will handle the redirect
+    }
+  
 
   // Render each question card
   const renderQuestion = ({ item }: { item: QuestionFromUser }) => (
