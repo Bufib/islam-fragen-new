@@ -13,6 +13,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { supabase } from "@/utils/supabase";
 import { useAuthStore } from "@/components/authStore";
 import { Controller, useForm } from "react-hook-form";
+import { coustomTheme } from "@/components/coustomTheme";
 
 type QuestionFormData = {
   title: string;
@@ -51,6 +52,7 @@ export default function askQuestion() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const session = useAuthStore((state) => state.session);
+  const themeStyles = coustomTheme();
 
   const {
     control,
@@ -72,14 +74,13 @@ export default function askQuestion() {
     if (!session?.user.id) {
       setError("You must be logged in to submit a question");
       return;
-      
     }
 
     setLoading(true);
     setError(null);
 
     try {
-        console.log(session.user.id)
+      console.log(session.user.id);
       const { error: submissionError } = await supabase
         .from("user_question")
         .insert([
@@ -91,7 +92,7 @@ export default function askQuestion() {
             user_age: parseInt(data.user_age.toString()),
             user_gender: data.user_gender,
             user_email: data.user_email,
-            status: "Beantwortung steht noch aus"
+            status: "Beantwortung steht noch aus",
           },
         ]);
 
@@ -100,7 +101,7 @@ export default function askQuestion() {
       // Add success feedback here
     } catch (err) {
       setError(err.message);
-      console.log(err)
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -109,14 +110,11 @@ export default function askQuestion() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
+      style={[styles.container, themeStyles.defaultBackgorundColor]}
     >
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-      >
+      <ScrollView style={styles.scrollView}>
         <ThemedView style={styles.formContainer}>
-          <ThemedText style={styles.title}>Submit Your Question</ThemedText>
+          <ThemedText style={styles.title} type="title">Neue Frage</ThemedText>
 
           {error && (
             <ThemedView style={styles.errorContainer}>
@@ -126,47 +124,47 @@ export default function askQuestion() {
 
           <Controller
             control={control}
-            rules={{ required: "Title is required" }}
+            rules={{ required: "Bitte gebe einen Titel ein!" }}
             name="title"
             render={({ field: { onChange, value } }) => (
               <CustomInput
-                label="Question Title"
+                label="Titel *"
                 value={value}
                 onChangeText={onChange}
                 error={errors.title?.message}
-                placeholder="Enter the title of your question"
+                placeholder="Titel deiner Frage"
               />
             )}
           />
 
           <Controller
             control={control}
-            rules={{ required: "Marja is required" }}
+            rules={{ required: "Bitte gebe deinen Marja an!" }}
             name="marja"
             render={({ field: { onChange, value } }) => (
               <CustomInput
-                label="Marja"
+                label="Marja *"
                 value={value}
                 onChangeText={onChange}
                 error={errors.marja?.message}
-                placeholder="Enter marja name"
+                placeholder="Wer ist dein Marja?"
               />
             )}
           />
 
           <Controller
             control={control}
-            rules={{ required: "Question is required" }}
+            rules={{ required: "Bitte gebe deine Frage ein!" }}
             name="question"
             render={({ field: { onChange, value } }) => (
               <CustomInput
-                label="Your Question"
+                label="Frage *"
                 value={value}
                 onChangeText={onChange}
                 error={errors.question?.message}
                 multiline
                 numberOfLines={4}
-                placeholder="Type your question here"
+                placeholder="Wie lautet deine Frage?"
               />
             )}
           />
@@ -174,33 +172,32 @@ export default function askQuestion() {
           <Controller
             control={control}
             rules={{
-              required: "Age is required",
-              min: { value: 13, message: "You must be at least 13 years old" },
+              required: "Bitte gebe dein Alter ein!",
             }}
             name="user_age"
             render={({ field: { onChange, value } }) => (
               <CustomInput
-                label="Age"
+                label="Alter *"
                 value={value?.toString() || ""}
-                onChangeText={(text) => onChange(parseInt(text) || "")}
+                onChangeText={(text: string) => onChange(parseInt(text) || "")}
                 keyboardType="numeric"
                 error={errors.user_age?.message}
-                placeholder="Enter your age"
+                placeholder="Dein Alter"
               />
             )}
           />
 
           <Controller
             control={control}
-            rules={{ required: "Gender is required" }}
+            rules={{ required: "Bitte gebe dein Geschlecht an!" }}
             name="user_gender"
             render={({ field: { onChange, value } }) => (
               <CustomInput
-                label="Gender"
+                label="Geschlecht *"
                 value={value}
                 onChangeText={onChange}
                 error={errors.user_gender?.message}
-                placeholder="Enter your gender"
+                placeholder="Dein Geschlecht"
               />
             )}
           />
@@ -208,22 +205,22 @@ export default function askQuestion() {
           <Controller
             control={control}
             rules={{
-              required: "Email is required",
+              required: "Bitte gebe deinen Email an!",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Invalid email address",
+                message: "Ungültige Emailadresse",
               },
             }}
             name="user_email"
             render={({ field: { onChange, value } }) => (
               <CustomInput
-                label="Email"
+                label="Email *"
                 value={value || ""}
                 onChangeText={onChange}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 error={errors.user_email?.message}
-                placeholder="Enter your email"
+                placeholder="Deine Emailadresse"
               />
             )}
           />
@@ -257,11 +254,9 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  contentContainer: {
-    flexGrow: 1,
-    padding: 16,
-  },
+
   formContainer: {
+    flex:1,
     padding: 20,
     borderRadius: 16,
     shadowColor: "#000",
@@ -274,10 +269,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "700",
     marginBottom: 24,
-    textAlign: "center",
   },
   inputContainer: {
     marginBottom: 16,
@@ -293,7 +285,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#E1E1E1",
   },
   textArea: {
     height: 120,
