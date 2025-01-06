@@ -39,9 +39,30 @@ export default function RootLayout() {
         <Stack.Screen name="question" options={{ headerShown: true }} />
         <Stack.Screen name="login" options={{ headerShown: true }} />
         <Stack.Screen name="signup" options={{ headerShown: true }} />
-        <Stack.Screen name="userQuestions" options={{ headerShown: false, headerTitle: "Fragen" }} />
-        <Stack.Screen name="[questionId]" options={{ headerShown: true, headerTitle: "",  }} />
+        <Stack.Screen name="askQuestion" options={{ headerShown: true }} />
 
+        <Stack.Screen
+          name="userQuestions"
+          options={{
+            headerShown: true,
+            headerTitle: "Deine Fragen",
+            headerLeft: () => {
+              return (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={Colors.universal.link}
+                  style={{ marginLeft: -16 }}
+                  onPress={() => router.back()}
+                />
+              );
+            },
+          }}
+        />
+        <Stack.Screen
+          name="[questionId]"
+          options={{ headerShown: true, headerTitle: "" }}
+        />
       </Stack>
     </ThemeProvider>
   );

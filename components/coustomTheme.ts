@@ -41,7 +41,6 @@ export const darkTheme = {
   },
   contrast: {
     backgroundColor: Colors.dark.contrast,
-    borderColor: Colors.dark.borderColor,
   },
   text: {
     color: Colors.dark.text,

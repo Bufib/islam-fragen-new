@@ -18,24 +18,17 @@ import {
 import { useAuthStore } from "@/components/authStore";
 import { formateDate } from "@/components/formateDate";
 import { Colors } from "@/constants/Colors";
-
-// Helper to map statuses to colors
-const getStatusColor = (status: QuestionFromUser["status"]) => {
-  switch (status) {
-    case "Beantwortung steht noch aus":
-      return "#FFA500";
-    case "Beantwortet":
-      return "#4CAF50";
-    case "Abgelehnt":
-      return "#F44336";
-    default:
-      return "#999";
-  }
-};
+import getStatusColor from "@/components/getStatusColor";
+import { useColorScheme } from "react-native";
+import { coustomTheme } from "@/components/coustomTheme";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 
 export default function QuestionsList() {
   // 1. Check auth state from the store
   const { isLoggedIn, session } = useAuthStore();
+  const colorScheme = useColorScheme();
+  const themeStyles = coustomTheme();
 
   // 2. If not logged in, redirect to login
   useEffect(() => {
@@ -60,61 +53,65 @@ export default function QuestionsList() {
   // 4. Handle loading
   if (isLoading) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <View style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#007BFF" />
+          <ActivityIndicator
+            size="large"
+            color={colorScheme === "dark" ? "white" : "black"}
+          />
           <Text style={styles.loadingText}>Loading questions...</Text>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // 5. Handle error
   if (isError) {
     return (
-      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+      <View style={styles.container}>
         <View style={styles.centered}>
           <Text style={styles.errorText}>Failed to load questions</Text>
+
           <Pressable style={styles.retryButton} onPress={refetch}>
             <Text style={styles.retryButtonText}>Retry</Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+      </View>
     );
   }
 
   // 6. Render item
   const renderQuestion = ({ item }: { item: QuestionFromUser }) => (
-    <Link
-      href={{
-        pathname: "/(tabs)/renderItems/[questionId]",
-        params: { questionId: item.id },
-      }}
-      asChild
+    <Pressable
+      style={[styles.questionCard, themeStyles.contrast]}
+      onPress={() =>
+        router.push({
+          pathname: "/(tabs)/renderItems/[questionId]",
+          params: { questionId: item.id },
+        })
+      }
     >
-      <Pressable style={styles.questionCard}>
-        <Text style={styles.questionTitle}>{item.title}</Text>
-        <Text style={styles.questionText} numberOfLines={2}>
-          {item.question}
-        </Text>
-        <View style={styles.questionFooter}>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: getStatusColor(item.status) },
-            ]}
-          >
-            <Text style={styles.statusText}>{item.status}</Text>
-          </View>
+      <ThemedText style={styles.questionTitle}>{item.title}</ThemedText>
+      <ThemedText style={styles.questionText} numberOfLines={2}>
+        {item.question}
+      </ThemedText>
+      <View style={styles.questionFooter}>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: getStatusColor(item.status) },
+          ]}
+        >
+          <Text style={styles.statusText}>{item.status}</Text>
         </View>
-        <Text style={styles.createdAtText}>{formateDate(item.created_at)}</Text>
-      </Pressable>
-    </Link>
+      </View>
+      <Text style={styles.createdAtText}>{formateDate(item.created_at)}</Text>
+    </Pressable>
   );
 
   // 7. Render the full list
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <View style={[styles.container, themeStyles.defaultBackgorundColor]}>
       <FlatList
         data={questions ?? []}
         renderItem={renderQuestion}
@@ -127,16 +124,26 @@ export default function QuestionsList() {
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
         }
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No questions yet</Text>
-          </View>
+          <ThemedView style={styles.emptyContainer}>
+            <ThemedText style={styles.emptyText}>
+              Du hast noch keine Fragen!
+              {"\n"}
+              Klicke unten auf den Button um eine zu stellen.
+            </ThemedText>
+          </ThemedView>
         }
       />
-    </SafeAreaView>
+      <Pressable style={styles.askQuestionButton} onPress={() => router.push("/(tabs)/renderItems/askQuestion")}>
+        <ThemedText>Neue Frage stellen</ThemedText>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -172,11 +179,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   questionCard: {
-    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    // Shadow/elevation for Android
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -190,7 +195,7 @@ const styles = StyleSheet.create({
   },
   questionText: {
     fontSize: 14,
-    color: "#666",
+    color: Colors.universal.questionBoxQuestionText,
     marginBottom: 12,
   },
   questionFooter: {
@@ -215,15 +220,22 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   createdAtText: {
-    color: Colors.universal.created_atTextColor
+    color: Colors.universal.created_atTextColor,
   },
   emptyContainer: {
     alignItems: "center",
     padding: 20,
   },
   emptyText: {
-    color: "#666",
     fontSize: 16,
     textAlign: "center",
+  },
+  askQuestionButton: {
+    position: "absolute",
+    bottom: 30,
+    right: 15,
+    padding: 15,
+    backgroundColor: "blue",
+    borderRadius: 25,
   },
 });

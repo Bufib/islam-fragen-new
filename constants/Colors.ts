@@ -110,5 +110,6 @@ export const Colors = {
     chatBubbleQuestion: "#E3F2FD",
     chatBubbleAnswer: "#E8F5E9",
     statusText: "#ffffff",
+    questionBoxQuestionText: "#666"
   },
 };
