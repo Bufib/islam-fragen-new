@@ -1,24 +1,17 @@
 // app/questions/[questionId].tsx
 import React, { useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, SafeAreaView } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { QuestionFromUser } from "@/hooks/useGetUserQuestions";
 import { useAuthStore } from "@/components/authStore";
-
+import getStatusColor from "@/components/getStatusColor";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { coustomTheme } from "@/components/coustomTheme";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
+import { Colors } from "@/constants/Colors";
 // Helper function to map statuses to colors
-const getStatusColor = (status: QuestionFromUser["status"]) => {
-  switch (status) {
-    case "Beantwortet":
-      return "#4CAF50"; // Green
-    case "Beantwortung steht noch aus":
-      return "#FFA500"; // Orange
-    case "Abgelehnt":
-      return "#F44336"; // Red
-    default:
-      return "#999999"; // Gray
-  }
-};
 
 export default function QuestionDetailScreen() {
   // 1. Grab the questionId from the URL
@@ -28,6 +21,7 @@ export default function QuestionDetailScreen() {
   // 3. Auth
   const { isLoggedIn, session } = useAuthStore();
   const userId = session?.user?.id ?? null;
+  const themeStyles = coustomTheme();
 
   // 4. If user is not logged in, redirect to login
   useEffect(() => {
@@ -52,7 +46,7 @@ export default function QuestionDetailScreen() {
   // 7. Fallback if the question is not in the cache
   if (!question) {
     return (
-      <View style={styles.centerContainer}>
+      <View style={styles.notFound}>
         <Text>Question not found</Text>
       </View>
     );
@@ -60,9 +54,12 @@ export default function QuestionDetailScreen() {
 
   // 8. Render
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{question.title}</Text>
+    <ScrollView
+      contentContainerStyle={styles.contentContainerScrollView}
+      style={[styles.container, themeStyles.defaultBackgorundColor]}
+      showsVerticalScrollIndicator={false}
+    >
+      <ThemedView style={[styles.header, themeStyles.borderColor]}>
         <View
           style={[
             styles.statusBadge,
@@ -71,69 +68,81 @@ export default function QuestionDetailScreen() {
         >
           <Text style={styles.statusText}>{question.status}</Text>
         </View>
-      </View>
+        <ThemedText style={styles.title} type="title">
+          {question.title}
+        </ThemedText>
+      </ThemedView>
 
-      <ScrollView style={styles.chatContainer}>
+      <View style={styles.chatContainer}>
         <View style={styles.questionBubble}>
-          <Text style={styles.bubbleText}>{question.question_text}</Text>
-          <Text style={styles.timestamp}>
-            {new Date(question.created_at).toLocaleDateString()}
+          <Text style={[styles.bubbleText, styles.informationText]}>
+            Marja: {question.marja}
           </Text>
+          <Text style={[styles.bubbleText, styles.informationText]}>
+            Geschlecht: {question.user_gender}
+          </Text>
+          <Text style={[styles.bubbleText, styles.informationText]}>
+            Alter: {question.user_age}
+          </Text>
+          {/* Spacer */}
+          <View style={{ marginBottom: 10 }}></View>
+          <Text style={styles.bubbleText}>{question.question}</Text>
         </View>
 
-        {question.answer_text ? (
+        {question.answer ? (
           <View style={styles.answerBubble}>
-            <Text style={styles.bubbleText}>{question.answer_text}</Text>
-            <Text style={styles.statusLabel}>{question.status}</Text>
+            <Text style={styles.bubbleText}>{question.answer}</Text>
           </View>
         ) : (
           <View style={styles.waitingContainer}>
-            <Text style={styles.waitingText}>Beantwortung steht noch aus.</Text>
+            <ThemedText style={styles.waitingText}>
+              Beantwortung steht noch aus.
+            </ThemedText>
           </View>
         )}
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
   },
-  centerContainer: {
+  contentContainerScrollView: {},
+  notFound: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
   header: {
-    backgroundColor: "white",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    gap: 20,
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+    borderBottomWidth: 1.5,
   },
   title: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 8,
   },
   statusBadge: {
-    alignSelf: "flex-start",
+    alignSelf: "flex-end",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   statusText: {
-    color: "white",
+    color: Colors.universal.statusText,
     fontSize: 12,
     fontWeight: "500",
+    textAlign: "center",
   },
   chatContainer: {
     flex: 1,
     padding: 16,
   },
   questionBubble: {
-    backgroundColor: "#E3F2FD",
+    backgroundColor: Colors.universal.chatBubbleQuestion,
     padding: 16,
     borderRadius: 16,
     borderBottomLeftRadius: 4,
@@ -142,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   answerBubble: {
-    backgroundColor: "#E8F5E9",
+    backgroundColor: Colors.universal.chatBubbleAnswer,
     padding: 16,
     borderRadius: 16,
     borderBottomRightRadius: 4,
@@ -154,23 +163,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
   },
-  timestamp: {
-    fontSize: 12,
-    color: "#666666",
-    marginTop: 8,
+  informationText: {
+    fontWeight: "bold",
   },
-  statusLabel: {
-    fontSize: 12,
-    color: "#4CAF50",
-    marginTop: 8,
-    fontWeight: "500",
-  },
+
   waitingContainer: {
     padding: 16,
     alignItems: "center",
   },
   waitingText: {
-    color: "#666666",
     fontStyle: "italic",
   },
 });

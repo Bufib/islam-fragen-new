@@ -4,11 +4,9 @@ import { useColorScheme } from "react-native";
 export const lightTheme = {
   defaultBackgorundColor: {
     backgroundColor: Colors.light.background,
-    borderColor: Colors.light.borderColor,
   },
   contrast: {
     backgroundColor: Colors.light.contrast,
-    borderColor: Colors.light.borderColor,
   },
 
   text: {
@@ -29,6 +27,10 @@ export const lightTheme = {
   },
   newsMenuLoeschen:{
     color: Colors.light.newsMenuLoeschen,
+  },
+  borderColor: {
+    borderColor: Colors.light.borderColor,
+
   }
 };
 
@@ -59,6 +61,10 @@ export const darkTheme = {
   },
   newsMenuLoeschen:{
     color: Colors.dark.newsMenuLoeschen,
+  },
+  borderColor: {
+    borderColor: Colors.dark.borderColor,
+
   }
 };
 

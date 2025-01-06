@@ -17,14 +17,9 @@ export const Colors = {
     thumbColor: "#f4f3f4",
     modalQuestionText: "#000000",
     activityIndicator: "#000000",
-    newsMenuFixieren:"#388e3c",
-    newsMenuBearbeiten:"#2563EB",
-    newsMenuLoeschen:"#DC2626",
-
-
-
-
-
+    newsMenuFixieren: "#388e3c",
+    newsMenuBearbeiten: "#2563EB",
+    newsMenuLoeschen: "#DC2626",
 
     white: "#FFFFFF",
     error: "#E8290B",
@@ -68,16 +63,9 @@ export const Colors = {
     thumbColor: "#f4f3f4",
     modalQuestionText: "#d0d0c0",
     activityIndicator: "#ffffff",
-    newsMenuFixieren:"#4caf50",
-    newsMenuBearbeiten:"#60A5FA",
-    newsMenuLoeschen:"#EF4444",
-
-
-
-
-
-
-
+    newsMenuFixieren: "#4caf50",
+    newsMenuBearbeiten: "#60A5FA",
+    newsMenuLoeschen: "#EF4444",
 
     white: "#FFFFFF",
     error: "#BA2F16",
@@ -85,7 +73,7 @@ export const Colors = {
     favoriteIcon: "#fbc531",
     black: "#000000",
     link: "rgb(10, 132, 255)", // Delete
-    
+
     addNewsButton: "#d0d0c0",
     tabbarIcon: "##000000",
     categorieBackground: "#96BFCC",
@@ -117,7 +105,10 @@ export const Colors = {
     arrowUp: "#2980b9",
     borderBottomToggleSettings: "#ccc",
     created_atTextColor: "#888",
-    pickImageButton:  "#007bff",
+    pickImageButton: "#007bff",
     submitButton: "#28a745",
+    chatBubbleQuestion: "#E3F2FD",
+    chatBubbleAnswer: "#E8F5E9",
+    statusText: "#ffffff",
   },
 };

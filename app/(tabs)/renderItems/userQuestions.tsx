@@ -16,6 +16,8 @@ import {
   QuestionFromUser,
 } from "@/hooks/useGetUserQuestions";
 import { useAuthStore } from "@/components/authStore";
+import { formateDate } from "@/components/formateDate";
+import { Colors } from "@/constants/Colors";
 
 // Helper to map statuses to colors
 const getStatusColor = (status: QuestionFromUser["status"]) => {
@@ -105,7 +107,7 @@ export default function QuestionsList() {
             <Text style={styles.statusText}>{item.status}</Text>
           </View>
         </View>
-        <Text style={styles.createdAtText}>{item.created_at}</Text>
+        <Text style={styles.createdAtText}>{formateDate(item.created_at)}</Text>
       </Pressable>
     </Link>
   );
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   createdAtText: {
-    
+    color: Colors.universal.created_atTextColor
   },
   emptyContainer: {
     alignItems: "center",

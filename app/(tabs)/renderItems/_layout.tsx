@@ -39,7 +39,8 @@ export default function RootLayout() {
         <Stack.Screen name="question" options={{ headerShown: true }} />
         <Stack.Screen name="login" options={{ headerShown: true }} />
         <Stack.Screen name="signup" options={{ headerShown: true }} />
-        <Stack.Screen name="userQuestions" options={{ headerShown: false }} />
+        <Stack.Screen name="userQuestions" options={{ headerShown: false, headerTitle: "Fragen" }} />
+        <Stack.Screen name="[questionId]" options={{ headerShown: true, headerTitle: "",  }} />
 
       </Stack>
     </ThemeProvider>
