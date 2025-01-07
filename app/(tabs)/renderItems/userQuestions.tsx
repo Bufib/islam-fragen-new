@@ -37,9 +37,7 @@ export default function QuestionsList() {
     }
   }, [isLoggedIn]);
 
-  if (!isLoggedIn || !session) {
-    return null; // or a loading screen
-  }
+ 
 
   // 3. Use our hook to fetch data
   const {
@@ -235,7 +233,7 @@ const styles = StyleSheet.create({
     bottom: 30,
     right: 15,
     padding: 15,
-    backgroundColor: "blue",
+    backgroundColor: "lightblue",
     borderRadius: 25,
   },
 });
