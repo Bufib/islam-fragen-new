@@ -8,7 +8,7 @@ import {
   isQuestionInFavorite,
   addQuestionToFavorite,
   removeQuestionFromFavorite,
-} from "@/components/initializeDatabase";
+} from "@/utils/initializeDatabase";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { removeFavoriteToast, addFavoriteToast } from "@/constants/messages";
 import { useRefreshFavorites } from "@/stores/refreshFavoriteStore";

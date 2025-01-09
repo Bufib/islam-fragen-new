@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Controller } from "react-hook-form";
 
 import { ThemedText } from "@/components/ThemedText";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
 import { TitleSearchInput } from "@/components/TitleSearch";
 import { useAddNews } from "@/hooks/useAddNews"; // Path may vary

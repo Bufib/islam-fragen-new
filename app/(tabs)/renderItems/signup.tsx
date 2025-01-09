@@ -16,7 +16,7 @@ import { supabase } from "@/utils/supabase";
 import { router } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
 
 // Define validation schema with Zod

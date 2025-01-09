@@ -13,7 +13,7 @@ import { supabase } from "@/utils/supabase";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuthStore } from "@/components/authStore";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 
 type LoginFormValues = {
   email: string;

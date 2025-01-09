@@ -5,7 +5,7 @@ import { Link } from "expo-router";
 import { Pressable } from "react-native";
 import { Image } from "expo-image";
 import { useColorScheme } from "react-native";
-import { coustomTheme } from "./coustomTheme";
+import { coustomTheme } from "../utils/coustomTheme";
 import { Text } from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";

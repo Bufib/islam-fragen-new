@@ -3,7 +3,7 @@ import { Modal, StyleSheet, Pressable } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "react-native";
-import { coustomTheme } from "./coustomTheme";
+import { coustomTheme } from "../utils/coustomTheme";
 import { useFontSizeStore } from "@/stores/fontSizeStore";
 
 interface FontSizePickerModalProps {

@@ -2,15 +2,15 @@
 import { useEffect, useState } from "react";
 import { View, Pressable, Text, StyleSheet, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useColorScheme } from "react-native";
 import { router } from "expo-router";
-import editTitle from "./editTitle";
+import editTitle from "../utils/editTitle";
 import { useLocalSearchParams } from "expo-router";
-import { getSubcategoriesForCategory } from "./initializeDatabase";
+import { getSubcategoriesForCategory } from "../utils/initializeDatabase";
 
 function RenderCategoryItems() {
   const { category } = useLocalSearchParams<{ category: string }>();

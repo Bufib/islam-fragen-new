@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useAuthStore } from "./authStore";
+import { useAuthStore } from "../components/authStore";
 import { Alert } from "react-native";
 
 const handleLogout = async () => {

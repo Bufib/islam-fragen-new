@@ -5,7 +5,7 @@ import { Link, router } from "expo-router";
 import { Pressable } from "react-native";
 import { Image } from "expo-image";
 import { useColorScheme } from "react-native";
-import { coustomTheme } from "./coustomTheme";
+import { coustomTheme } from "../utils/coustomTheme";
 import { Text } from "react-native";
 
 export default function QuestionLinksFirst() {

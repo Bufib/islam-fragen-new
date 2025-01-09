@@ -8,10 +8,10 @@ import {
 } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { NewsItemType } from "@/hooks/useFetchNews";
 import { Colors } from "@/constants/Colors";
-import { formateDate } from "./formateDate";
+import { formateDate } from "../utils/formateDate";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import RenderLinkNewsItem from "@/components/RenderLinkNewsItem";
 import { useAuthStore } from "./authStore";

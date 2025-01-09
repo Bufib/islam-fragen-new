@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { initializeDatabase } from "@/components/initializeDatabase";
+import { initializeDatabase } from "@/utils/initializeDatabase";
 
 export function useInitializeDatabase() {
   const [initialized, setInitialized] = useState(false);
@@ -9,7 +9,8 @@ export function useInitializeDatabase() {
       try {
         await initializeDatabase();
         console.log("Database initialized successfully.");
-        setInitialized(true); // Mark initialization as complete
+        // Mark initialization as complete
+        setInitialized(true);
       } catch (error) {
         console.error("Error initializing database:", error);
         setInitialized(false);

@@ -16,11 +16,11 @@ import {
   QuestionFromUser,
 } from "@/hooks/useGetUserQuestions";
 import { useAuthStore } from "@/components/authStore";
-import { formateDate } from "@/components/formateDate";
+import { formateDate } from "@/utils/formateDate";
 import { Colors } from "@/constants/Colors";
-import getStatusColor from "@/components/getStatusColor";
+import getStatusColor from "@/utils/getStatusColor";
 import { useColorScheme } from "react-native";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 

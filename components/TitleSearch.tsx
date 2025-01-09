@@ -299,7 +299,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
-import { searchQuestions } from '@/components/initializeDatabase';
+import { searchQuestions } from '@/utils/initializeDatabase';
 import Feather from '@expo/vector-icons/Feather';
 
 interface TitleSearchInputProps {

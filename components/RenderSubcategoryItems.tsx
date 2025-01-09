@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { View, Pressable, StyleSheet, FlatList } from "react-native";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useColorScheme } from "react-native";
 import { router } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
-import { getQuestionsForSubcategory, QuestionType } from "./initializeDatabase";
+import { getQuestionsForSubcategory, QuestionType } from "../utils/initializeDatabase";
 
 function RenderSubcategoryItems() {
   const { category, subcategory } = useLocalSearchParams<{

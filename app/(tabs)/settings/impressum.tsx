@@ -4,7 +4,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import Markdown from "react-native-markdown-display";
 import { Colors } from "@/constants/Colors";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function impressum() {

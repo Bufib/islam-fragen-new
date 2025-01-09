@@ -4,14 +4,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import Storage from "expo-sqlite/kv-store";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 import { Linking } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuthStore } from "@/components/authStore";
-import handleLogout from "@/components/handleLogout";
+import handleLogout from "@/utils/handleLogout";
 
 const Settings = () => {
   const colorScheme = useColorScheme();

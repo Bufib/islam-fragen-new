@@ -11,7 +11,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme, Pressable } from "react-native";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import Feather from "@expo/vector-icons/Feather";
 import { router } from "expo-router";
 import RenderFavoriteQuestions from "@/components/RenderFavorites";

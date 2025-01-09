@@ -13,7 +13,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { supabase } from "@/utils/supabase";
 import { useAuthStore } from "@/components/authStore";
 import { Controller, useForm } from "react-hook-form";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 
 type QuestionFormData = {
   title: string;

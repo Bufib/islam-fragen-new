@@ -9,9 +9,9 @@ import {
 import Entypo from "@expo/vector-icons/Entypo";
 import { useColorScheme } from "react-native";
 import { Colors } from "@/constants/Colors";
-import { coustomTheme } from "./coustomTheme";
-import { deleteNewsItem } from "./deleteNewsItem";
-import { toggleIsPinnedStatus } from "./toggleIsPinnedStatus";
+import { coustomTheme } from "../utils/coustomTheme";
+import { deleteNewsItem } from "../utils/deleteNewsItem";
+import { toggleIsPinnedStatus } from "../utils/toggleIsPinnedStatus";
 export default function NewsMenu({
   id,
   is_pinned,

@@ -1,6 +1,6 @@
 import { useEffect, useState, useLayoutEffect } from "react";
 import { View, Pressable, StyleSheet, FlatList } from "react-native";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -11,7 +11,7 @@ import {
   getQuestionsForSubcategory,
   QuestionType,
   getFavoriteQuestions,
-} from "./initializeDatabase";
+} from "../utils/initializeDatabase";
 import { useRefreshFavorites } from "@/stores/refreshFavoriteStore";
 
 function RenderFavoriteQuestions() {

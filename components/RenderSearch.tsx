@@ -205,9 +205,9 @@ import { ThemedView } from "./ThemedView";
 import { ThemedText } from "./ThemedText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme, Pressable } from "react-native";
-import { coustomTheme } from "./coustomTheme";
+import { coustomTheme } from "../utils/coustomTheme";
 import Feather from "@expo/vector-icons/Feather";
-import { searchQuestions } from "./initializeDatabase";
+import { searchQuestions } from "../utils/initializeDatabase";
 import { router } from "expo-router";
 import { Keyboard } from "react-native";
 

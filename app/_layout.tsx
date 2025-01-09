@@ -30,6 +30,7 @@ export default function RootLayout() {
   const dbInitialized = useInitializeDatabase();
   const { restoreSession } = useAuthStore();
   const [isSessionRestored, setIsSessionRestored] = useState(false);
+  
   // Musst be before 'if (!loaded || !dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
   useEffect(() => {
     const savedColorScheme = Storage.getItemSync("isDarkMode");

@@ -6,7 +6,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Image } from "expo-image";
-import { coustomTheme } from "./coustomTheme";
+import { coustomTheme } from "../utils/coustomTheme";
 import { useFontSizeStore } from "@/stores/fontSizeStore";
 
 export function Collapsible({

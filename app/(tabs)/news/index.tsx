@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { coustomTheme } from "@/components/coustomTheme";
+import { coustomTheme } from "@/utils/coustomTheme";
 import { useFetchNews } from "@/hooks/useFetchNews";
 import { NewsItem } from "@/components/NewsItem";
 import Ionicons from "@expo/vector-icons/Ionicons";
