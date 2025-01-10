@@ -137,9 +137,9 @@ export default function SignUpScreen() {
       if (usernameExists) {
         Alert.alert(signUpErrorGeneral, signUpUserNameAlreadyInUsage);
         return;
-      } else if (emailExists) {
-        
-       Alert.alert(signUpErrorGeneral, signUpUserEmailAlreadyInUsage);
+      }
+      if (emailExists) {
+        Alert.alert(signUpErrorGeneral, signUpUserEmailAlreadyInUsage);
         return;
       }
 
@@ -154,7 +154,6 @@ export default function SignUpScreen() {
         });
 
       if (signUpError) {
-        //! here
         console.log(signUpError);
 
         Alert.alert(signUpErrorGeneral, signUpError.message);
@@ -180,7 +179,6 @@ export default function SignUpScreen() {
         router.push("/(tabs)/home");
       }
     } catch (error) {
-      //! Here
       console.log(error);
       Alert.alert(signUpErrorGeneral, error.message);
 

@@ -18,7 +18,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
 import { TitleSearchInput } from "@/components/TitleSearch";
-import { useAddNews } from "@/hooks/useAddNews"; // Path may vary
+import { useAddNews } from "@/hooks/useAddNews"; 
 
 export default function AddNews() {
   const {
@@ -62,7 +62,7 @@ export default function AddNews() {
               />
             )}
           />
-          
+
           <ThemedText style={styles.label}>Nachricht</ThemedText>
           <Controller
             control={control}
@@ -201,14 +201,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   imagePickerText: {
-    color: "#fff",
+    color: Colors.universal.white,
     fontWeight: "600",
     fontSize: 16,
   },
   imageContainer: {
     marginRight: 15,
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: Colors.universal.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -221,13 +221,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   removeButton: {
-    backgroundColor: "#e74c3c",
+    backgroundColor: Colors.universal.error,
     borderRadius: 8,
     paddingVertical: 5,
     paddingHorizontal: 10,
   },
   removeButtonText: {
-    color: "#fff",
+    color: Colors.universal.white,
     fontSize: 12,
     fontWeight: "600",
   },
@@ -238,10 +238,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   disabledButton: {
-    backgroundColor: "#aaa",
+    backgroundColor: Colors.universal.created_atTextColor,
   },
   submitButtonText: {
-    color: "#fff",
+    color: Colors.universal.white,
     fontWeight: "700",
     fontSize: 16,
   },

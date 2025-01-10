@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   StyleSheet,
   FlatList,
@@ -40,6 +40,15 @@ export default function NewsFeed() {
   const ListFooter = () => {
     if (!hasNextPage) return null;
 
+    useEffect(() => {
+      const fetchNewsWithoutLoadButton = async () => {
+        if (isAdmin && updated) {
+          await refetch();
+        }
+      };
+      fetchNewsWithoutLoadButton();
+    }, []);
+
     return (
       <ThemedView style={styles.loadMoreContainer}>
         {isFetchingNextPage ? (
@@ -74,7 +83,7 @@ export default function NewsFeed() {
       style={[styles.container, themeStyles.defaultBackgorundColor]}
       edges={["top"]}
     >
-      {updated && (
+      {updated && !isAdmin && (
         <ThemedView style={styles.updateContainer}>
           <Button
             title="Neuer Beitrag verfügbar"

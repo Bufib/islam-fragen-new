@@ -114,7 +114,6 @@ const styles = StyleSheet.create({
   },
   flatListStyle: {
     paddingTop: 10,
-    paddingHorizontal: 10,
   },
   item: {
     flexDirection: "row",

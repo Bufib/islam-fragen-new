@@ -80,3 +80,24 @@ export const addFavoriteToast = () => {
     topOffset: 60,
   });
 };
+
+
+// news
+
+export const newsAddedSuccessToast = () => {
+  return Toast.show({
+    type: "success",
+    text1: "Nachricht erfolgreich hinzugefügt!",
+    text1Style: { fontWeight: "500" },
+    topOffset: 60,
+  });
+};
+
+export const newsDeletedSuccessToast = () => {
+  return Toast.show({
+    type: "success",
+    text1: "Nachricht erfolgreich gelöscht!",
+    text1Style: { fontWeight: "500" },
+    topOffset: 60,
+  });
+};

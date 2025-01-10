@@ -121,6 +121,7 @@ export const NewsItem = ({
                   source={{ uri: item }}
                   style={styles.image}
                   contentFit="cover"
+                  allowDownscaling={true}
                 />
               </View>
             )}

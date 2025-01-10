@@ -12,6 +12,7 @@ import { Colors } from "@/constants/Colors";
 import { coustomTheme } from "../utils/coustomTheme";
 import { deleteNewsItem } from "../utils/deleteNewsItem";
 import { toggleIsPinnedStatus } from "../utils/toggleIsPinnedStatus";
+import { newsDeletedSuccessToast } from "@/constants/messages";
 export default function NewsMenu({
   id,
   is_pinned,
@@ -49,11 +50,7 @@ export default function NewsMenu({
               {is_pinned ? "Nicht mehr fixieren" : "Fixieren"}
             </Text>
           </MenuOption>
-          <MenuOption onSelect={() => Alert.alert("Bearbeiten")}>
-            <Text style={[themeStyles.newsMenuBearbeiten, styles.optionText]}>
-              Bearbeiten
-            </Text>
-          </MenuOption>
+
           <MenuOption
             onSelect={() => {
               Alert.alert(
@@ -68,7 +65,10 @@ export default function NewsMenu({
                   {
                     text: "Löschen",
                     style: "destructive",
-                    onPress: async () => deleteNewsItem(id),
+                    onPress: async () => {
+                      deleteNewsItem(id);
+                      newsDeletedSuccessToast();
+                    },
                   },
                 ]
               );

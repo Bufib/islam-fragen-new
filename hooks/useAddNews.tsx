@@ -5,6 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import { supabase } from "@/utils/supabase";
 import { decode } from "base64-arraybuffer";
 import { router } from "expo-router";
+import { newsAddedSuccessToast } from "@/constants/messages";
 
 export type NewsFormValues = {
   title: string;
@@ -254,7 +255,7 @@ export function useAddNews() {
 
       reset();
       setSelectedImages([]);
-      Alert.alert("Success", "News added successfully!");
+      newsAddedSuccessToast();
       router.push("/(tabs)/news");
     } catch (error: any) {
       console.error("Error submitting news:", error.message);
