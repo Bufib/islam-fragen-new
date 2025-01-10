@@ -14,10 +14,11 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuthStore } from "@/components/authStore";
 import { coustomTheme } from "@/utils/coustomTheme";
-import { loginError, loginSuccess } from "@/constants/messages";
+import { loginError, loginSuccess, loginEmailNotEmpty,loginPasswordNotEmpty } from "@/constants/messages";
 import { Colors } from "@/constants/Colors";
 import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { router } from "expo-router";
+
 
 type LoginFormValues = {
   email: string;
@@ -84,61 +85,61 @@ export default function LoginScreen() {
         style={[styles.scrollViewContainer]}
         contentContainerStyle={styles.scrollViewContent}
       >
-          <View style={[styles.contentContainer, themeStyles.contrast]}>
-            <ThemedText style={styles.title} type="title">
-              Login
+        <View style={[styles.contentContainer, themeStyles.contrast]}>
+          <ThemedText style={styles.title} type="title">
+            Login
+          </ThemedText>
+
+          <Controller
+            control={control}
+            name="email"
+            rules={{ required: loginEmailNotEmpty }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={[styles.input, themeStyles.text]}
+                placeholder="E-mail"
+                onChangeText={onChange}
+                value={value}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            )}
+          />
+          {errors.email && (
+            <Text style={styles.error}>{errors.email.message}</Text>
+          )}
+
+          <Controller
+            control={control}
+            name="password"
+            rules={{ required: loginPasswordNotEmpty }}
+            render={({ field: { onChange, value } }) => (
+              <TextInput
+                style={[styles.input, themeStyles.text]}
+                placeholder="Password"
+                onChangeText={onChange}
+                value={value}
+                secureTextEntry
+              />
+            )}
+          />
+          {errors.password && (
+            <Text style={styles.error}>{errors.password.message}</Text>
+          )}
+
+          <View style={styles.stayLoggedInContainer}>
+            <Switch value={stayLoggedIn} onValueChange={setStayLoggedIn} />
+            <ThemedText style={styles.stayLoggedInText}>
+              Eingeloggt bleiben
             </ThemedText>
-
-            <Controller
-              control={control}
-              name="email"
-              rules={{ required: "Bitte gebe deine E-mail-Adresse ein!" }}
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={[styles.input, themeStyles.text]}
-                  placeholder="E-mail"
-                  onChangeText={onChange}
-                  value={value}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              )}
-            />
-            {errors.email && (
-              <Text style={styles.error}>{errors.email.message}</Text>
-            )}
-
-            <Controller
-              control={control}
-              name="password"
-              rules={{ required: "Bitte gebe dein Passwort ein!" }}
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={[styles.input, themeStyles.text]}
-                  placeholder="Password"
-                  onChangeText={onChange}
-                  value={value}
-                  secureTextEntry
-                />
-              )}
-            />
-            {errors.password && (
-              <Text style={styles.error}>{errors.password.message}</Text>
-            )}
-
-            <View style={styles.stayLoggedInContainer}>
-              <Switch value={stayLoggedIn} onValueChange={setStayLoggedIn} />
-              <ThemedText style={styles.stayLoggedInText}>
-                Eingeloggt bleiben
-              </ThemedText>
-            </View>
-
-            <Button title="Einloggen" onPress={handleSubmit(onSubmit)} />
-            <Button
-              title="Ich möchte mich gerne Registrieren"
-              onPress={() => router.push("/(tabs)/(auth)/signup")}
-            />
           </View>
+
+          <Button title="Einloggen" onPress={handleSubmit(onSubmit)} />
+          <Button
+            title="Ich möchte mich gerne Registrieren"
+            onPress={() => router.push("/(tabs)/(auth)/signup")}
+          />
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -22,7 +22,8 @@ import { Colors } from "@/constants/Colors";
 import {
   signUpErrorGeneral,
   signUpSuccess,
-  signUpUserNamesAlreadyInUsage,
+  signUpUserNameAlreadyInUsage,
+  signUpUserEmailAlreadyInUsage,
   signUpUserNameMin,
   signUpUserPasswordFormat,
   signUpUserPasswordMin,
@@ -43,17 +44,17 @@ const schema = z
   .object({
     username: z
       .string({
-        required_error: signUpUsernameNotEmpty
+        required_error: signUpUsernameNotEmpty,
       })
-      .min(3),
+      .min(3, signUpUserNameMin),
     email: z
       .string({
-        required_error: signUpEmailNotEmpty
+        required_error: signUpEmailNotEmpty,
       })
       .email(signUpEmailNotEmpty),
     password: z
       .string({
-        required_error: signUpPasswordNotEmpty
+        required_error: signUpPasswordNotEmpty,
       })
       .min(8, signUpUserPasswordMin)
       .regex(
@@ -62,7 +63,7 @@ const schema = z
       ),
     confirmPassword: z
       .string({
-        required_error: signUpPasswordNotEmpty
+        required_error: signUpPasswordNotEmpty,
       })
       .min(8, signUpUserPasswordMin),
   })
@@ -94,25 +95,31 @@ export default function SignUpScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const colorScheme = useColorScheme();
 
-  const checkUsernameExists = async (username: string): Promise<boolean> => {
+  const checkUserExists = async (username: string, email: string) => {
     try {
-      const { data: users, error } = await supabase
+      const { data, error } = await supabase
         .from("user")
-        .select("user_username")
-        .eq("user_username", username)
-        .limit(1); // Only fetch one match, that's all we need
+        .select("user_username, user_email") // Fetch both fields
+        .or(`user_username.eq.${username},user_email.eq.${email}`); // Check if either matches
 
       if (error) {
         Alert.alert(signUpErrorGeneral, error.message);
-        return false;
+        return { usernameExists: false, emailExists: false };
       }
 
-      return users && users.length > 0;
+      // Determine which fields already exist
+      const usernameExists = data.some(
+        (user) => user.user_username === username
+      );
+      const emailExists = data.some((user) => user.user_email === email);
+
+      return { usernameExists, emailExists };
     } catch (error) {
       Alert.alert(signUpErrorGeneral, error.message);
-      return false;
+      return { usernameExists: false, emailExists: false };
     }
   };
+
   const signUpWithSupabase = async (
     username: string,
     email: string,
@@ -122,9 +129,17 @@ export default function SignUpScreen() {
       setIsLoading(true);
 
       // First check if username exists
-      const usernameExists = await checkUsernameExists(username);
+      const { usernameExists, emailExists } = await checkUserExists(
+        username,
+        email
+      );
+
       if (usernameExists) {
-        Alert.alert(signUpErrorGeneral, signUpUserNamesAlreadyInUsage);
+        Alert.alert(signUpErrorGeneral, signUpUserNameAlreadyInUsage);
+        return;
+      } else if (emailExists) {
+        
+       Alert.alert(signUpErrorGeneral, signUpUserEmailAlreadyInUsage);
         return;
       }
 
@@ -139,6 +154,7 @@ export default function SignUpScreen() {
         });
 
       if (signUpError) {
+        //! here
         console.log(signUpError);
 
         Alert.alert(signUpErrorGeneral, signUpError.message);
@@ -156,18 +172,15 @@ export default function SignUpScreen() {
         ]);
 
         if (userError) {
-          if (userError.code === "23505") {
-            Alert.alert(signUpErrorGeneral, signUpUserNamesAlreadyInUsage);
-            return;
-          } else {
-            Alert.alert(signUpErrorGeneral, userError.message);
-            return;
-          }
+          Alert.alert(signUpErrorGeneral, userError.message);
+          return;
         }
+
         signUpSuccess();
         router.push("/(tabs)/home");
       }
     } catch (error) {
+      //! Here
       console.log(error);
       Alert.alert(signUpErrorGeneral, error.message);
 

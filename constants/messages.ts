@@ -5,6 +5,7 @@ export const noInternetHeader = "Keine Internetverbindung";
 export const noInternetBody =
   "Bitte stelle sicher, dass du mit dem Internet verbunden bist und versuch es später no einhmal ";
 
+  
 // SignUp
 export const signUpErrorGeneral = "Fehler beim Registrieren!";
 
@@ -26,8 +27,10 @@ export const signUpUserPasswordFormat =
   "Passwort muss mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten";
 export const signUpUserPasswordConformation =
   "Passwörter stimmen nicht überein";
-export const signUpUserNamesAlreadyInUsage =
+export const signUpUserNameAlreadyInUsage =
   "Dieser Benutzername ist bereits vergeben!";
+  export const signUpUserEmailAlreadyInUsage =
+  "Diese Email wird bereis verwendet!";
 
 export const signUpUsernameNotEmpty = "Benutzername darf nicht leer sein.";
 export const signUpEmailNotEmpty = "Email darf nicht leer sein.";
@@ -46,6 +49,8 @@ export const loginSuccess = () => {
   });
 };
 
+export const loginEmailNotEmpty = "Bitte gib deine E-Mail-Adresse ein!";
+export const loginPasswordNotEmpty = "Bitte gib dein Passwort ein!";
 // Logout
 export const logoutErrorGeneral = "Fehler beim ausloggen";
 export const logoutSuccess = () => {

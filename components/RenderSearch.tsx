@@ -210,6 +210,9 @@ import Feather from "@expo/vector-icons/Feather";
 import { searchQuestions } from "../utils/initializeDatabase";
 import { router } from "expo-router";
 import { Keyboard } from "react-native";
+import { Link } from "expo-router";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { Colors } from "@/constants/Colors";
 
 type SearchResults = {
   id: number;
@@ -281,10 +284,27 @@ const RenderSearch = () => {
         })
       }
     >
-      <ThemedText
-        style={[styles.resultCategory, themeStyles.searchResultCategory]}
-      >
-        {item.category_name} {">"} {item.subcategory_name}
+      <ThemedText style={styles.resultCategorySubcategoryLink}>
+        <Link
+          href={{
+            pathname: "/(tabs)/renderItems/category",
+            params: { category: item.category_name },
+          }}
+        >
+          {item.category_name}
+        </Link>
+        {" > "}
+        <Link
+          href={{
+            pathname: "/(tabs)/renderItems/subcategory",
+            params: {
+              category: item.category_name,
+              subcategory: item.subcategory_name,
+            },
+          }}
+        >
+          {item.subcategory_name}
+        </Link>
       </ThemedText>
       <ThemedText style={styles.resultQuestionTitle}>{item.title}</ThemedText>
       <ThemedText style={styles.resultQuestionQuestion} numberOfLines={1}>
@@ -294,56 +314,61 @@ const RenderSearch = () => {
   );
 
   return (
-    <SafeAreaView
-      style={[styles.container, themeStyles.defaultBackgorundColor]}
-      edges={["top"]}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <ThemedView style={styles.headerContainer}>
-        <ThemedText style={styles.headerText} type="title">
-          Suche
-        </ThemedText>
-        <ThemedView style={[styles.searchBarContainer, themeStyles.contrast]}>
-          <TextInput
-            style={[styles.searchBarInput, themeStyles.text]}
-            onChangeText={handleSearchTextChange}
-            value={searchText}
-            placeholder="Suche nach einer Frage die dich interessiert"
-            keyboardType="default"
-          />
-          {searchText && (
-            <Feather
-              name="x-circle"
-              size={18}
-              color={colorScheme === "light" ? "black" : "white"}
-              onPress={() => handleSearchTextChange("")}
-              style={styles.xButton}
+      <SafeAreaView
+        style={[styles.container, themeStyles.defaultBackgorundColor]}
+        edges={["top"]}
+      >
+        <ThemedView style={styles.headerContainer}>
+          <ThemedText style={styles.headerText} type="title">
+            Suche
+          </ThemedText>
+          <ThemedView style={[styles.searchBarContainer, themeStyles.contrast]}>
+            <TextInput
+              style={[styles.searchBarInput, themeStyles.text]}
+              onChangeText={handleSearchTextChange}
+              value={searchText}
+              placeholder="Suche nach einer Frage die dich interessiert"
+              keyboardType="default"
+            />
+            {searchText && (
+              <Feather
+                name="x-circle"
+                size={18}
+                color={colorScheme === "light" ? "black" : "white"}
+                onPress={() => handleSearchTextChange("")}
+                style={styles.xButton}
+              />
+            )}
+          </ThemedView>
+        </ThemedView>
+
+        <ThemedView style={styles.contentContainer}>
+          {loading ? (
+            <ActivityIndicator size="large" color="gray" />
+          ) : (
+            <FlatList
+              data={searchResults}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={renderItem}
+              showsVerticalScrollIndicator={false}
+              keyboardDismissMode="on-drag"
+              keyboardShouldPersistTaps="handled"
+              ListEmptyComponent={
+                searchText.trim() && !loading ? (
+                  <ThemedText style={styles.noResultsText}>
+                    Keine Ergebnisse gefunden.
+                  </ThemedText>
+                ) : null
+              }
             />
           )}
         </ThemedView>
-      </ThemedView>
-
-      <ThemedView style={styles.contentContainer}>
-        {loading ? (
-          <ActivityIndicator size="large" color="gray" />
-        ) : (
-          <FlatList
-            data={searchResults}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={renderItem}
-            showsVerticalScrollIndicator={false}
-            keyboardDismissMode="on-drag"
-            keyboardShouldPersistTaps="handled"
-            ListEmptyComponent={
-              searchText.trim() && !loading ? (
-                <ThemedText style={styles.noResultsText}>
-                  Keine Ergebnisse gefunden.
-                </ThemedText>
-              ) : null
-            }
-          />
-        )}
-      </ThemedView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -354,6 +379,7 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 10,
   },
+
   headerContainer: {
     flexDirection: "column",
     marginBottom: 10,
@@ -388,9 +414,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     gap: 5,
   },
-  resultCategory: {
+  resultCategorySubcategoryLink: {
     fontSize: 14,
-    color: "#555",
+    color: Colors.universal.link,
   },
   resultQuestionTitle: {
     fontSize: 16,

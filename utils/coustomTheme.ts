@@ -7,6 +7,7 @@ export const lightTheme = {
   },
   contrast: {
     backgroundColor: Colors.light.contrast,
+    borderColor: Colors.universal.black
   },
 
   text: {
@@ -41,6 +42,7 @@ export const darkTheme = {
   },
   contrast: {
     backgroundColor: Colors.dark.contrast,
+    borderColor: Colors.universal.white
   },
   text: {
     color: Colors.dark.text,
