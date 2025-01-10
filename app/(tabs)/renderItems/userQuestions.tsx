@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   retryButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: Colors.universal.link,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
