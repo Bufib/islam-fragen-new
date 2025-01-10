@@ -1,14 +1,12 @@
 // Import required modules and hooks
 import { useEffect, useState } from "react";
 import { View, Pressable, Text, StyleSheet, FlatList } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useColorScheme } from "react-native";
 import { router } from "expo-router";
-import editTitle from "../utils/editTitle";
 import { useLocalSearchParams } from "expo-router";
 import { getSubcategoriesForCategory } from "../utils/initializeDatabase";
 
@@ -19,8 +17,6 @@ function RenderCategoryItems() {
   const themeStyle = coustomTheme();
   const colorScheme = useColorScheme();
 
-  // Fetch tables for "Rechtsfragen" category
-  // Fetch tables for "Rechtsfragen" category
   useEffect(() => {
     const loadSubcategories = async () => {
       setIsLoading(true);
@@ -43,7 +39,7 @@ function RenderCategoryItems() {
     loadSubcategories();
   }, [category]);
 
-  // // Display loading state
+  //  Display loading state
   if (isLoading) {
     return (
       <View style={styles.centeredContainer}>

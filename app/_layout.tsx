@@ -3,7 +3,6 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -21,20 +20,22 @@ import { useAuthStore } from "@/components/authStore";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
+
   // Initialize database
   const dbInitialized = useInitializeDatabase();
   const { restoreSession } = useAuthStore();
   const [isSessionRestored, setIsSessionRestored] = useState(false);
-  
-  // Musst be before 'if (!loaded || !dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
+
+  // Musst be before 'if (!dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
   useEffect(() => {
-    const savedColorScheme = Storage.getItemSync("isDarkMode");
-    Appearance.setColorScheme(savedColorScheme === "true" ? "dark" : "light");
+    const setColorTheme = () => {
+      const savedColorScheme = Storage.getItemSync("isDarkMode");
+      Appearance.setColorScheme(savedColorScheme === "true" ? "dark" : "light");
+    };
+    setColorTheme();
   }, []);
 
   // Session restoration effect
@@ -48,12 +49,12 @@ export default function RootLayout() {
 
   // Hide splash screen when everything is ready
   useEffect(() => {
-    if (loaded && dbInitialized && isSessionRestored) {
+    if (dbInitialized && isSessionRestored) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, dbInitialized, isSessionRestored]);
+  }, [dbInitialized, isSessionRestored]);
 
-  if (!loaded || !dbInitialized || !isSessionRestored) {
+  if (!dbInitialized || !isSessionRestored) {
     return null;
   }
 

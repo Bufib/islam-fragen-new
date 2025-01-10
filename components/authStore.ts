@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   async getUserRole(userId: string): Promise<string | null> {
     try {
       const { data, error } = await supabase
-        .from("user_role")
+        .from("user")
         .select("role")
         .eq("user_id", userId)
         .single();

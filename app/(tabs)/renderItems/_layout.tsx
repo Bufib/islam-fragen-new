@@ -37,8 +37,6 @@ export default function RootLayout() {
         />
         <Stack.Screen name="subcategory" options={{ headerShown: true }} />
         <Stack.Screen name="question" options={{ headerShown: true }} />
-        <Stack.Screen name="login" options={{ headerShown: true }} />
-        <Stack.Screen name="signup" options={{ headerShown: true }} />
         <Stack.Screen name="askQuestion" options={{ headerShown: true }} />
 
         <Stack.Screen

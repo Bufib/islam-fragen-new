@@ -80,6 +80,12 @@ export default function TabLayout() {
           href: null,
         }}
       />
+       <Tabs.Screen
+        name="(auth)"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }

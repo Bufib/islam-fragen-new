@@ -56,7 +56,7 @@ const Settings = () => {
             name="login"
             size={24}
             color={colorScheme === "dark" ? "white" : "black"}
-            onPress={() => router.push("/(tabs)/renderItems/login")}
+            onPress={() => router.push("/(tabs)/(auth)/login")}
           />
         )}
       </ThemedView>

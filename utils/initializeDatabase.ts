@@ -20,6 +20,7 @@ export const initializeDatabase = async () => {
     const versionFromStorage = await Storage.getItem("version");
     const versionFromSupabase = await fetchVersionFromSupabase();
 
+    // Check for version mismatch
     if (versionFromStorage !== versionFromSupabase) {
       await fetchQuestionsFromSupabase();
       await Storage.setItem("version", versionFromSupabase);
@@ -390,7 +391,7 @@ export const searchQuestions = async (
       [`%${searchTerm}%`, `%${searchTerm}%`]
     );
 
-    return rows; // Return the matching rows
+    return rows; 
   } catch (error) {
     console.error("Error searching questions:", error);
     throw error;
