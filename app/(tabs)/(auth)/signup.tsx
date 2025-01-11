@@ -39,6 +39,8 @@ import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import Feather from "@expo/vector-icons/Feather";
+import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
+import { useRef, useEffect } from "react";
 // Define validation schema with Zod
 const schema = z
   .object({
@@ -94,6 +96,14 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const colorScheme = useColorScheme();
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const captchaRef = useRef(null);
+
+  useEffect(() => {
+    if (showCaptcha && captchaRef.current) {
+      captchaRef.current?.show();
+    }
+  }, [showCaptcha]);
 
   const checkUserExists = async (username: string, email: string) => {
     try {
@@ -123,7 +133,8 @@ export default function SignUpScreen() {
   const signUpWithSupabase = async (
     username: string,
     email: string,
-    password: string
+    password: string,
+    captchaToken: string
   ) => {
     try {
       setIsLoading(true);
@@ -150,6 +161,7 @@ export default function SignUpScreen() {
           password,
           options: {
             data: { username },
+            captchaToken,
           },
         });
 
@@ -185,8 +197,41 @@ export default function SignUpScreen() {
       console.error(error);
     } finally {
       setIsLoading(false);
+      setShowCaptcha(false);
     }
   };
+
+  const onMessage = async (event: any) => {
+    if (event && event.nativeEvent.data) {
+      const token = event.nativeEvent.data;
+
+      if (["error", "expired"].includes(token)) {
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+        );
+      } else if (token === "cancel") {
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
+        );
+      } else if (token === "open") {
+        // Captcha opened
+      } else {
+        handleSubmit(async (formData) => {
+          await signUpWithSupabase(
+            formData.username,
+            formData.email,
+            formData.password,
+            token
+          );
+        })();
+      }
+    }
+  };
+
   const onSubmit = async (data: SignUpFormValues) => {
     // Check for internet
     const netInfo = await NetInfo.fetch();
@@ -194,7 +239,7 @@ export default function SignUpScreen() {
       Alert.alert(noInternetHeader, noInternetBody);
       return;
     }
-    await signUpWithSupabase(data.username, data.email, data.password);
+    setShowCaptcha(true);
   };
 
   return (
@@ -350,6 +395,16 @@ export default function SignUpScreen() {
             />
           </View>
         </View>
+        {showCaptcha && (
+          <ConfirmHcaptcha
+            ref={captchaRef}
+             siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
+          baseUrl="https://hcaptcha.com"
+            onMessage={onMessage}
+            languageCode="de"
+            size="invisible"
+          />
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
