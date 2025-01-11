@@ -16,7 +16,7 @@ import {
   useFetchUserQuestions,
   QuestionFromUser,
 } from "@/hooks/useFetchUserQuestions";
-import { useAuthStore } from "@/components/authStore";
+import { useAuthStore } from "@/utils/authStore";
 import { formateDate } from "@/utils/formateDate";
 import { Colors } from "@/constants/Colors";
 import getStatusColor from "@/utils/getStatusColor";

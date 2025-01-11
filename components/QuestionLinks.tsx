@@ -8,12 +8,14 @@ import { useColorScheme } from "react-native";
 import { coustomTheme } from "../utils/coustomTheme";
 import { Text } from "react-native";
 import { Colors } from "@/constants/Colors";
+import { useAuthStore } from "@/utils/authStore";
 
 export default function QuestionLinks() {
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
   const { width } = useWindowDimensions();
+  const { isLoggedIn } = useAuthStore();
 
   // Dynamically calculate the size of each element based on screen width
   const elementSize = width > 400 ? 200 : 160;
@@ -32,7 +34,7 @@ export default function QuestionLinks() {
       name: "Historie",
       image: require("@/assets/images/historie.png"),
     },
-    { 
+    {
       name: "Glaubensfragen",
       image: require("@/assets/images/glaubensfragen.png"),
     },
@@ -60,10 +62,14 @@ export default function QuestionLinks() {
           onPressOut={() => setPressedIndex(null)}
           onPress={() =>
             router.replace(
-              category.name === "Frage stellen"
+              category.name === "Frage stellen" && isLoggedIn
                 ? {
                     pathname: "/(tabs)/(auth)/(userQuestions)",
                     params: { category: category.name },
+                  }
+                : category.name === "Frage stellen" && !isLoggedIn
+                ? {
+                    pathname: "/(tabs)/(auth)/login",
                   }
                 : {
                     pathname: "/(tabs)/renderItems/category",
@@ -90,9 +96,9 @@ export default function QuestionLinks() {
             contentFit="contain"
           />
           <View style={styles.elementTextContainer}>
-          <Text style={[styles.elementText, { fontSize: fontSize }]}>
-            {category.name}
-          </Text>
+            <Text style={[styles.elementText, { fontSize: fontSize }]}>
+              {category.name}
+            </Text>
           </View>
         </Pressable>
       ))}
@@ -120,7 +126,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: -2.5, height: 4 },
     shadowOpacity: 0.65,
     shadowRadius: 3,
-    backgroundColor: Colors.universal.indexItemBackgroundColor
+    backgroundColor: Colors.universal.indexItemBackgroundColor,
   },
 
   askQuestionElement: {},
@@ -130,14 +136,12 @@ const styles = StyleSheet.create({
     height: "auto",
     aspectRatio: 1.5,
     alignSelf: "center",
-    
   },
   elementTextContainer: {
     padding: 1,
     backgroundColor: Colors.universal.white,
     borderRadius: 20,
     borderWidth: 1,
-
   },
 
   elementText: {

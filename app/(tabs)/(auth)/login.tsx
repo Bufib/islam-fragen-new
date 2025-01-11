@@ -12,7 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import { supabase } from "@/utils/supabase";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { useAuthStore } from "@/components/authStore";
+import { useAuthStore } from "@/utils/authStore";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { loginError, loginSuccess, loginEmailNotEmpty,loginPasswordNotEmpty } from "@/constants/messages";
 import { Colors } from "@/constants/Colors";

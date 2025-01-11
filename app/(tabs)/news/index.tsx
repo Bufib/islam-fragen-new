@@ -13,7 +13,7 @@ import { coustomTheme } from "@/utils/coustomTheme";
 import { useFetchNews } from "@/hooks/useFetchNews";
 import { NewsItem } from "@/components/NewsItem";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useAuthStore } from "@/components/authStore";
+import { useAuthStore } from "@/utils/authStore";
 import { router } from "expo-router";
 
 export default function NewsFeed() {

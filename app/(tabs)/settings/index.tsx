@@ -10,7 +10,7 @@ import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
 import { Linking } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
-import { useAuthStore } from "@/components/authStore";
+import { useAuthStore } from "@/utils/authStore";
 import handleLogout from "@/utils/handleLogout";
 
 const Settings = () => {

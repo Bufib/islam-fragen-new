@@ -14,7 +14,7 @@ import { Colors } from "@/constants/Colors";
 import { formateDate } from "../utils/formateDate";
 import { useColorScheme } from "@/hooks/useColorScheme.web";
 import RenderLinkNewsItem from "@/components/RenderLinkNewsItem";
-import { useAuthStore } from "./authStore";
+import { useAuthStore } from "../utils/authStore";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import NewsMenu from "./NewsMenu";
 import { Image } from "expo-image";
