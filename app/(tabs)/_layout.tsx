@@ -60,9 +60,8 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="settings"
-        
         options={{
-          title: "settings",
+          title: "Einstellungen",
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="gear.circle" color={color} />
           ),
@@ -80,7 +79,7 @@ export default function TabLayout() {
           href: null,
         }}
       />
-       <Tabs.Screen
+      <Tabs.Screen
         name="(auth)"
         options={{
           href: null,

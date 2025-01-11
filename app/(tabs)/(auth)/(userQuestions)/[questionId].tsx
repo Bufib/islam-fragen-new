@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { QuestionFromUser } from "@/hooks/useGetUserQuestions";
+import { QuestionFromUser } from "@/hooks/useFetchUserQuestions";
 import { useAuthStore } from "@/components/authStore";
 import getStatusColor from "@/utils/getStatusColor";
 import { SafeAreaView } from "react-native-safe-area-context";

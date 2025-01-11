@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
+import { userQuestionsNewAnswerForQuestions } from "@/constants/messages";
 
 export type QuestionFromUser = {
   id: string;
@@ -10,8 +11,8 @@ export type QuestionFromUser = {
   status: "Beantwortet" | "Beantwortung steht noch aus" | "Abgelehnt";
   marja: string;
   title: string;
-  user_gender: string,
-  user_age: string,
+  user_gender: string;
+  user_age: string;
   created_at: string;
 };
 
@@ -21,10 +22,11 @@ export type AskQuestionFormData = {
   marja: string;
 };
 
-export const useGetUserQuestions = () => {
+export const useFetchUserQuestions = () => {
   const queryClient = useQueryClient();
   const [userId, setUserId] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [hasUpdate, setHasUpdate] = useState(false); // Tracks if new data is available
 
   //
   // 1. Fetch the current user once, and set up an auth state listener
@@ -77,16 +79,39 @@ export const useGetUserQuestions = () => {
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "INSERT",
           schema: "public",
           table: "user_question",
           filter: `user_id=eq.${userId}`,
         },
         () => {
-          // Invalidate so TanStack Query re-fetches
-          queryClient.invalidateQueries({
-            queryKey: ["questionsFromUser", userId],
-          });
+          setHasUpdate(true);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "user_question",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          setHasUpdate(true);
+          userQuestionsNewAnswerForQuestions();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "DELETE",
+          schema: "public",
+          table: "user_question",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          setHasUpdate(true);
+          userQuestionsNewAnswerForQuestions();
         }
       )
       .subscribe();
@@ -108,7 +133,8 @@ export const useGetUserQuestions = () => {
         .from("user_question")
         .select("*")
         .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+        .order("update_answered_at", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: true });
 
       if (error) {
         throw new Error(error.message);
@@ -123,8 +149,15 @@ export const useGetUserQuestions = () => {
     refetchOnWindowFocus: false,
   });
 
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["questionsFromUser"] });
+    setHasUpdate(false); // Reset the flag after refreshing
+  };
+
   return {
     ...queryResult,
     isInitializing,
+    hasUpdate,
+    handleRefresh,
   };
 };

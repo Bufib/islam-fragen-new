@@ -7,14 +7,15 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
+  Button,
 } from "react-native";
 import { Link } from "expo-router";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  useGetUserQuestions,
+  useFetchUserQuestions,
   QuestionFromUser,
-} from "@/hooks/useGetUserQuestions";
+} from "@/hooks/useFetchUserQuestions";
 import { useAuthStore } from "@/components/authStore";
 import { formateDate } from "@/utils/formateDate";
 import { Colors } from "@/constants/Colors";
@@ -23,6 +24,7 @@ import { useColorScheme } from "react-native";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { userQuestionErrorLoadingQuestions } from "@/constants/messages";
 
 export default function QuestionsList() {
   // 1. Check auth state from the store
@@ -37,8 +39,6 @@ export default function QuestionsList() {
     }
   }, [isLoggedIn]);
 
- 
-
   // 3. Use our hook to fetch data
   const {
     data: questions, // Here, data is now an array of questions
@@ -46,35 +46,41 @@ export default function QuestionsList() {
     isRefetching,
     refetch,
     isError,
-  } = useGetUserQuestions();
+    hasUpdate,
+    handleRefresh,
+  } = useFetchUserQuestions();
 
-  // 4. Handle loading
+  // Loading state should be checked first
   if (isLoading) {
     return (
-      <View style={styles.container}>
-        <View style={styles.centered}>
-          <ActivityIndicator
-            size="large"
-            color={colorScheme === "dark" ? "white" : "black"}
-          />
-          <Text style={styles.loadingText}>Loading questions...</Text>
-        </View>
-      </View>
+      <ThemedView style={[styles.container, styles.centered]}>
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "white" : "black"}
+        />
+        <ThemedText style={styles.loadingText}>
+          Fragen werden geladen...
+        </ThemedText>
+      </ThemedView>
     );
   }
 
   // 5. Handle error
   if (isError) {
     return (
-      <View style={styles.container}>
-        <View style={styles.centered}>
-          <Text style={styles.errorText}>Failed to load questions</Text>
+      <ThemedView style={styles.container}>
+        <ThemedView style={styles.centered}>
+          <ThemedText style={styles.errorText}>
+            {userQuestionErrorLoadingQuestions}
+          </ThemedText>
 
           <Pressable style={styles.retryButton} onPress={refetch}>
-            <Text style={styles.retryButtonText}>Retry</Text>
+            <ThemedText style={styles.retryButtonText}>
+              Versuch es nochmal
+            </ThemedText>
           </Pressable>
-        </View>
-      </View>
+        </ThemedView>
+      </ThemedView>
     );
   }
 
@@ -84,7 +90,7 @@ export default function QuestionsList() {
       style={[styles.questionCard, themeStyles.contrast]}
       onPress={() =>
         router.push({
-          pathname: "/(tabs)/renderItems/[questionId]",
+          pathname: "/(tabs)/(auth)/(userQuestions)/[questionId]",
           params: { questionId: item.id },
         })
       }
@@ -109,14 +115,21 @@ export default function QuestionsList() {
 
   // 7. Render the full list
   return (
-    <View style={[styles.container, themeStyles.defaultBackgorundColor]}>
+    <ThemedView style={[styles.container, themeStyles.defaultBackgorundColor]}>
+      {hasUpdate && (
+        <Pressable style={styles.updateButton} onPress={handleRefresh}>
+          <Text style={styles.updateButtonText}>Aktualisieren</Text>
+        </Pressable>
+      )}
+
       <FlatList
-        data={questions ?? []}
+        data={questions}
         renderItem={renderQuestion}
         keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.listContainer,
-          questions?.length === 0 && styles.emptyListContainer,
+          questions?.length === 0 && !isLoading && styles.emptyListContainer,
         ]}
         refreshControl={
           <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
@@ -131,10 +144,18 @@ export default function QuestionsList() {
           </ThemedView>
         }
       />
-      <Pressable style={styles.askQuestionButton} onPress={() => router.push("/(tabs)/renderItems/askQuestion")}>
-        <ThemedText>Neue Frage stellen</ThemedText>
+
+      <Pressable
+        style={styles.askQuestionButton}
+        onPress={() =>
+          router.push("/(tabs)/(auth)/(userQuestions)/askQuestion")
+        }
+      >
+        <ThemedText style={styles.askQuestionButtonText}>
+          Neue Frage stellen
+        </ThemedText>
       </Pressable>
-    </View>
+    </ThemedView>
   );
 }
 
@@ -153,9 +174,8 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   errorText: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 16,
+    fontSize: 18,
+    marginBottom: 20,
     textAlign: "center",
   },
   retryButton: {
@@ -176,6 +196,19 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
   },
+  updateButton: {
+    backgroundColor: Colors.universal.link,
+    padding: 10,
+    margin: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  updateButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
   questionCard: {
     borderRadius: 12,
     padding: 16,
@@ -233,7 +266,10 @@ const styles = StyleSheet.create({
     bottom: 30,
     right: 15,
     padding: 15,
-    backgroundColor: "lightblue",
+    backgroundColor: Colors.universal.link,
     borderRadius: 25,
+  },
+  askQuestionButtonText: {
+    color: Colors.universal.white,
   },
 });

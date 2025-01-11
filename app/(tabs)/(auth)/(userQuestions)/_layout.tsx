@@ -4,13 +4,11 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import Entypo from "@expo/vector-icons/Entypo";
-import { Colors } from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
+import { Colors } from "@/constants/Colors";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -19,9 +17,10 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen
-          name="category"
+          name="index"
           options={{
             headerShown: true,
+            headerTitle: "Deine Fragen",
             headerLeft: () => {
               return (
                 <Ionicons
@@ -35,8 +34,11 @@ export default function RootLayout() {
             },
           }}
         />
-        <Stack.Screen name="subcategory" options={{ headerShown: true }} />
-        <Stack.Screen name="question" options={{ headerShown: true }} />
+        <Stack.Screen name="askQuestion" options={{ headerShown: true }} />
+        <Stack.Screen
+          name="[questionId]"
+          options={{ headerShown: true, headerTitle: "" }}
+        />
       </Stack>
     </ThemeProvider>
   );

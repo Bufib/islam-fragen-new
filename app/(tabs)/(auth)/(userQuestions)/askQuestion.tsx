@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  View,
 } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -14,6 +15,9 @@ import { supabase } from "@/utils/supabase";
 import { useAuthStore } from "@/components/authStore";
 import { Controller, useForm } from "react-hook-form";
 import { coustomTheme } from "@/utils/coustomTheme";
+import { Colors } from "@/constants/Colors";
+import { askQuestionQuestionSendSuccess } from "@/constants/messages";
+import { router } from "expo-router";
 
 type QuestionFormData = {
   title: string;
@@ -29,15 +33,17 @@ const CustomInput = ({
   error,
   multiline,
   numberOfLines,
+  style,
   ...props
 }: any) => (
-  <ThemedView style={styles.inputContainer}>
+  <View style={styles.inputContainer}>
     <ThemedText style={styles.label}>{label}</ThemedText>
     <TextInput
       style={[
         styles.input,
         multiline && styles.textArea,
         error && styles.inputError,
+        style,
       ]}
       placeholderTextColor="#666"
       numberOfLines={numberOfLines}
@@ -45,7 +51,7 @@ const CustomInput = ({
       {...props}
     />
     {error && <ThemedText style={styles.errorText}>{error}</ThemedText>}
-  </ThemedView>
+  </View>
 );
 
 export default function askQuestion() {
@@ -98,7 +104,8 @@ export default function askQuestion() {
 
       if (submissionError) throw submissionError;
       reset();
-      // Add success feedback here
+      //askQuestionQuestionSendSuccess();
+      router.push("/");
     } catch (err) {
       setError(err.message);
       console.log(err);
@@ -112,16 +119,21 @@ export default function askQuestion() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, themeStyles.defaultBackgorundColor]}
     >
-      <ScrollView style={styles.scrollView}>
-        <ThemedView style={styles.formContainer}>
-          <ThemedText style={styles.title} type="title">Neue Frage</ThemedText>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        <ThemedText style={styles.title} type="title">
+          Neue Frage
+        </ThemedText>
 
-          {error && (
-            <ThemedView style={styles.errorContainer}>
-              <ThemedText style={styles.errorText}>{error}</ThemedText>
-            </ThemedView>
-          )}
+        {error && (
+          <ThemedView style={styles.errorContainer}>
+            <ThemedText style={styles.errorText}>{error}</ThemedText>
+          </ThemedView>
+        )}
 
+        <View style={[styles.formContainer, themeStyles.contrast]}>
           <Controller
             control={control}
             rules={{ required: "Bitte gebe einen Titel ein!" }}
@@ -133,6 +145,7 @@ export default function askQuestion() {
                 onChangeText={onChange}
                 error={errors.title?.message}
                 placeholder="Titel deiner Frage"
+                style={themeStyles.text}
               />
             )}
           />
@@ -148,6 +161,7 @@ export default function askQuestion() {
                 onChangeText={onChange}
                 error={errors.marja?.message}
                 placeholder="Wer ist dein Marja?"
+                style={themeStyles.text}
               />
             )}
           />
@@ -165,6 +179,7 @@ export default function askQuestion() {
                 multiline
                 numberOfLines={4}
                 placeholder="Wie lautet deine Frage?"
+                style={themeStyles.text}
               />
             )}
           />
@@ -183,6 +198,7 @@ export default function askQuestion() {
                 keyboardType="numeric"
                 error={errors.user_age?.message}
                 placeholder="Dein Alter"
+                style={themeStyles.text}
               />
             )}
           />
@@ -198,6 +214,7 @@ export default function askQuestion() {
                 onChangeText={onChange}
                 error={errors.user_gender?.message}
                 placeholder="Dein Geschlecht"
+                style={themeStyles.text}
               />
             )}
           />
@@ -221,27 +238,24 @@ export default function askQuestion() {
                 autoCapitalize="none"
                 error={errors.user_email?.message}
                 placeholder="Deine Emailadresse"
+                style={themeStyles.text}
               />
             )}
           />
-
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              loading && styles.submitButtonDisabled,
-            ]}
-            onPress={handleSubmit(onSubmit)}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <ThemedText style={styles.submitButtonText}>
-                Submit Question
-              </ThemedText>
-            )}
-          </TouchableOpacity>
-        </ThemedView>
+        </View>
+        <Pressable
+          style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+          onPress={handleSubmit(onSubmit)}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="black" />
+          ) : (
+            <ThemedText style={styles.submitButtonText}>
+              Frage stellen
+            </ThemedText>
+          )}
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -250,24 +264,12 @@ export default function askQuestion() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 15,
   },
   scrollView: {
     flex: 1,
   },
 
-  formContainer: {
-    flex:1,
-    padding: 20,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
   title: {
     marginBottom: 24,
   },
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   inputError: {
-    borderColor: "#FF3B30",
+    borderColor: Colors.universal.error,
   },
   errorContainer: {
     backgroundColor: "#FFE5E5",
@@ -302,23 +304,30 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   errorText: {
-    color: "#FF3B30",
+    color: Colors.universal.error,
     fontSize: 14,
   },
+  formContainer: {
+    flex: 1,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 20,
+  },
   submitButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: Colors.universal.link,
     height: 56,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 24,
+    marginBottom: 20,
   },
   submitButtonDisabled: {
     opacity: 0.7,
   },
   submitButtonText: {
-    color: "#ffffff",
     fontSize: 18,
     fontWeight: "600",
+    color: Colors.universal.white,
   },
 });

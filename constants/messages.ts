@@ -1,11 +1,11 @@
 import Toast from "react-native-toast-message";
+import { router } from "expo-router";
 
 // Internet
 export const noInternetHeader = "Keine Internetverbindung";
 export const noInternetBody =
   "Bitte stelle sicher, dass du mit dem Internet verbunden bist und versuch es später no einhmal ";
 
-  
 // SignUp
 export const signUpErrorGeneral = "Fehler beim Registrieren!";
 
@@ -29,14 +29,12 @@ export const signUpUserPasswordConformation =
   "Passwörter stimmen nicht überein";
 export const signUpUserNameAlreadyInUsage =
   "Dieser Benutzername ist bereits vergeben!";
-  export const signUpUserEmailAlreadyInUsage =
+export const signUpUserEmailAlreadyInUsage =
   "Diese Email wird bereis verwendet!";
 
 export const signUpUsernameNotEmpty = "Benutzername darf nicht leer sein.";
 export const signUpEmailNotEmpty = "Email darf nicht leer sein.";
 export const signUpPasswordNotEmpty = "Passwort darf nicht leer sein.";
-
-
 
 // Login
 export const loginError = "Fehler beim login";
@@ -81,7 +79,6 @@ export const addFavoriteToast = () => {
   });
 };
 
-
 // news
 
 export const newsAddedSuccessToast = () => {
@@ -97,6 +94,32 @@ export const newsDeletedSuccessToast = () => {
   return Toast.show({
     type: "success",
     text1: "Nachricht erfolgreich gelöscht!",
+    text1Style: { fontWeight: "500" },
+    topOffset: 60,
+  });
+};
+
+// userQuestions
+
+export const userQuestionsNewAnswerForQuestions = () => {
+  return Toast.show({
+    type: "info",
+    text1: "Neue Nachricht verfügbar",
+    text1Style: { fontWeight: "500" },
+    topOffset: 60,
+    onPress() {
+      router.push("/(tabs)/(auth)/(userQuestions)/");
+    },
+  });
+};
+
+export const userQuestionErrorLoadingQuestions = "Fehler beim laden deiner Fragen!";
+
+// send question
+export const askQuestionQuestionSendSuccess = () => {
+  return Toast.show({
+    type: "success",
+    text1: "Die Frage wurde erfolgreich gesendet!",
     text1Style: { fontWeight: "500" },
     topOffset: 60,
   });
