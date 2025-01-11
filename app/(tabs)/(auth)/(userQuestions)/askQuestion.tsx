@@ -16,7 +16,6 @@ import { useAuthStore } from "@/components/authStore";
 import { Controller, useForm } from "react-hook-form";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
-import { askQuestionQuestionSendSuccess } from "@/constants/messages";
 import { router } from "expo-router";
 
 type QuestionFormData = {
@@ -104,8 +103,6 @@ export default function askQuestion() {
 
       if (submissionError) throw submissionError;
       reset();
-      //askQuestionQuestionSendSuccess();
-      router.push("/");
     } catch (err) {
       setError(err.message);
       console.log(err);

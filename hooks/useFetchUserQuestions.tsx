@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 import { userQuestionsNewAnswerForQuestions } from "@/constants/messages";
+import { router } from "expo-router";
+import { askQuestionQuestionSendSuccess } from "@/constants/messages";
+
 
 export type QuestionFromUser = {
   id: string;
@@ -85,7 +88,10 @@ export const useFetchUserQuestions = () => {
           filter: `user_id=eq.${userId}`,
         },
         () => {
-          setHasUpdate(true);
+          askQuestionQuestionSendSuccess();
+
+          handleRefresh();
+          router.push("/");
         }
       )
       .on(
