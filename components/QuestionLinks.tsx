@@ -48,7 +48,7 @@ export default function QuestionLinks() {
       image: require("@/assets/images/ratschlaege.png"),
     },
     {
-      name: "Frage stellen",
+      name: "Stelle eine Frage",
       image: require("@/assets/images/frageStellen.png"),
     },
   ];
@@ -80,26 +80,55 @@ export default function QuestionLinks() {
           style={[
             styles.element,
             {
-              shadowColor: colorScheme === "light" ? "black" : "white",
               width: elementSize,
               height: elementSize,
             },
-            pressedIndex === index && { shadowOpacity: 0 },
 
             index === 6 && styles.askQuestionElement,
-            index === 6 && { width: elementSize * 2.1 },
+            index === 6 && {
+              width: elementSize * 2.1,
+              height: elementSize / 2,
+            },
           ]}
         >
-          <Image
-            style={styles.elementIcon}
-            source={category.image}
-            contentFit="contain"
-          />
-          <View style={styles.elementTextContainer}>
-            <Text style={[styles.elementText, { fontSize: fontSize }]}>
-              {category.name}
-            </Text>
-          </View>
+          {/* Image top and text bottom */}
+
+          {category.name !== "Stelle eine Frage" && (
+            <View style={styles.buttonContentContainerNormal}>
+              <Image
+                style={styles.elementIcon}
+                source={category.image}
+                contentFit="contain"
+              />
+
+              <View style={styles.elementTextContainer}>
+                <Text style={[styles.elementText, { fontSize: fontSize }]}>
+                  {category.name}
+                </Text>
+              </View>
+            </View>
+          )}
+
+          {/* Text left and Image right */}
+
+          {category.name === "Stelle eine Frage" && (
+            <View style={styles.buttonContentContainerAskQuestion}>
+              <View style={styles.elementTextContainerAskQuestion}>
+                <Text style={[styles.elementText, { fontSize: fontSize }]}>
+                  {category.name}
+                </Text>
+              </View>
+
+              <Image
+                style={[
+                  styles.elementIcon,
+                  { width: 100, alignItems: "center" },
+                ]}
+                source={category.image}
+                contentFit="contain"
+              />
+            </View>
+          )}
         </Pressable>
       ))}
     </ThemedView>
@@ -123,32 +152,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 30,
     borderWidth: 2,
-    shadowOffset: { width: -2.5, height: 4 },
-    shadowOpacity: 0.65,
-    shadowRadius: 3,
     backgroundColor: Colors.universal.indexItemBackgroundColor,
   },
 
-  askQuestionElement: {},
+  askQuestionElement: {
+    backgroundColor: "#0C556A"
+  },
 
+  buttonContentContainerNormal: {},
+  buttonContentContainerAskQuestion: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  elementTextContainer: {
+    padding: 5,
+    backgroundColor: Colors.universal.white,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  elementTextContainerAskQuestion: {
+    flex: 1,
+    padding: 7,
+    marginHorizontal: 10,
+    backgroundColor: Colors.universal.white,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
   elementIcon: {
     width: 150,
     height: "auto",
     aspectRatio: 1.5,
     alignSelf: "center",
   },
-  elementTextContainer: {
-    padding: 1,
-    backgroundColor: Colors.universal.white,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-
   elementText: {
     fontSize: 20,
     fontWeight: "bold",
-    padding: 5,
     textAlign: "center",
-    paddingHorizontal: 5,
   },
 });

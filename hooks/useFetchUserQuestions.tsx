@@ -5,7 +5,6 @@ import { userQuestionsNewAnswerForQuestions } from "@/constants/messages";
 import { router } from "expo-router";
 import { askQuestionQuestionSendSuccess } from "@/constants/messages";
 
-
 export type QuestionFromUser = {
   id: string;
   user_id: string;

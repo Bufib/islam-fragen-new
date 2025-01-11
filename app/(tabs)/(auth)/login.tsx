@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   View,
   TextInput,
@@ -14,11 +14,16 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuthStore } from "@/utils/authStore";
 import { coustomTheme } from "@/utils/coustomTheme";
-import { loginError, loginSuccess, loginEmailNotEmpty,loginPasswordNotEmpty } from "@/constants/messages";
+import {
+  loginError,
+  loginSuccess,
+  loginEmailNotEmpty,
+  loginPasswordNotEmpty,
+} from "@/constants/messages";
 import { Colors } from "@/constants/Colors";
 import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { router } from "expo-router";
-
+import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
 
 type LoginFormValues = {
   email: string;
@@ -31,19 +36,27 @@ export default function LoginScreen() {
     handleSubmit,
     formState: { errors },
     reset,
+    getValues,
   } = useForm<LoginFormValues>();
 
-  const { setSession, restoreSession } = useAuthStore();
+  const { setSession } = useAuthStore();
   const [stayLoggedIn, setStayLoggedIn] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [showCaptcha, setShowCaptcha] = React.useState(false);
+  const captchaRef = useRef(null);
   const themeStyles = coustomTheme();
 
-  const loginWithSupabase = async (email: string, password: string) => {
+  const loginWithSupabase = async (
+    email: string,
+    password: string,
+    captchaToken: string
+  ) => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: { captchaToken },
       });
 
       if (error) {
@@ -51,14 +64,9 @@ export default function LoginScreen() {
         return false;
       }
 
-      // session for the user
       if (data.session) {
         await setSession(data.session, stayLoggedIn);
-
-        // Clear form after successful login
         reset();
-
-        // Show login success toast
         loginSuccess();
         router.push("/(tabs)/home");
       }
@@ -69,12 +77,45 @@ export default function LoginScreen() {
       );
     } finally {
       setIsLoading(false);
+      setShowCaptcha(false);
     }
   };
 
-  const onSubmit = async (data: LoginFormValues) => {
-    await loginWithSupabase(data.email, data.password);
+  const onMessage = async (event: any) => {
+    if (event && event.nativeEvent.data) {
+      const token = event.nativeEvent.data;
+
+      if (["cancel", "error", "expired"].includes(token)) {
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+        );
+      } else if (token === "open") {
+        // Captcha opened
+      } else {
+        const { email, password } = getValues();
+        await loginWithSupabase(email, password, token);
+      }
+    }
   };
+
+  const onSubmit = async () => {
+    const { email, password } = getValues();
+
+    if (!email || !password) {
+      Alert.alert("Fehler", "Bitte fülle alle Felder aus.");
+      return;
+    }
+
+    setShowCaptcha(true);
+  };
+
+  useEffect(() => {
+    if (showCaptcha && captchaRef.current) {
+      captchaRef.current?.show();
+    }
+  }, [showCaptcha]);
 
   return (
     <KeyboardAvoidingView
@@ -134,13 +175,28 @@ export default function LoginScreen() {
             </ThemedText>
           </View>
 
-          <Button title="Einloggen" onPress={handleSubmit(onSubmit)} />
+          <Button
+            title="Einloggen"
+            onPress={handleSubmit(onSubmit)}
+            disabled={isLoading}
+          />
           <Button
             title="Ich möchte mich gerne Registrieren"
             onPress={() => router.push("/(tabs)/(auth)/signup")}
           />
         </View>
       </ScrollView>
+
+      {showCaptcha && (
+        <ConfirmHcaptcha
+          ref={captchaRef}
+          siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
+          baseUrl="https://hcaptcha.com"
+          onMessage={onMessage}
+          languageCode="de"
+          size="invisible"
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }
