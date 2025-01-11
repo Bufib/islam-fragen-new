@@ -395,17 +395,17 @@ export default function SignUpScreen() {
             />
           </View>
         </View>
-        {showCaptcha && (
-          <ConfirmHcaptcha
-            ref={captchaRef}
-             siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
-          baseUrl="https://hcaptcha.com"
-            onMessage={onMessage}
-            languageCode="de"
-            size="invisible"
-          />
-        )}
       </ScrollView>
+      {showCaptcha && (
+        <ConfirmHcaptcha
+          ref={captchaRef}
+          siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
+          baseUrl="https://hcaptcha.com"
+          onMessage={onMessage}
+          languageCode="de"
+          size="invisible"
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }

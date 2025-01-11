@@ -17,6 +17,9 @@ import { Controller, useForm } from "react-hook-form";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
+import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
+import { useEffect, useRef } from "react";
+import { Alert } from "react-native";
 
 type QuestionFormData = {
   title: string;
@@ -58,11 +61,14 @@ export default function askQuestion() {
   const [error, setError] = useState<string | null>(null);
   const session = useAuthStore((state) => state.session);
   const themeStyles = coustomTheme();
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const captchaRef = useRef(null);
 
   const {
     control,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<QuestionFormData>({
     defaultValues: {
@@ -75,7 +81,16 @@ export default function askQuestion() {
     },
   });
 
-  const onSubmit = async (data: QuestionFormData) => {
+  useEffect(() => {
+    if (showCaptcha && captchaRef.current) {
+      captchaRef.current?.show();
+    }
+  }, [showCaptcha]);
+
+  const submitQuestion = async (
+    data: QuestionFormData,
+    captchaToken: string
+  ) => {
     if (!session?.user.id) {
       setError("You must be logged in to submit a question");
       return;
@@ -108,6 +123,38 @@ export default function askQuestion() {
       console.log(err);
     } finally {
       setLoading(false);
+      setShowCaptcha(false);
+    }
+  };
+
+  const onSubmit = async (data: QuestionFormData) => {
+    setShowCaptcha(true);
+  };
+
+  const onMessage = async (event: any) => {
+    if (event && event.nativeEvent.data) {
+      const token = event.nativeEvent.data;
+
+      if (["error", "expired"].includes(token)) {
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+        );
+      } else if (token === "cancel") {
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
+        );
+      } else if (token === "open") {
+        // Captcha opened
+      } else {
+        // Validate form and submit with token
+        handleSubmit(async (formData) => {
+          await submitQuestion(formData, token);
+        })();
+      }
     }
   };
 
@@ -254,6 +301,16 @@ export default function askQuestion() {
           )}
         </Pressable>
       </ScrollView>
+      {showCaptcha && (
+        <ConfirmHcaptcha
+          ref={captchaRef}
+          siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
+          baseUrl="https://hcaptcha.com"
+          onMessage={onMessage}
+          languageCode="de"
+          size="invisible"
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }

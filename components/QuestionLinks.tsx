@@ -62,12 +62,12 @@ export default function QuestionLinks() {
           onPressOut={() => setPressedIndex(null)}
           onPress={() =>
             router.replace(
-              category.name === "Frage stellen" && isLoggedIn
+              category.name === "Stelle eine Frage" && isLoggedIn
                 ? {
                     pathname: "/(tabs)/(auth)/(userQuestions)",
                     params: { category: category.name },
                   }
-                : category.name === "Frage stellen" && !isLoggedIn
+                : category.name === "Stelle eine Frage" && !isLoggedIn
                 ? {
                     pathname: "/(tabs)/(auth)/login",
                   }
