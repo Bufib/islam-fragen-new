@@ -85,13 +85,20 @@ export default function LoginScreen() {
     if (event && event.nativeEvent.data) {
       const token = event.nativeEvent.data;
 
-      if (["cancel", "error", "expired"].includes(token)) {
+      if (["error", "expired"].includes(token)) {
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
           "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
         );
-      } else if (token === "open") {
+      }  else if (token === "cancel"  ) {
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
+        );
+      }
+      else if (token === "open") {
         // Captcha opened
       } else {
         const { email, password } = getValues();
@@ -99,6 +106,9 @@ export default function LoginScreen() {
       }
     }
   };
+
+
+  
 
   const onSubmit = async () => {
     const { email, password } = getValues();
