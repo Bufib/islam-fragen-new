@@ -11,7 +11,7 @@ const handleOpenInternallUrl = async (title: string) => {
     }
 
     router.push({
-      pathname: "/(tabs)/renderItems/question",
+      pathname: "/(question)",
       params: {
         category: question.category_name,
         subcategory: question.subcategory_name,

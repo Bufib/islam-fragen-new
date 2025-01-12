@@ -5,7 +5,7 @@ import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
-
+import { Href } from "expo-router";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
@@ -64,24 +64,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => (
             <IconSymbol size={28} name="gear.circle" color={color} />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="renderItems"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="(auth)"
-        options={{
-          href: null,
         }}
       />
     </Tabs>

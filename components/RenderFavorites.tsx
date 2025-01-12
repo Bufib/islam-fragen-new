@@ -73,7 +73,7 @@ function RenderFavoriteQuestions() {
           <Pressable
             onPress={() =>
               router.push({
-                pathname: "/(tabs)/renderItems/question",
+                pathname: "/(question)",
                 params: {
                   category: item.category_name,
                   subcategory: item.subcategory_name,

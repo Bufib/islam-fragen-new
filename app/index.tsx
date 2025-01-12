@@ -54,7 +54,7 @@ export default function Index() {
 
   if (videoEnded || !isFirstOpen) {
     // Redirect after the video ends or if it's not the first open
-    return <Redirect href="/(tabs)/home" />;
+    return <Redirect href="/(tabs)/home/" />;
   }
 
   // Show the video if it's the first open

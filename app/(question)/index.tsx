@@ -13,6 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { removeFavoriteToast, addFavoriteToast } from "@/constants/messages";
 import { useRefreshFavorites } from "@/stores/refreshFavoriteStore";
 import FontSizePickerModal from "@/components/FontSizePickerModal";
+import { router } from "expo-router";
 export default function question() {
   const { category, subcategory, questionId, questionTitle } =
     useLocalSearchParams<{
@@ -105,6 +106,17 @@ export default function question() {
               )}
             </View>
           ),
+          headerLeft: () => {
+            return (
+              <Ionicons
+                name="chevron-back-outline"
+                size={30}
+                color={Colors.universal.link}
+                style={{ marginLeft: -16 }}
+                onPress={() => router.back()}
+              />
+            );
+          },
         }}
       />
       <RenderQuestion

@@ -21,6 +21,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="addNews" options={{ headerShown: false }} />
+
         </Stack>
       </MenuProvider>
     </ThemeProvider>

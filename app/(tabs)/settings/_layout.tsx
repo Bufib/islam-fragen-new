@@ -23,7 +23,10 @@ export default function RootLayout() {
           name="impressum"
           options={{ headerShown: true, headerBackTitle: "Einstellungen" }}
         />
-        <Stack.Screen name="about" options={{ presentation: "modal", headerTitle: "Über die App" }} />
+        <Stack.Screen
+          name="about"
+          options={{ presentation: "modal", headerTitle: "Über die App" }}
+        />
       </Stack>
     </ThemeProvider>
   );

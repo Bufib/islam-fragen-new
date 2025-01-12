@@ -19,6 +19,24 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="category"
+          options={{
+            headerShown: true,
+            headerLeft: () => {
+              return (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={Colors.universal.link}
+                  style={{ marginLeft: -16 }}
+                  onPress={() => router.back()}
+                />
+              );
+            },
+          }}
+        />
+        <Stack.Screen name="subcategory" options={{ headerShown: true }} />
       </Stack>
     </ThemeProvider>
   );

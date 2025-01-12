@@ -274,7 +274,7 @@ const RenderSearch = () => {
       style={[styles.resultItem, themeStyles.contrast]}
       onPress={() =>
         router.push({
-          pathname: "/(tabs)/renderItems/question",
+          pathname: "/(question)",
           params: {
             questionId: item.id.toString(),
             category: item.category_name,
@@ -285,26 +285,9 @@ const RenderSearch = () => {
       }
     >
       <ThemedText style={styles.resultCategorySubcategoryLink}>
-        <Link
-          href={{
-            pathname: "/(tabs)/renderItems/category",
-            params: { category: item.category_name },
-          }}
-        >
-          {item.category_name}
-        </Link>
+        {item.category_name}
         {" > "}
-        <Link
-          href={{
-            pathname: "/(tabs)/renderItems/subcategory",
-            params: {
-              category: item.category_name,
-              subcategory: item.subcategory_name,
-            },
-          }}
-        >
-          {item.subcategory_name}
-        </Link>
+        {item.subcategory_name}
       </ThemedText>
       <ThemedText style={styles.resultQuestionTitle}>{item.title}</ThemedText>
       <ThemedText style={styles.resultQuestionQuestion} numberOfLines={1}>
