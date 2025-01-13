@@ -2,9 +2,9 @@ import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 
 // Internet
-export const noInternetHeader = "Keine Internetverbindung";
+export const noInternetHeader = "Keine Internetverbindung!";
 export const noInternetBody =
-  "Bitte stelle sicher, dass du mit dem Internet verbunden bist und versuch es später no einhmal ";
+  "Bitte stelle sicher, dass du mit dem Internet verbunden damit du updates und Benachrichtigungen erhalten kannst!";
 
 // SignUp
 export const signUpErrorGeneral = "Fehler beim Registrieren!";
@@ -113,7 +113,8 @@ export const userQuestionsNewAnswerForQuestions = () => {
   });
 };
 
-export const userQuestionErrorLoadingQuestions = "Fehler beim laden deiner Fragen!";
+export const userQuestionErrorLoadingQuestions =
+  "Fehler beim laden deiner Fragen!";
 
 // send question
 export const askQuestionQuestionSendSuccess = () => {
@@ -125,8 +126,7 @@ export const askQuestionQuestionSendSuccess = () => {
   });
 };
 
-
-// questions 
+// questions
 
 export const questionsDatabaseUpate = () => {
   return Toast.show({

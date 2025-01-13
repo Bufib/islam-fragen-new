@@ -14,6 +14,12 @@ import { removeFavoriteToast, addFavoriteToast } from "@/constants/messages";
 import { useRefreshFavorites } from "@/stores/refreshFavoriteStore";
 import FontSizePickerModal from "@/components/FontSizePickerModal";
 import { router } from "expo-router";
+import { noInternet } from "@/constants/messages";
+import NetInfo from "@react-native-community/netinfo";
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
+import { noInternetBody, noInternetHeader } from "@/constants/messages";
+
 export default function question() {
   const { category, subcategory, questionId, questionTitle } =
     useLocalSearchParams<{
@@ -26,6 +32,16 @@ export default function question() {
   const { triggerRefreshFavorites } = useRefreshFavorites();
   const colorScheme = useColorScheme();
   const [modalVisible, setModalVisible] = useState(false);
+  const [isConnected, setIsConnected] = useState<boolean | null>(true);
+
+  // Check internet connectivity
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Check if question is favorite
   useEffect(() => {
@@ -119,6 +135,7 @@ export default function question() {
           },
         }}
       />
+    
       <RenderQuestion
         category={category}
         subcategory={subcategory}
@@ -142,5 +159,14 @@ const styles = StyleSheet.create({
     flexWrap: "nowrap",
     alignItems: "center",
     gap: 10,
+  },
+  noInternet: {
+    padding: 15,
+  },
+  noInternetText: {
+    textAlign: "center",
+    color: Colors.universal.error,
+    fontSize: 16,
+    fontWeight: "700"
   },
 });

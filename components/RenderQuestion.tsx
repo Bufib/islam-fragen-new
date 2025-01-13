@@ -15,7 +15,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import * as Clipboard from "expo-clipboard";
 import Feather from "@expo/vector-icons/Feather";
 import Markdown from "react-native-markdown-display";
-
+import NoInternet from "./NoInternet";
 type RenderQuestionProps = {
   category: string;
   subcategory: string;
@@ -115,7 +115,8 @@ const RenderQuestion = ({
     <ScrollView
       style={[styles.scrollViewStyles, themeStyles.defaultBackgorundColor]}
       contentContainerStyle={styles.scrollViewContent}
-    >
+  >
+    <NoInternet />
       <View style={[styles.questionContainer, themeStyles.contrast]}>
         <ThemedText style={[styles.questionText, { fontSize, lineHeight }]}>
           {question?.question}
@@ -189,16 +190,16 @@ const RenderQuestion = ({
                   />
                 )}
                 <Markdown
-                style={{
-                  body: {
-                    ...themeStyles.text,
-                    fontSize: fontSize,
-                    lineHeight: lineHeight,
-                  },
-                }}
-              >
-                {question?.answer_khamenei || "Antwort wird geladen"}
-              </Markdown>
+                  style={{
+                    body: {
+                      ...themeStyles.text,
+                      fontSize: fontSize,
+                      lineHeight: lineHeight,
+                    },
+                  }}
+                >
+                  {question?.answer_khamenei || "Antwort wird geladen"}
+                </Markdown>
               </View>
             </Collapsible>
             <Collapsible title="Sayid as-Sistani" marja="sistani">
@@ -225,16 +226,16 @@ const RenderQuestion = ({
                   />
                 )}
                 <Markdown
-                style={{
-                  body: {
-                    ...themeStyles.text,
-                    fontSize: fontSize,
-                    lineHeight: lineHeight,
-                  },
-                }}
-              >
-                {question?.answer_sistani || "Antwort wird geladen"}
-              </Markdown>
+                  style={{
+                    body: {
+                      ...themeStyles.text,
+                      fontSize: fontSize,
+                      lineHeight: lineHeight,
+                    },
+                  }}
+                >
+                  {question?.answer_sistani || "Antwort wird geladen"}
+                </Markdown>
               </View>
             </Collapsible>
           </>
@@ -253,6 +254,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     gap: 20,
   },
+
   questionContainer: {
     padding: 15,
     margin: 10,
