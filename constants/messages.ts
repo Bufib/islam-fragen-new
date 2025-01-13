@@ -136,3 +136,15 @@ export const questionsDatabaseUpate = () => {
     topOffset: 60,
   });
 };
+
+// no internet
+
+export const noInternet = () => {
+  return Toast.show({
+    type: "error",
+    text1: "Keine Internetverbindung!",
+    text2: "Du erhälst keine updates und Benachrichtigungen!",
+    text1Style: { fontWeight: "500" },
+    topOffset: 60,
+  });
+};

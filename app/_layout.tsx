@@ -16,7 +16,8 @@ import { Appearance } from "react-native";
 import { Storage } from "expo-sqlite/kv-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
-
+import NetInfo from "@react-native-community/netinfo";
+import { noInternet } from "@/constants/messages";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ export default function RootLayout() {
   const dbInitialized = useInitializeDatabase();
   const { restoreSession } = useAuthStore();
   const [isSessionRestored, setIsSessionRestored] = useState(false);
+  const [isConnected, setIsConnected] = useState<boolean | null>(true);
 
   // Musst be before 'if (!dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
   useEffect(() => {
@@ -38,6 +40,22 @@ export default function RootLayout() {
     setColorTheme();
   }, []);
 
+    // Check internet connectivity
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Show toast on connectivity change
+  useEffect(() => {
+    if (isConnected === false) {
+      noInternet();
+    }
+  }, [isConnected]);
+    
   // Session restoration effect
   useEffect(() => {
     const initSession = async () => {
@@ -57,6 +75,8 @@ export default function RootLayout() {
   if (!dbInitialized || !isSessionRestored) {
     return null;
   }
+
+
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>

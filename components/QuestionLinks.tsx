@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 30,
+    borderRadius: 20,
     borderWidth: 2,
     backgroundColor: Colors.universal.indexItemBackgroundColor,
   },
@@ -372,14 +372,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#0C556A",
   },
 
-  buttonContentContainerNormal: {},
+  buttonContentContainerNormal: {
+    gap: 10,
+  },
   buttonContentContainerAskQuestion: {
     flexDirection: "row",
     alignItems: "center",
   },
 
   elementTextContainer: {
-    padding: 5,
+    padding: 10,
     backgroundColor: Colors.universal.white,
     borderRadius: 20,
     borderWidth: 1,
@@ -393,7 +395,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   elementIcon: {
-    width: 150,
+    width: 120,
     height: "auto",
     aspectRatio: 1.5,
     alignSelf: "center",
