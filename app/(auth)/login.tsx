@@ -14,6 +14,8 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { useAuthStore } from "@/stores/authStore";
 import { coustomTheme } from "@/utils/coustomTheme";
+import Feather from "@expo/vector-icons/Feather";
+import { Pressable } from "react-native";
 import {
   loginError,
   loginSuccess,
@@ -24,7 +26,8 @@ import { Colors } from "@/constants/Colors";
 import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { router } from "expo-router";
 import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
-
+import { useState } from "react";
+import { useColorScheme } from "react-native";
 type LoginFormValues = {
   email: string;
   password: string;
@@ -45,6 +48,9 @@ export default function LoginScreen() {
   const [showCaptcha, setShowCaptcha] = React.useState(false);
   const captchaRef = useRef(null);
   const themeStyles = coustomTheme();
+  const [showPassword, setShowPassword] = useState(false);
+  const colorScheme = useColorScheme();
+
 
   const loginWithSupabase = async (
     email: string,
@@ -91,14 +97,13 @@ export default function LoginScreen() {
           "Fehler",
           "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
         );
-      }  else if (token === "cancel"  ) {
+      } else if (token === "cancel") {
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
           "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
         );
-      }
-      else if (token === "open") {
+      } else if (token === "open") {
         // Captcha opened
       } else {
         const { email, password } = getValues();
@@ -106,9 +111,6 @@ export default function LoginScreen() {
       }
     }
   };
-
-
-  
 
   const onSubmit = async () => {
     const { email, password } = getValues();
@@ -165,13 +167,35 @@ export default function LoginScreen() {
             name="password"
             rules={{ required: loginPasswordNotEmpty }}
             render={({ field: { onChange, value } }) => (
-              <TextInput
-                style={[styles.input, themeStyles.text]}
-                placeholder="Password"
-                onChangeText={onChange}
-                value={value}
-                secureTextEntry
-              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                 style={[styles.passwordInput, themeStyles.text]}
+                  placeholder="Password"
+                  onChangeText={onChange}
+                  value={value}
+                  secureTextEntry={!showPassword}
+                />
+                <Pressable
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.eyeIcon}
+                >
+                  <Text>
+                    {showPassword ? (
+                      <Feather
+                        name="eye"
+                        size={24}
+                        color={colorScheme === "dark" ? "white" : "black"}
+                      />
+                    ) : (
+                      <Feather
+                        name="eye-off"
+                        size={24}
+                        color={colorScheme === "dark" ? "white" : "black"}
+                      />
+                    )}
+                  </Text>
+                </Pressable>
+              </View>
             )}
           />
           {errors.password && (
@@ -244,6 +268,20 @@ const styles = StyleSheet.create({
   error: {
     color: Colors.universal.error,
     marginBottom: 12,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: 12,
+  },
+  eyeIcon: {
+    padding: 10,
   },
   stayLoggedInContainer: {
     marginTop: 10,
