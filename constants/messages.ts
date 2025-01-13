@@ -124,3 +124,15 @@ export const askQuestionQuestionSendSuccess = () => {
     topOffset: 60,
   });
 };
+
+
+// questions 
+
+export const questionsDatabaseUpate = () => {
+  return Toast.show({
+    type: "success",
+    text1: "Die Frage und Antworten wurden aktualsiert!",
+    text1Style: { fontWeight: "500" },
+    topOffset: 60,
+  });
+};

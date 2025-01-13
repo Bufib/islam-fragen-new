@@ -206,6 +206,12 @@ export default function SignUpScreen() {
       const token = event.nativeEvent.data;
 
       if (["error", "expired"].includes(token)) {
+        if (!showCaptcha) {
+          //Skip so message doesn't appear spontanousley while app is opened and captcha expires
+          console.log("Captcha not active.");
+          return;
+        }
+
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
@@ -389,10 +395,7 @@ export default function SignUpScreen() {
             <ThemedText style={styles.logInText}>
               Hast du bereits einen Account?
             </ThemedText>
-            <Button
-              title="Login"
-              onPress={() => router.replace("/login")}
-            />
+            <Button title="Login" onPress={() => router.replace("/login")} />
           </View>
         </View>
       </ScrollView>

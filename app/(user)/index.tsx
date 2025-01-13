@@ -59,7 +59,7 @@ export default function QuestionsList() {
           color={colorScheme === "dark" ? "white" : "black"}
         />
         <ThemedText style={styles.loadingText}>
-          Fragen werden geladen...
+          Fragen werden geladen
         </ThemedText>
       </ThemedView>
     );

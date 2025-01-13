@@ -51,7 +51,6 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const colorScheme = useColorScheme();
 
-
   const loginWithSupabase = async (
     email: string,
     password: string,
@@ -66,7 +65,17 @@ export default function LoginScreen() {
       });
 
       if (error) {
-        Alert.alert(loginError, error.message);
+        // Überprüfe die genaue Fehlermeldung
+        if (error.message.includes("Invalid login credentials")) {
+          Alert.alert(
+            "Login fehlgeschlagen",
+            "E-Mail oder Passwort ist falsch."
+          );
+        } else if (error.message.includes("User not found")) {
+          Alert.alert("Login fehlgeschlagen", "Benutzer existiert nicht.");
+        } else {
+          Alert.alert("Login fehlgeschlagen", error.message);
+        }
         return false;
       }
 
@@ -92,6 +101,11 @@ export default function LoginScreen() {
       const token = event.nativeEvent.data;
 
       if (["error", "expired"].includes(token)) {
+        if (!showCaptcha) {
+          //Skip so message doesn't appear spontanousley while app is opened and captcha expires
+          console.log("Captcha not active.");
+          return;
+        }
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
@@ -125,7 +139,12 @@ export default function LoginScreen() {
 
   useEffect(() => {
     if (showCaptcha && captchaRef.current) {
-      captchaRef.current?.show();
+      try {
+        captchaRef.current?.show();
+      } catch (error) {
+        console.error("Captcha konnte nicht geöffnet werden:", error);
+        setShowCaptcha(false);
+      }
     }
   }, [showCaptcha]);
 
@@ -169,7 +188,7 @@ export default function LoginScreen() {
             render={({ field: { onChange, value } }) => (
               <View style={styles.passwordContainer}>
                 <TextInput
-                 style={[styles.passwordInput, themeStyles.text]}
+                  style={[styles.passwordInput, themeStyles.text]}
                   placeholder="Password"
                   onChangeText={onChange}
                   value={value}

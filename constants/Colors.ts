@@ -113,8 +113,8 @@ export const Colors = {
     statusText: "#ffffff",
     questionBoxQuestionText: "#666",
     bismilAllahBackground: "#4fa1b8",
-    // indexItemBackgroundColor: "#2475B0",
-    indexItemBackgroundColor: "#3498DB",
+    indexItemBackgroundColor:  "#4fa1b8",
+    // indexItemBackgroundColor: "#3498DB",
     error: "#DC2626",
 
   },

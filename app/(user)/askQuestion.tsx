@@ -139,6 +139,11 @@ export default function askQuestion() {
       const token = event.nativeEvent.data;
 
       if (["error", "expired"].includes(token)) {
+        if (!showCaptcha) {
+          //Skip so message doesn't appear spontanousley while app is opened and captcha expires
+          console.log("Captcha not active.");
+          return;
+        }
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
@@ -193,6 +198,7 @@ export default function askQuestion() {
                 error={errors.title?.message}
                 placeholder="Titel deiner Frage"
                 style={themeStyles.text}
+                autoCapitalize="none"
               />
             )}
           />
@@ -209,6 +215,7 @@ export default function askQuestion() {
                 error={errors.marja?.message}
                 placeholder="Wer ist dein Marja?"
                 style={themeStyles.text}
+                autoCapitalize="none"
               />
             )}
           />
@@ -227,6 +234,7 @@ export default function askQuestion() {
                 numberOfLines={4}
                 placeholder="Wie lautet deine Frage?"
                 style={themeStyles.text}
+                autoCapitalize="none"
               />
             )}
           />
@@ -262,6 +270,7 @@ export default function askQuestion() {
                 error={errors.user_gender?.message}
                 placeholder="Dein Geschlecht"
                 style={themeStyles.text}
+                autoCapitalize="none"
               />
             )}
           />

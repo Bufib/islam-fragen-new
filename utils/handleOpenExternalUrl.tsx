@@ -1,10 +1,16 @@
-import * as WebBrowser from "expo-web-browser";
+import { Linking } from "react-native";
 
 const handleOpenExternalUrl = async (url: string) => {
   try {
-    await WebBrowser.openBrowserAsync(url);
+    const supported = await Linking.canOpenURL(url);
+
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      console.error("URL wird nicht unterstützt:", url);
+    }
   } catch (error) {
-    console.error("Error opening URL:", error);
+    console.error("Fehler beim Öffnen der URL:", error);
   }
 };
 

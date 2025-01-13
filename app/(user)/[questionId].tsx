@@ -6,7 +6,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { QuestionFromUser } from "@/hooks/useFetchUserQuestions";
 import { useAuthStore } from "@/stores/authStore";
 import getStatusColor from "@/utils/getStatusColor";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";

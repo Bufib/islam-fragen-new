@@ -1,6 +1,8 @@
 import * as SQLite from "expo-sqlite";
 import { supabase } from "@/utils/supabase";
 import Storage from "expo-sqlite/kv-store";
+import { router } from "expo-router";
+import { questionsDatabaseUpate } from "@/constants/messages";
 
 export type QuestionType = {
   id: number;
@@ -135,6 +137,8 @@ const setupSubscriptions = () => {
         try {
           console.log("Change received!", payload);
           await initializeDatabase(); // Re-fetch data if version changes
+          router.replace("/(tabs)/home/");
+          questionsDatabaseUpate();
         } catch (error) {
           console.error("Error handling Supabase subscription change:", error);
         }
@@ -160,6 +164,9 @@ const setupSubscriptions = () => {
           } else if (payload.eventType === "DELETE") {
             await deleteQuestionFromSQLite(payload.old.id);
           }
+          router.replace("/(tabs)/home/");
+          questionsDatabaseUpate();
+
         } catch (error) {
           console.error("Error handling Supabase subscription change:", error);
         }
@@ -391,7 +398,7 @@ export const searchQuestions = async (
       [`%${searchTerm}%`, `%${searchTerm}%`]
     );
 
-    return rows; 
+    return rows;
   } catch (error) {
     console.error("Error searching questions:", error);
     throw error;
