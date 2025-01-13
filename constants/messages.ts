@@ -108,7 +108,7 @@ export const userQuestionsNewAnswerForQuestions = () => {
     text1Style: { fontWeight: "500" },
     topOffset: 60,
     onPress() {
-      router.push("/(tabs)/(auth)/(userQuestions)/");
+      router.push("/(tabs)/(user)/[questionId]");
     },
   });
 };

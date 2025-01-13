@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useAuthStore } from "./authStore";
+import { useAuthStore } from "../stores/authStore";
 import { Alert } from "react-native";
 import { logoutSuccess, logoutErrorGeneral } from "@/constants/messages";
 

@@ -34,7 +34,7 @@ export default function RootLayout() {
             },
           }}
         />
-        <Stack.Screen name="askQuestion" options={{ headerShown: true }} />
+        <Stack.Screen name="askQuestion" options={{ headerShown: true, headerTitle: "" }} />
         <Stack.Screen
           name="[questionId]"
           options={{ headerShown: true, headerTitle: "" }}

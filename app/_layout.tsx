@@ -15,7 +15,7 @@ import Toast from "react-native-toast-message";
 import { Appearance } from "react-native";
 import { Storage } from "expo-sqlite/kv-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStore } from "@/stores/authStore";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

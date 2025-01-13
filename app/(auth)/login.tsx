@@ -12,7 +12,7 @@ import { useForm, Controller } from "react-hook-form";
 import { supabase } from "@/utils/supabase";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import { coustomTheme } from "@/utils/coustomTheme";
 import {
   loginError,
@@ -192,7 +192,7 @@ export default function LoginScreen() {
           />
           <Button
             title="Ich möchte mich gerne Registrieren"
-            onPress={() => router.push("/(tabs)/(auth)/signup")}
+            onPress={() => router.replace("/signup")}
           />
         </View>
       </ScrollView>

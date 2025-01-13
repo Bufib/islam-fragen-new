@@ -391,7 +391,7 @@ export default function SignUpScreen() {
             </ThemedText>
             <Button
               title="Login"
-              onPress={() => router.push("/(tabs)/(auth)/login")}
+              onPress={() => router.replace("/login")}
             />
           </View>
         </View>

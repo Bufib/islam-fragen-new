@@ -6,6 +6,9 @@ import {
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Colors } from "@/constants/Colors";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -13,8 +16,42 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="login"
+          options={{
+            headerShown: true,
+            headerTitle: "Login",
+            headerLeft: () => {
+              return (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={Colors.universal.link}
+                  style={{ marginLeft: -16 }}
+                  onPress={() => router.back()}
+                />
+              );
+            },
+          }}
+        />
+        <Stack.Screen
+          name="signup"
+          options={{
+            headerShown: true,
+            headerTitle: "Registrieren",
+            headerLeft: () => {
+              return (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={Colors.universal.link}
+                  style={{ marginLeft: -16 }}
+                  onPress={() => router.back()}
+                />
+              );
+            },
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

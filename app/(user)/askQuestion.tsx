@@ -12,7 +12,7 @@ import {
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { supabase } from "@/utils/supabase";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import { Controller, useForm } from "react-hook-form";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
@@ -28,6 +28,7 @@ type QuestionFormData = {
   user_age: number;
   user_gender: string;
   user_email: string;
+  user_username: string;
 };
 
 const CustomInput = ({
@@ -60,10 +61,10 @@ export default function askQuestion() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const session = useAuthStore((state) => state.session);
+  const user_username = useAuthStore((state) => state.user_username);
   const themeStyles = coustomTheme();
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaRef = useRef(null);
-
   const {
     control,
     handleSubmit,
@@ -78,6 +79,7 @@ export default function askQuestion() {
       user_age: undefined,
       user_gender: "",
       user_email: "",
+      user_username: "",
     },
   });
 
@@ -106,6 +108,7 @@ export default function askQuestion() {
         .insert([
           {
             user_id: session.user.id,
+            user_username: user_username,
             title: data.title,
             marja: data.marja,
             question: data.question,
@@ -318,13 +321,14 @@ export default function askQuestion() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
+    padding: 10,
   },
   scrollView: {
     flex: 1,
   },
 
   title: {
+    marginTop: 10,
     marginBottom: 24,
   },
   inputContainer: {
@@ -343,7 +347,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   textArea: {
-    height: 120,
+    height: 250,
     paddingTop: 12,
     paddingBottom: 12,
     textAlignVertical: "top",
@@ -374,7 +378,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 24,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   submitButtonDisabled: {
     opacity: 0.7,

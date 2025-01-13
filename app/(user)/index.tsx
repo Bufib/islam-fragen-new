@@ -16,7 +16,7 @@ import {
   useFetchUserQuestions,
   QuestionFromUser,
 } from "@/hooks/useFetchUserQuestions";
-import { useAuthStore } from "@/utils/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import { formateDate } from "@/utils/formateDate";
 import { Colors } from "@/constants/Colors";
 import getStatusColor from "@/utils/getStatusColor";
@@ -35,7 +35,7 @@ export default function QuestionsList() {
   // 2. If not logged in, redirect to login
   useEffect(() => {
     if (!isLoggedIn) {
-      router.replace("/(tabs)/renderItems/login");
+      router.push("/(tabs)/(auth)/login");
     }
   }, [isLoggedIn]);
 
@@ -90,7 +90,7 @@ export default function QuestionsList() {
       style={[styles.questionCard, themeStyles.contrast]}
       onPress={() =>
         router.push({
-          pathname: "/(tabs)/(auth)/(userQuestions)/[questionId]",
+          pathname: "/(user)/[questionId]",
           params: { questionId: item.id },
         })
       }
@@ -147,9 +147,7 @@ export default function QuestionsList() {
 
       <Pressable
         style={styles.askQuestionButton}
-        onPress={() =>
-          router.push("/(tabs)/(auth)/(userQuestions)/askQuestion")
-        }
+        onPress={() => router.push("/(user)/askQuestion")}
       >
         <ThemedText style={styles.askQuestionButtonText}>
           Neue Frage stellen
