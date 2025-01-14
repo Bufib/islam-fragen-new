@@ -15,6 +15,7 @@ import { NewsItem } from "@/components/NewsItem";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuthStore } from "@/stores/authStore";
 import { router } from "expo-router";
+import NoInternet from "@/components/NoInternet";
 
 export default function NewsFeed() {
   const {
@@ -83,6 +84,7 @@ export default function NewsFeed() {
       style={[styles.container, themeStyles.defaultBackgorundColor]}
       edges={["top"]}
     >
+      <NoInternet />
       {updated && !isAdmin && (
         <ThemedView style={styles.updateContainer}>
           <Button

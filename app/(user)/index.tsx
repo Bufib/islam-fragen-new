@@ -25,12 +25,17 @@ import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { userQuestionErrorLoadingQuestions } from "@/constants/messages";
+import NoInternet from "@/components/NoInternet";
+import { noInternetBody, noInternetHeader } from "@/constants/messages";
+import NetInfo from "@react-native-community/netinfo";
+import { useState } from "react";
 
 export default function QuestionsList() {
   // 1. Check auth state from the store
   const { isLoggedIn, session } = useAuthStore();
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
+  const [isConnected, setIsConnected] = useState<boolean | null>(true);
 
   // 2. If not logged in, redirect to login
   useEffect(() => {
@@ -49,6 +54,15 @@ export default function QuestionsList() {
     hasUpdate,
     handleRefresh,
   } = useFetchUserQuestions();
+
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Loading state should be checked first
   if (isLoading) {
@@ -86,36 +100,37 @@ export default function QuestionsList() {
 
   // 6. Render item
   const renderQuestion = ({ item }: { item: QuestionFromUser }) => (
-    <Pressable
-      style={[styles.questionCard, themeStyles.contrast]}
-      onPress={() =>
-        router.push({
-          pathname: "/(user)/[questionId]",
-          params: { questionId: item.id },
-        })
-      }
-    >
-      <ThemedText style={styles.questionTitle}>{item.title}</ThemedText>
-      <ThemedText style={styles.questionText} numberOfLines={2}>
-        {item.question}
-      </ThemedText>
-      <View style={styles.questionFooter}>
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: getStatusColor(item.status) },
-          ]}
-        >
-          <Text style={styles.statusText}>{item.status}</Text>
+      <Pressable
+        style={[styles.questionCard, themeStyles.contrast]}
+        onPress={() =>
+          router.push({
+            pathname: "/(user)/[questionId]",
+            params: { questionId: item.id },
+          })
+        }
+      >
+        <ThemedText style={styles.questionTitle}>{item.title}</ThemedText>
+        <ThemedText style={styles.questionText} numberOfLines={2}>
+          {item.question}
+        </ThemedText>
+        <View style={styles.questionFooter}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: getStatusColor(item.status) },
+            ]}
+          >
+            <Text style={styles.statusText}>{item.status}</Text>
+          </View>
         </View>
-      </View>
-      <Text style={styles.createdAtText}>{formateDate(item.created_at)}</Text>
-    </Pressable>
+        <Text style={styles.createdAtText}>{formateDate(item.created_at)}</Text>
+      </Pressable>
   );
 
   // 7. Render the full list
   return (
     <ThemedView style={[styles.container, themeStyles.defaultBackgorundColor]}>
+      <NoInternet />
       {hasUpdate && (
         <Pressable style={styles.updateButton} onPress={handleRefresh}>
           <Text style={styles.updateButtonText}>Aktualisieren</Text>
@@ -146,8 +161,9 @@ export default function QuestionsList() {
       />
 
       <Pressable
-        style={styles.askQuestionButton}
+        style={[styles.askQuestionButton, !isConnected && {backgroundColor: Colors.universal.created_atTextColor}]}
         onPress={() => router.push("/(user)/askQuestion")}
+        disabled={!isConnected}
       >
         <ThemedText style={styles.askQuestionButtonText}>
           Neue Frage stellen

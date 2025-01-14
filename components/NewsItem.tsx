@@ -18,7 +18,7 @@ import { useAuthStore } from "../stores/authStore";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import NewsMenu from "./NewsMenu";
 import { Image } from "expo-image";
-
+import NoInternet from "./NoInternet";
 const screenWidth = Dimensions.get("window").width;
 const imageHeight = screenWidth * 1.2;
 
@@ -54,6 +54,7 @@ export const NewsItem = ({
 
   return (
     <View style={[styles.newsItem, themeStyles.contrast]}>
+     
       {is_pinned && (
         <AntDesign
           name="pushpin"
