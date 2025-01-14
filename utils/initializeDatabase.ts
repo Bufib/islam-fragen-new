@@ -15,6 +15,9 @@ export type QuestionType = {
   subcategory_name: string;
   created_at: string;
 };
+type Paypal = {
+  link: string;
+};
 
 export const initializeDatabase = async () => {
   // Check if version in Storage is up to date
@@ -25,7 +28,8 @@ export const initializeDatabase = async () => {
     // Check for version mismatch
     if (versionFromStorage !== versionFromSupabase) {
       await fetchQuestionsFromSupabase();
-      await Storage.setItem("version", versionFromSupabase);
+      await fetchPayPalLink();
+      await Storage.setItemSync("version", versionFromSupabase);
     }
   };
   await checkVersion();
@@ -125,6 +129,27 @@ const fetchQuestionsFromSupabase = async () => {
     console.error("Unexpected error in fetchQuestionsFromSupabase:", error);
   }
 };
+const fetchPayPalLink = async () => {
+  try {
+    // Fetch PayPal data from Supabase
+    const { data, error } = await supabase
+      .from("paypal")
+      .select("link")
+      .single();
+
+    if (error) {
+      console.error("Error fetching PayPal link from Supabase:", error.message);
+      return;
+    }
+    if (data?.link) {
+      Storage.setItemSync("paypal", data.link);
+    } else {
+      console.warn("No PayPal link found in Supabase.");
+    }
+  } catch (error) {
+    console.error("Unexpected error fetching PayPal link:", error);
+  }
+};
 
 const setupSubscriptions = () => {
   // Subscribe to changes in the `version` table
@@ -166,7 +191,24 @@ const setupSubscriptions = () => {
           }
           router.replace("/(tabs)/home/");
           questionsDatabaseUpate();
+        } catch (error) {
+          console.error("Error handling Supabase subscription change:", error);
+        }
+      }
+    )
+    .subscribe();
 
+  supabase
+    .channel("paypal")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "paypal" },
+      async (payload) => {
+        try {
+          console.log("Change received!", payload);
+          await fetchPayPalLink(); // Re-fetch data if version changes
+          router.replace("/(tabs)/home/");
+          questionsDatabaseUpate();
         } catch (error) {
           console.error("Error handling Supabase subscription change:", error);
         }

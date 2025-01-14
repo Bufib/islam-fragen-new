@@ -18,11 +18,19 @@ const Settings = () => {
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const themeStyles = coustomTheme();
   const { isLoggedIn, restoreSession, clearSession } = useAuthStore();
+  const [paypalLink, setPaypalLink] = useState<string | null>("");
 
   useEffect(() => {
     const savedColorSetting = Storage.getItemSync("isDarkMode");
     Appearance.setColorScheme(savedColorSetting === "true" ? "dark" : "light");
   }, [isDarkMode]);
+
+  // Get paypal link
+  useLayoutEffect(() => {
+    const paypal = Storage.getItemSync("paypal");
+    setPaypalLink(paypal);
+    console.log(paypal);
+  }, []);
 
   // Function to handle colorswitch
   const toggleDarkMode = async () => {
@@ -32,7 +40,6 @@ const Settings = () => {
     Storage.setItemSync("isDarkMode", `${!isDarkMode}`);
   };
 
-  
   return (
     <SafeAreaView
       style={[styles.container, themeStyles.defaultBackgorundColor]}
@@ -49,7 +56,6 @@ const Settings = () => {
             size={24}
             color={colorScheme === "dark" ? "white" : "black"}
             onPress={handleLogout}
-
           />
         ) : (
           <Entypo
@@ -76,35 +82,57 @@ const Settings = () => {
             }
           />
         </View>
+        <ThemedText
+          style={styles.linkText}
+          onPress={() =>
+            Linking.openURL("https://example.com/account-loeschen")
+          }
+        >
+          Account löschen
+        </ThemedText>
+        <ThemedText
+          style={styles.linkText}
+          onPress={() =>
+            Linking.openURL("https://example.com/passwort-aendern")
+          }
+        >
+          Passwort ändern
+        </ThemedText>
+        <ThemedText
+          style={styles.linkText}
+          onPress={() => Linking.openURL(paypalLink)}
+        >
+          Spenden
+        </ThemedText>
+      </ThemedView>
 
-        {/* Push everything down */}
-        <View style={{ flexGrow: 1 }} />
+      {/* Push everything down */}
+      <View style={{ flexGrow: 1 }} />
 
-        {/* Legal Links */}
-        <ThemedView style={styles.legalLinksContainer}>
-          <ThemedText
-            style={styles.linkText}
-            onPress={() =>
-              Linking.openURL(
-                "https://bufib.github.io/Islam-Fragen-App-rechtliches/datenschutz"
-              )
-            }
-          >
-            Datenschutz
-          </ThemedText>
-          <ThemedText
-            style={styles.linkText}
-            onPress={() => router.push("/settings/about")}
-          >
-            Über die App
-          </ThemedText>
-          <ThemedText
-            style={styles.linkText}
-            onPress={() => router.push("/settings/impressum")}
-          >
-            Impressum
-          </ThemedText>
-        </ThemedView>
+      {/* Legal Links */}
+      <ThemedView style={styles.legalLinksContainer}>
+        <ThemedText
+          style={styles.linkText}
+          onPress={() =>
+            Linking.openURL(
+              "https://bufib.github.io/Islam-Fragen-App-rechtliches/datenschutz"
+            )
+          }
+        >
+          Datenschutz
+        </ThemedText>
+        <ThemedText
+          style={styles.linkText}
+          onPress={() => router.push("/settings/about")}
+        >
+          Über die App
+        </ThemedText>
+        <ThemedText
+          style={styles.linkText}
+          onPress={() => router.push("/settings/impressum")}
+        >
+          Impressum
+        </ThemedText>
       </ThemedView>
     </SafeAreaView>
   );
@@ -128,6 +156,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     marginTop: 20,
+    gap: 10,
   },
   row: {
     flexDirection: "row",
