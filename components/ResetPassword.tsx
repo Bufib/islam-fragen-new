@@ -58,19 +58,26 @@ export function ResetPassword() {
 
     try {
       setLoading(true);
+      
+      // First verify the recovery token
       const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-        email: email,
+        email,
         token: data.code,
         type: 'recovery'
       });
 
-      if (verifyError) throw verifyError;
+      if (verifyError) {
+        throw verifyError;
+      }
 
+      // If verification successful, now we can update the password
       const { error: updateError } = await supabase.auth.updateUser({
         password: data.newPassword
       });
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        throw updateError;
+      }
 
       Alert.alert('Erfolg', 'Dein Passwort wurde aktualisiert.');
       router.replace("/login");
@@ -83,7 +90,7 @@ export function ResetPassword() {
     } finally {
       setLoading(false);
     }
-  };
+};
 
   return (
     <View style={styles.container}>

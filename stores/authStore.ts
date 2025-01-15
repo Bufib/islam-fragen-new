@@ -94,7 +94,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   // Restore the session and user role from storage
-  // Restore the session and user role from storage
   restoreSession: async () => {
     try {
       const shouldPersist = await AsyncStorage.getItem(PERSIST_LOGIN_KEY);
