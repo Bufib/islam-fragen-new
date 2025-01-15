@@ -217,6 +217,19 @@ const setupSubscriptions = () => {
     .subscribe();
 };
 
+export const getQuestionCount = async (): Promise<number> => {
+  try {
+    const db = await SQLite.openDatabaseAsync("islam-fragen.db");
+    const result = await db.getFirstAsync<{ count: number }>(
+      `SELECT COUNT(*) as count FROM question;`
+    );
+    return result?.count ?? 0;
+  } catch (error) {
+    console.error("Error getting question count:", error);
+    return 0;
+  }
+};
+
 const syncSingleQuestion = async (question: QuestionType) => {
   const db = await SQLite.openDatabaseAsync("islam-fragen.db");
   await db.runAsync(

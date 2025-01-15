@@ -12,22 +12,33 @@ import { Linking } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuthStore } from "@/stores/authStore";
 import handleLogout from "@/utils/handleLogout";
+import { getQuestionCount } from "@/utils/initializeDatabase";
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const themeStyles = coustomTheme();
-  const { isLoggedIn, restoreSession, clearSession } = useAuthStore();
+  const { isLoggedIn, restoreSession, clearSession, isAdmin } = useAuthStore();
   const [paypalLink, setPaypalLink] = useState<string | null>("");
+  const [version, setVersion] = useState<string | null>("");
+  const [questionCount, setQuestionCount] = useState<number | null>(0);
+
   useEffect(() => {
     const savedColorSetting = Storage.getItemSync("isDarkMode");
     Appearance.setColorScheme(savedColorSetting === "true" ? "dark" : "light");
   }, [isDarkMode]);
 
-  // Get paypal link
+  // Get paypal link and version and count
   useLayoutEffect(() => {
     const paypal = Storage.getItemSync("paypal");
     setPaypalLink(paypal);
-    console.log(paypal);
+
+    const version = Storage.getItemSync("version");
+    setVersion(version);
+    const countQuestions = async () => {
+      const count = await getQuestionCount();
+      setQuestionCount(count);
+    };
+    countQuestions();
   }, []);
 
   // Function to handle colorswitch
@@ -106,6 +117,9 @@ const Settings = () => {
         >
           Spenden
         </ThemedText>
+        <ThemedText>
+          Anzahl an Fragen in der Datenbank: {questionCount}
+        </ThemedText>
       </ThemedView>
 
       {/* Push everything down */}
@@ -113,6 +127,11 @@ const Settings = () => {
 
       {/* Legal Links */}
       <ThemedView style={styles.legalLinksContainer}>
+        {isAdmin && isLoggedIn && (
+          <ThemedText style={styles.versionText}>
+            Version der Fragen in der App: {version}
+          </ThemedText>
+        )}
         <ThemedText
           style={styles.linkText}
           onPress={() =>
@@ -170,6 +189,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 18,
+  },
+  versionText: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 5,
   },
   legalLinksContainer: {
     marginTop: 40,
