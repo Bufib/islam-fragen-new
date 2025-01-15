@@ -27,7 +27,7 @@ const Settings = () => {
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const themeStyles = coustomTheme();
   const { isLoggedIn, restoreSession, clearSession, isAdmin } = useAuthStore();
-  const [paypalLink, setPaypalLink] = useState<string | null>("");
+  const [paypalLink, setPaypalLink] = useState<string>("");
   const [version, setVersion] = useState<string | null>("");
   const [questionCount, setQuestionCount] = useState<number | null>(0);
 
@@ -39,7 +39,9 @@ const Settings = () => {
   // Get paypal link and version and count
   useLayoutEffect(() => {
     const paypal = Storage.getItemSync("paypal");
-    setPaypalLink(paypal);
+    if (paypal) {
+      setPaypalLink(paypal);
+    }
 
     const version = Storage.getItemSync("version");
     setVersion(version);
@@ -125,7 +127,10 @@ const Settings = () => {
             handleOpenExternalUrl(paypalLink);
           }}
         >
-          <Image source={require("@/assets/images/paypal.png")} style={styles.paypalImage}/>
+          <Image
+            source={require("@/assets/images/paypal.png")}
+            style={styles.paypalImage}
+          />
         </Pressable>
 
         <ThemedText>
@@ -217,6 +222,6 @@ const styles = StyleSheet.create({
   },
   paypalImage: {
     height: 70,
-    aspectRatio: 2
+    aspectRatio: 2,
   },
 });

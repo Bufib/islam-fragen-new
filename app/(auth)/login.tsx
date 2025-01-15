@@ -233,10 +233,15 @@ export default function LoginScreen() {
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}
           />
+           <Button
+            title="Passwort vergessen"
+            onPress={() => router.replace("/forgotPassword")}
+          />
           <Button
             title="Ich möchte mich gerne Registrieren"
             onPress={() => router.replace("/signup")}
           />
+           
         </View>
       </ScrollView>
 

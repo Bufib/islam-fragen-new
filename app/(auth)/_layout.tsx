@@ -52,6 +52,42 @@ export default function RootLayout() {
             },
           }}
         />
+         <Stack.Screen
+          name="forgotPassword"
+          options={{
+            headerShown: true,
+            headerTitle: "Passwort vergessen",
+            headerLeft: () => {
+              return (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={Colors.universal.link}
+                  style={{ marginLeft: -16 }}
+                  onPress={() => router.back()}
+                />
+              );
+            },
+          }}
+        />
+         <Stack.Screen
+          name="resetPassword"
+          options={{
+            headerShown: true,
+            headerTitle: "Passwort ändern",
+            headerLeft: () => {
+              return (
+                <Ionicons
+                  name="chevron-back-outline"
+                  size={30}
+                  color={Colors.universal.link}
+                  style={{ marginLeft: -16 }}
+                  onPress={() => router.back()}
+                />
+              );
+            },
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );

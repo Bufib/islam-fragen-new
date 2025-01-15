@@ -18,6 +18,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
 import NetInfo from "@react-native-community/netinfo";
 import { noInternet } from "@/constants/messages";
+import { router } from "expo-router";
+import { Linking } from "react-native";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
@@ -40,7 +42,7 @@ export default function RootLayout() {
     setColorTheme();
   }, []);
 
-    // Check internet connectivity
+  // Check internet connectivity
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       setIsConnected(state.isConnected);
@@ -55,7 +57,7 @@ export default function RootLayout() {
       noInternet();
     }
   }, [isConnected]);
-    
+
   // Session restoration effect
   useEffect(() => {
     const initSession = async () => {
@@ -75,8 +77,6 @@ export default function RootLayout() {
   if (!dbInitialized || !isSessionRestored) {
     return null;
   }
-
-
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
