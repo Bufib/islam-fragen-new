@@ -27,6 +27,10 @@ export default function RootLayout() {
           name="about"
           options={{ presentation: "modal", headerTitle: "Über die App" }}
         />
+        <Stack.Screen
+          name="changePassword"
+          options={{ headerShown: true, headerBackTitle: "Einstellungen", headerTitle: "" }}
+        />
       </Stack>
     </ThemeProvider>
   );

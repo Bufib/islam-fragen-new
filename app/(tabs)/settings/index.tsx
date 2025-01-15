@@ -12,14 +12,12 @@ import { Linking } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useAuthStore } from "@/stores/authStore";
 import handleLogout from "@/utils/handleLogout";
-
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
   const themeStyles = coustomTheme();
   const { isLoggedIn, restoreSession, clearSession } = useAuthStore();
   const [paypalLink, setPaypalLink] = useState<string | null>("");
-
   useEffect(() => {
     const savedColorSetting = Storage.getItemSync("isDarkMode");
     Appearance.setColorScheme(savedColorSetting === "true" ? "dark" : "light");
@@ -82,22 +80,26 @@ const Settings = () => {
             }
           />
         </View>
-        <ThemedText
-          style={styles.linkText}
-          onPress={() =>
-            Linking.openURL("https://example.com/account-loeschen")
-          }
-        >
-          Account löschen
-        </ThemedText>
-        <ThemedText
-          style={styles.linkText}
-          onPress={() =>
-            Linking.openURL("https://example.com/passwort-aendern")
-          }
-        >
-          Passwort ändern
-        </ThemedText>
+
+        {isLoggedIn && (
+          <>
+            <ThemedText
+              style={styles.linkText}
+              onPress={() =>
+                Linking.openURL("https://example.com/account-loeschen")
+              }
+            >
+              Account löschen
+            </ThemedText>
+
+            <ThemedText
+              style={styles.linkText}
+              onPress={() => router.push("/(tabs)/settings/changePassword")}
+            >
+              Passwort ändern
+            </ThemedText>
+          </>
+        )}
         <ThemedText
           style={styles.linkText}
           onPress={() => Linking.openURL(paypalLink)}
