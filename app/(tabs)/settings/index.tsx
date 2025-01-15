@@ -1,5 +1,12 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { StyleSheet, Text, View, Switch, Appearance } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Switch,
+  Appearance,
+  Pressable,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
@@ -13,6 +20,8 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { useAuthStore } from "@/stores/authStore";
 import handleLogout from "@/utils/handleLogout";
 import { getQuestionCount } from "@/utils/initializeDatabase";
+import handleOpenExternalUrl from "@/utils/handleOpenExternalUrl";
+import { Image } from "expo-image";
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
@@ -111,12 +120,14 @@ const Settings = () => {
             </ThemedText>
           </>
         )}
-        <ThemedText
-          style={styles.linkText}
-          onPress={() => Linking.openURL(paypalLink)}
+        <Pressable
+          onPress={() => {
+            handleOpenExternalUrl(paypalLink);
+          }}
         >
-          Spenden
-        </ThemedText>
+          <Image source={require("@/assets/images/paypal.png")} style={styles.paypalImage}/>
+        </Pressable>
+
         <ThemedText>
           Anzahl an Fragen in der Datenbank: {questionCount}
         </ThemedText>
@@ -203,5 +214,9 @@ const styles = StyleSheet.create({
     color: Colors.universal.link,
     fontSize: 18,
     marginBottom: 10,
+  },
+  paypalImage: {
+    height: 70,
+    aspectRatio: 2
   },
 });
