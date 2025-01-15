@@ -18,7 +18,7 @@
 //    */
 //   value: string;
 //   /**
-//    * React Hook Form's onChange method. We'll call this with our new CSV string 
+//    * React Hook Form's onChange method. We'll call this with our new CSV string
 //    * whenever items are added or removed.
 //    */
 //   onChangeText: (text: string) => void;
@@ -52,7 +52,7 @@
 //   useEffect(() => {
 //     if (value) {
 //       const titles = value.split(',').map((t) => t.trim()).filter(Boolean);
-//       // If you need more data (like category_name), you'd have to fetch those 
+//       // If you need more data (like category_name), you'd have to fetch those
 //       // or store them separately. For now, let's just store the title in selectedItems.
 //       const initialItems = titles.map((title) => ({
 //         title,
@@ -154,8 +154,8 @@
 
 //   return (
 //     <View style={styles.container}>
-//       {/** 
-//        * The TextInput is now bound to "searchText" 
+//       {/**
+//        * The TextInput is now bound to "searchText"
 //        * so we can clear it without losing the CSV stored in the form.
 //        */}
 //       <TextInput
@@ -286,8 +286,7 @@
 //   },
 // });
 
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   TextInput,
@@ -297,10 +296,11 @@ import {
   ActivityIndicator,
   Modal,
   TouchableOpacity,
-} from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { searchQuestions } from '@/utils/initializeDatabase';
-import Feather from '@expo/vector-icons/Feather';
+} from "react-native";
+import { ThemedText } from "@/components/ThemedText";
+import { searchQuestions } from "@/utils/initializeDatabase";
+import Feather from "@expo/vector-icons/Feather";
+import { Colors } from "@/constants/Colors";
 
 interface TitleSearchInputProps {
   value: string;
@@ -323,7 +323,7 @@ export const TitleSearchInput = ({
   style,
   themeStyles,
 }: TitleSearchInputProps) => {
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState<SelectedItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -331,11 +331,14 @@ export const TitleSearchInput = ({
 
   useEffect(() => {
     if (value) {
-      const titles = value.split(',').map((t) => t.trim()).filter(Boolean);
+      const titles = value
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
       const initialItems = titles.map((title) => ({
         title,
-        category_name: '',
-        subcategory_name: '',
+        category_name: "",
+        subcategory_name: "",
       }));
       setSelectedItems(initialItems);
     }
@@ -357,7 +360,7 @@ export const TitleSearchInput = ({
       }));
       setSearchResults(formattedResults);
     } catch (error) {
-      console.error('Error searching titles:', error);
+      console.error("Error searching titles:", error);
       setSearchResults([]);
     } finally {
       setLoading(false);
@@ -379,9 +382,9 @@ export const TitleSearchInput = ({
 
     const newSelected = [...selectedItems, selectedItem];
     setSelectedItems(newSelected);
-    const csv = newSelected.map((item) => item.title).join(', ');
+    const csv = newSelected.map((item) => item.title).join(", ");
     onChangeText(csv);
-    setSearchText('');
+    setSearchText("");
     setModalVisible(false);
   };
 
@@ -390,7 +393,7 @@ export const TitleSearchInput = ({
       (item) => item.title !== itemToDelete.title
     );
     setSelectedItems(newSelected);
-    const csv = newSelected.map((item) => item.title).join(', ');
+    const csv = newSelected.map((item) => item.title).join(", ");
     onChangeText(csv);
   };
 
@@ -400,11 +403,14 @@ export const TitleSearchInput = ({
         <ThemedText style={styles.titleText}>{item.title}</ThemedText>
         {Boolean(item.category_name) && (
           <ThemedText style={styles.categoryText}>
-            {item.category_name} {'>'} {item.subcategory_name}
+            {item.category_name} {">"} {item.subcategory_name}
           </ThemedText>
         )}
       </View>
-      <Pressable onPress={() => handleDeleteItem(item)} style={styles.deleteButton}>
+      <Pressable
+        onPress={() => handleDeleteItem(item)}
+        style={styles.deleteButton}
+      >
         <Feather name="trash-2" size={24} color="black" />
       </Pressable>
     </View>
@@ -412,11 +418,14 @@ export const TitleSearchInput = ({
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => setModalVisible(true)} style={[styles.input, style]}>
+      <Pressable
+        onPress={() => setModalVisible(true)}
+        style={[styles.input, style]}
+      >
         <ThemedText style={themeStyles.text}>
           {selectedItems.length > 0
-            ? selectedItems.map((item) => item.title).join(', ')
-            : 'Select Titles'}
+            ? selectedItems.map((item) => item.title).join(", ")
+            : "Wähle die Fragen aus"}
         </ThemedText>
       </Pressable>
 
@@ -432,7 +441,7 @@ export const TitleSearchInput = ({
               style={[styles.input, themeStyles.text]}
               value={searchText}
               onChangeText={setSearchText}
-              placeholder="Search for a title..."
+              placeholder="Suche nach einem Title"
               placeholderTextColor="#888"
             />
             {loading && <ActivityIndicator size="small" color="#888" />}
@@ -445,10 +454,12 @@ export const TitleSearchInput = ({
                     style={styles.suggestionItem}
                     onPress={() => handleSelectSuggestion(item)}
                   >
-                    <ThemedText style={styles.titleText}>{item.title}</ThemedText>
+                    <ThemedText style={styles.titleText}>
+                      {item.title}
+                    </ThemedText>
                     {Boolean(item.category_name) && (
                       <ThemedText style={styles.categoryText}>
-                        {item.category_name} {'>'} {item.subcategory_name}
+                        {item.category_name} {">"} {item.subcategory_name}
                       </ThemedText>
                     )}
                   </Pressable>
@@ -465,7 +476,7 @@ export const TitleSearchInput = ({
               onPress={() => setModalVisible(false)}
               style={styles.closeButton}
             >
-              <ThemedText>Close</ThemedText>
+              <ThemedText style={{color: Colors.universal.link}}>Schließen</ThemedText>
             </TouchableOpacity>
           </View>
         </View>
@@ -485,7 +496,7 @@ export const TitleSearchInput = ({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
+    position: "relative",
     zIndex: 1,
   },
   input: {
@@ -496,48 +507,48 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    width: '80%',
-    maxHeight: '80%',
+    width: "80%",
+    maxHeight: "80%",
     borderRadius: 8,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   suggestionItem: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   titleText: {
     fontSize: 16,
   },
   categoryText: {
     fontSize: 12,
-    color: '#666',
+    color: "#666",
   },
   noResults: {
     padding: 12,
-    textAlign: 'center',
-    color: '#888',
+    textAlign: "center",
+    color: "#888",
   },
   closeButton: {
     marginTop: 16,
     padding: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   selectedItemsList: {
-    marginTop: 10,
+    marginTop: 20,
   },
   selectedItemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 5,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 10,
     marginBottom: 8,
   },
   selectedItemContent: {
