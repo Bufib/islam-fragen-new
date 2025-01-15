@@ -23,13 +23,28 @@ import { Alert } from "react-native";
 
 type QuestionFormData = {
   title: string;
-  marja: string;
+  marja: {
+    sistani: boolean;
+    khamenei: boolean;
+    keineRechtsfrage: boolean;
+  };
   question: string;
   user_age: number;
   user_gender: string;
   user_email: string;
   user_username: string;
 };
+const CustomCheckbox = ({ label, value, onValueChange, error }: any) => (
+  <Pressable
+    style={[styles.checkboxContainer]}
+    onPress={() => onValueChange(!value)}
+  >
+    <View style={[styles.checkbox, value && styles.checkboxChecked]}>
+      {value && <ThemedText style={styles.checkmark}>✓</ThemedText>}
+    </View>
+    <ThemedText style={styles.checkboxLabel}>{label}</ThemedText>
+  </Pressable>
+);
 
 const CustomInput = ({
   label,
@@ -74,7 +89,12 @@ export default function askQuestion() {
   } = useForm<QuestionFormData>({
     defaultValues: {
       title: "",
-      marja: "",
+      marja: {
+        sistani: false,
+        khamenei: false,
+        keineRechtsfrage: false,
+      },
+
       question: "",
       user_age: undefined,
       user_gender: "",
@@ -102,6 +122,16 @@ export default function askQuestion() {
     setError(null);
 
     try {
+      // Extract the selected Marja
+      let selectedMarja = null;
+      if (data.marja.sistani) {
+        selectedMarja = "Sistani";
+      } else if (data.marja.khamenei) {
+        selectedMarja = "Khamenei";
+      } else if (data.marja.keineRechtsfrage) {
+        selectedMarja = "Keine Rechtsfrage";
+      }
+
       console.log(session.user.id);
       const { error: submissionError } = await supabase
         .from("user_question")
@@ -110,7 +140,7 @@ export default function askQuestion() {
             user_id: session.user.id,
             user_username: user_username,
             title: data.title,
-            marja: data.marja,
+            marja: selectedMarja,
             question: data.question,
             user_age: parseInt(data.user_age.toString()),
             user_gender: data.user_gender,
@@ -203,7 +233,7 @@ export default function askQuestion() {
             )}
           />
 
-          <Controller
+          {/* <Controller
             control={control}
             rules={{ required: "Bitte gebe deinen Marja an!" }}
             name="marja"
@@ -218,7 +248,73 @@ export default function askQuestion() {
                 autoCapitalize="none"
               />
             )}
-          />
+          /> */}
+
+          <View style={styles.marjaContainer}>
+            <ThemedText style={styles.label}>Marja *</ThemedText>
+            <Controller
+              control={control}
+              rules={{
+                validate: (value) => {
+                  // Ensure that at least one Marja is selected
+                  if (
+                    !value.sistani &&
+                    !value.khamenei &&
+                    !value.keineRechtsfrage
+                  ) {
+                    return "Bitte wähle einen Marja aus!";
+                  }
+                  return true;
+                },
+              }}
+              name="marja"
+              render={({ field: { onChange, value } }) => (
+                <View>
+                  <CustomCheckbox
+                    label="Sayid as-Sistani"
+                    value={value.sistani}
+                    onValueChange={
+                      () =>
+                        onChange({
+                          sistani: true,
+                          khamenei: false,
+                          keineRechtsfrage: false,
+                        }) // Select Sistani, deselect Khamenei
+                    }
+                  />
+                  <CustomCheckbox
+                    label="Sayid al-Khamenei"
+                    value={value.khamenei}
+                    onValueChange={
+                      () =>
+                        onChange({
+                          sistani: false,
+                          khamenei: true,
+                          keineRechtsfrage: false,
+                        }) // Select Khamenei, deselect Sistani
+                    }
+                  />
+                  <CustomCheckbox
+                    label="Keine Rechtsfrage"
+                    value={value.keineRechtsfrage}
+                    onValueChange={
+                      () =>
+                        onChange({
+                          sistani: false,
+                          khamenei: false,
+                          keineRechtsfrage: true,
+                        }) // neither
+                    }
+                  />
+                  {errors.marja && (
+                    <ThemedText style={styles.errorText}>
+                      {errors.marja.message}
+                    </ThemedText>
+                  )}
+                </View>
+              )}
+            />
+          </View>
 
           <Controller
             control={control}
@@ -364,6 +460,36 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: Colors.universal.error,
   },
+  marjaContainer: {
+    marginBottom: 16,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 6,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: Colors.universal.link,
+    borderRadius: 4,
+    marginRight: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: Colors.universal.link,
+  },
+  checkmark: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  checkboxLabel: {
+    fontSize: 16,
+  },
+
   errorContainer: {
     backgroundColor: "#FFE5E5",
     padding: 12,
