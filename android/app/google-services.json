@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "465062426932",
+    "project_id": "islam-fragen-notifications",
+    "storage_bucket": "islam-fragen-notifications.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465062426932:android:deebbaeac1bf5cd3ac0d61",
+        "android_client_info": {
+          "package_name": "com.bufib.islamfragen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPaKl7is5D9oDeaCvjyqQk9r3RKb-zBqs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

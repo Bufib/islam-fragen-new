@@ -17,7 +17,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.hadi_ea.islamfragen"
+      "package": "com.hadi_ea.islamfragen",
+      "googleServicesFile": "./android/app/google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -62,6 +66,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c4fc8fe1-37b5-48f0-8717-a7403159a30f"
+      }
     }
   }
 }

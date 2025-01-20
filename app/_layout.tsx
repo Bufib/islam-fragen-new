@@ -18,9 +18,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
 import NetInfo from "@react-native-community/netinfo";
 import { noInternet } from "@/constants/messages";
-import { router } from "expo-router";
-import { Linking } from "react-native";
-
+import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { SupabaseRealtimeProvider } from "@/components/SupabaseRealtimeProvider";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
@@ -33,6 +32,7 @@ export default function RootLayout() {
   const { restoreSession } = useAuthStore();
   const [isSessionRestored, setIsSessionRestored] = useState(false);
   const [isConnected, setIsConnected] = useState<boolean | null>(true);
+  const { expoPushToken, notification } = usePushNotifications();
 
   // Musst be before 'if (!dbInitialized)' or 'Rendered more hooks' appearce because if (!loaded || !dbInitialized) -> we return and the useEffect benath it doesn't get used
   useEffect(() => {
@@ -68,7 +68,19 @@ export default function RootLayout() {
     initSession();
   }, []);
 
-  
+  //! Store push token
+  useEffect(() => {
+    if (expoPushToken?.data) {
+      console.log("Push Token:", expoPushToken.data);
+    }
+  }, [expoPushToken]);
+
+  //! Handle notifications
+  useEffect(() => {
+    if (notification) {
+      console.log("Received notification:", notification);
+    }
+  }, [notification]);
 
   // Hide splash screen when everything is ready
   useEffect(() => {
@@ -82,21 +94,24 @@ export default function RootLayout() {
   }
 
   return (
-    
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
-        
-        <SQLiteProvider databaseName="islam-fragen.db">
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(user)" options={{ headerShown: false }} />
-            <Stack.Screen name="(question)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-          <StatusBar style="auto" />
-        </SQLiteProvider>
+        <SupabaseRealtimeProvider>
+          <SQLiteProvider databaseName="islam-fragen.db">
+            <Stack>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(user)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="(question)"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+            <StatusBar style="auto" />
+          </SQLiteProvider>
+        </SupabaseRealtimeProvider>
       </QueryClientProvider>
       <Toast />
     </ThemeProvider>

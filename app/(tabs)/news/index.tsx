@@ -16,6 +16,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAuthStore } from "@/stores/authStore";
 import { router } from "expo-router";
 import NoInternet from "@/components/NoInternet";
+import { FlashList } from "@shopify/flash-list";
+import { NewsItemType } from "@/hooks/useFetchNews";
 
 export default function NewsFeed() {
   const {
@@ -23,13 +25,13 @@ export default function NewsFeed() {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-    showUpdateButton: updated,
+    showUpdateButton,
     handleRefresh: refetch,
     isRefetching,
   } = useFetchNews();
 
   const themeStyles = coustomTheme();
-  const flatListRef = useRef<FlatList>(null);
+  const flatListRef = useRef<FlashList<NewsItemType>>(null);
   const colorScheme = useColorScheme();
   const handleRefreshAndScroll = async () => {
     await refetch();
@@ -41,14 +43,14 @@ export default function NewsFeed() {
   const ListFooter = () => {
     if (!hasNextPage) return null;
 
-    useEffect(() => {
-      const fetchNewsWithoutLoadButton = async () => {
-        if (isAdmin && updated) {
-          await refetch();
-        }
-      };
-      fetchNewsWithoutLoadButton();
-    }, []);
+    // useEffect(() => {
+    //   const fetchNewsWithoutLoadButton = async () => {
+    //     if (isAdmin && showUpdateButton) {
+    //       await handleRefreshAndScroll();
+    //     }
+    //   };
+    //   fetchNewsWithoutLoadButton();
+    // }, [isAdmin, showUpdateButton]);
 
     return (
       <ThemedView style={styles.loadMoreContainer}>
@@ -85,7 +87,7 @@ export default function NewsFeed() {
       edges={["top"]}
     >
       <NoInternet />
-      {updated && !isAdmin && (
+      {showUpdateButton && !isAdmin && (
         <ThemedView style={styles.updateContainer}>
           <Button
             title="Neuer Beitrag verfügbar"
@@ -109,10 +111,11 @@ export default function NewsFeed() {
         )}
       </ThemedView>
 
-      <FlatList
+      <FlashList
         ref={flatListRef}
         data={news}
         keyExtractor={(item) => item.id.toString()}
+        estimatedItemSize={104}
         renderItem={({ item }) => (
           <NewsItem
             id={item.id}

@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContainer: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
   },
   scrollViewContent: {
     flexGrow: 1,
@@ -666,8 +666,7 @@ const styles = StyleSheet.create({
   },
   logInText: {
     fontSize: 16,
-    fontWeight: "700",
-    marginRight: 8,
+    fontWeight: "600",
   },
   modalOverlay: {
     flex: 1,
