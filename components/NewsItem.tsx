@@ -82,7 +82,7 @@ export const NewsItem = ({
         <ThemedView style={styles.linksContainer}>
           {external_url.map((url, index) => (
             <RenderLinkNewsItem
-              key={`${external_url}-${index}`}
+            key={`external-url-${index}-${url}`} 
               url={url}
               index={index}
               isExternal={true}
@@ -95,7 +95,7 @@ export const NewsItem = ({
         <ThemedView style={styles.linksContainer}>
           {internal_url.map((url, index) => (
             <RenderLinkNewsItem
-              key={`${internal_url}-${index}`}
+            key={`internal-url-${index}-${url}`} 
               url={url}
               index={index}
               isExternal={false}

@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { Link, router, useFocusEffect } from "expo-router";
 import NetInfo from "@react-native-community/netinfo";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useFetchUserQuestions,
@@ -177,6 +176,7 @@ export default function QuestionsList() {
               }
               refetch();
             }}
+
           />
         }
         ListEmptyComponent={

@@ -57,7 +57,6 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 14,
     color: Colors.universal.link,
-    flex: 1,
   },
 });
 

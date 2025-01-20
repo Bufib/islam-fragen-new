@@ -185,6 +185,7 @@ export type QuestionFromUser = {
   title: string;
   user_gender: string;
   user_age: string;
+  internal_url: string[];
   created_at: string;
 };
 
