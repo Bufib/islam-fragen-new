@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Alert,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
 import { supabase } from "@/utils/supabase";
 import { router } from "expo-router";
 import { ActivityIndicator } from "react-native";
@@ -18,7 +11,11 @@ export default function VerifyTokenScreen() {
   const handleVerify = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.verifyEmail(token);
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: "email",
+      });
 
       if (error) {
         Alert.alert("Verification Failed", error.message);
