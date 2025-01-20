@@ -88,19 +88,41 @@ const Settings = () => {
       </ThemedView>
 
       <ThemedView style={styles.contentContainer}>
-        <View style={styles.row}>
-          <ThemedText style={styles.label}>Dunkelmodus</ThemedText>
-          <Switch
-            value={isDarkMode}
-            onValueChange={toggleDarkMode}
-            trackColor={{
-              false: Colors.light.trackColor,
-              true: Colors.dark.trackColor,
+        <View style={styles.togglebarContainer}>
+          <View style={styles.toogleBar}>
+            <ThemedText style={styles.label}>Dunkelmodus</ThemedText>
+            <Switch
+              value={isDarkMode}
+              onValueChange={toggleDarkMode}
+              trackColor={{
+                false: Colors.light.trackColor,
+                true: Colors.dark.trackColor,
+              }}
+              thumbColor={
+                isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
+              }
+            />
+          </View>
+          <View style={styles.toogleBar}>
+            <ThemedText style={styles.label}>Benachrichtigungen</ThemedText>
+            <Switch
+              value={isDarkMode}
+              onValueChange={toggleDarkMode}
+              trackColor={{
+                false: Colors.light.trackColor,
+                true: Colors.dark.trackColor,
+              }}
+              thumbColor={
+                isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
+              }
+            />
+          </View>
+          <View
+            style={{
+              borderBottomWidth: 1,
+              borderBottomColor: Colors.universal.borderBottomToggleSettings,
             }}
-            thumbColor={
-              isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
-            }
-          />
+          ></View>
         </View>
 
         {isLoggedIn && (
@@ -195,13 +217,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
     gap: 10,
   },
-  row: {
+  togglebarContainer: {
+    flexDirection: "column",
+  },
+
+  toogleBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.universal.borderBottomToggleSettings,
   },
   label: {
     fontSize: 18,
