@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,33 +8,70 @@ import {
   Platform,
   TextInput,
   View,
+  Alert,
 } from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import NetInfo from "@react-native-community/netinfo";
+import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { supabase } from "@/utils/supabase";
 import { useAuthStore } from "@/stores/authStore";
-import { Controller, useForm } from "react-hook-form";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
 import { router } from "expo-router";
-import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
-import { useEffect, useRef } from "react";
-import { Alert } from "react-native";
+import { askQuestionQuestionSendSuccess } from "@/constants/messages";
 
-type QuestionFormData = {
-  title: string;
-  marja: {
-    sistani: boolean;
-    khamenei: boolean;
-    keineRechtsfrage: boolean;
+// ---- 1. Zod Schema: For robust form validation
+const QuestionSchema = z.object({
+  title: z.string().min(1, "Bitte gebe einen Titel ein!"),
+  marja: z
+    .object({
+      sistani: z.boolean(),
+      khamenei: z.boolean(),
+      keineRechtsfrage: z.boolean(),
+    })
+    // at least one must be true
+    .refine(
+      (val) => val.sistani || val.khamenei || val.keineRechtsfrage,
+      "Bitte wähle einen Marja aus!"
+    ),
+  question: z.string().min(1, "Bitte gebe deine Frage ein!"),
+  user_age: z
+    .number({ invalid_type_error: "Bitte gebe dein Alter ein!" })
+    .min(1, "Bitte gebe dein Alter ein!"),
+  user_gender: z.string().min(1, "Bitte gebe dein Geschlecht an!"),
+  user_email: z
+    .string()
+    .email("Ungültige Emailadresse")
+    .min(1, "Bitte gebe deinen Email an!"),
+  user_username: z.string().optional(),
+});
+
+// The TypeScript definition derived from Zod:
+type QuestionFormData = z.infer<typeof QuestionSchema>;
+
+/** Typed hCaptcha event */
+type CaptchaEvent = {
+  nativeEvent: {
+    data: string;
   };
-  question: string;
-  user_age: number;
-  user_gender: string;
-  user_email: string;
-  user_username: string;
 };
-const CustomCheckbox = ({ label, value, onValueChange, error }: any) => (
+
+/** Reusable checkbox */
+const CustomCheckbox = ({
+  label,
+  value,
+  onValueChange,
+  error,
+}: {
+  label: string;
+  value: boolean;
+  onValueChange: (newVal: boolean) => void;
+  error?: string;
+}) => (
   <Pressable
     style={[styles.checkboxContainer]}
     onPress={() => onValueChange(!value)}
@@ -46,6 +83,7 @@ const CustomCheckbox = ({ label, value, onValueChange, error }: any) => (
   </Pressable>
 );
 
+/** Reusable text input w/ label, error, etc. */
 const CustomInput = ({
   label,
   error,
@@ -53,7 +91,14 @@ const CustomInput = ({
   numberOfLines,
   style,
   ...props
-}: any) => (
+}: {
+  label: string;
+  error?: string;
+  multiline?: boolean;
+  numberOfLines?: number;
+  style?: any;
+  [key: string]: any; // allow additional props like onChangeText, value
+}) => (
   <View style={styles.inputContainer}>
     <ThemedText style={styles.label}>{label}</ThemedText>
     <TextInput
@@ -72,21 +117,29 @@ const CustomInput = ({
   </View>
 );
 
-export default function askQuestion() {
+export default function AskQuestionScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCaptcha, setShowCaptcha] = useState(false);
+
+  // Access user info
   const session = useAuthStore((state) => state.session);
   const user_username = useAuthStore((state) => state.user_username);
+
+  // Theming
   const themeStyles = coustomTheme();
-  const [showCaptcha, setShowCaptcha] = useState(false);
-  const captchaRef = useRef(null);
+
+  // Captcha Ref
+  const captchaRef = useRef<ConfirmHcaptcha | null>(null);
+
   const {
     control,
     handleSubmit,
     reset,
-    getValues,
     formState: { errors },
+    setValue,
   } = useForm<QuestionFormData>({
+    resolver: zodResolver(QuestionSchema),
     defaultValues: {
       title: "",
       marja: {
@@ -94,7 +147,6 @@ export default function askQuestion() {
         khamenei: false,
         keineRechtsfrage: false,
       },
-
       question: "",
       user_age: undefined,
       user_gender: "",
@@ -103,18 +155,25 @@ export default function askQuestion() {
     },
   });
 
+  // If user already has a username stored in the store,
+  // you can auto-fill it so they don't have to retype:
+  useEffect(() => {
+    if (user_username) {
+      setValue("user_username", user_username);
+    }
+  }, [user_username, setValue]);
+
+  // Show captcha when state toggles
   useEffect(() => {
     if (showCaptcha && captchaRef.current) {
-      captchaRef.current?.show();
+      captchaRef.current.show();
     }
   }, [showCaptcha]);
 
-  const submitQuestion = async (
-    data: QuestionFormData,
-    captchaToken: string
-  ) => {
+  /** The actual DB insert logic after captcha success */
+  async function submitQuestion(data: QuestionFormData, captchaToken: string) {
     if (!session?.user.id) {
-      setError("You must be logged in to submit a question");
+      setError("You must be logged in to submit a question.");
       return;
     }
 
@@ -123,26 +182,24 @@ export default function askQuestion() {
 
     try {
       // Extract the selected Marja
-      let selectedMarja = null;
+      let selectedMarja = "Keine Rechtsfrage"; // default
       if (data.marja.sistani) {
         selectedMarja = "Sistani";
       } else if (data.marja.khamenei) {
         selectedMarja = "Khamenei";
-      } else if (data.marja.keineRechtsfrage) {
-        selectedMarja = "Keine Rechtsfrage";
       }
 
-      console.log(session.user.id);
+      // Insert into DB
       const { error: submissionError } = await supabase
         .from("user_question")
         .insert([
           {
             user_id: session.user.id,
-            user_username: user_username,
+            user_username: data.user_username ?? user_username,
             title: data.title,
             marja: selectedMarja,
             question: data.question,
-            user_age: parseInt(data.user_age.toString()),
+            user_age: data.user_age,
             user_gender: data.user_gender,
             user_email: data.user_email,
             status: "Beantwortung steht noch aus",
@@ -151,48 +208,61 @@ export default function askQuestion() {
 
       if (submissionError) throw submissionError;
       reset();
-    } catch (err) {
+
+      askQuestionQuestionSendSuccess();
+      router.replace("/(tabs)/home"); 
+    } catch (err: any) {
       setError(err.message);
       console.log(err);
     } finally {
       setLoading(false);
       setShowCaptcha(false);
     }
-  };
+  }
 
-  const onSubmit = async (data: QuestionFormData) => {
+  /** Called once user taps "Frage stellen" */
+  const handleAskQuestion = async (formData: QuestionFormData) => {
+    // Check if online
+    const netInfo = await NetInfo.fetch();
+    if (!netInfo.isConnected) {
+      Alert.alert("Keine Internetverbindung", "Bitte überprüfe dein Internet.");
+      return;
+    }
+
+    // If connected, open captcha
     setShowCaptcha(true);
   };
 
-  const onMessage = async (event: any) => {
-    if (event && event.nativeEvent.data) {
-      const token = event.nativeEvent.data;
+  /** Handle captcha message & token */
+  const onCaptchaMessage = async (event: CaptchaEvent) => {
+    if (!showCaptcha) return;
 
-      if (["error", "expired"].includes(token)) {
-        if (!showCaptcha) {
-          //Skip so message doesn't appear spontanousley while app is opened and captcha expires
-          console.log("Captcha not active.");
-          return;
-        }
+    const token = event.nativeEvent.data;
+    switch (token) {
+      case "error":
+      case "expired":
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
           "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
         );
-      } else if (token === "cancel") {
+        return;
+
+      case "cancel":
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
           "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
         );
-      } else if (token === "open") {
-        // Captcha opened
-      } else {
-        // Validate form and submit with token
-        handleSubmit(async (formData) => {
-          await submitQuestion(formData, token);
-        })();
-      }
+        return;
+
+      case "open":
+        // Just opened, do nothing
+        return;
+
+      default:
+        // Valid token from hCaptcha, run the insert logic
+        handleSubmit((validData) => submitQuestion(validData, token))();
     }
   };
 
@@ -216,9 +286,9 @@ export default function askQuestion() {
         )}
 
         <View style={[styles.formContainer, themeStyles.contrast]}>
+          {/* TITLE */}
           <Controller
             control={control}
-            rules={{ required: "Bitte gebe einen Titel ein!" }}
             name="title"
             render={({ field: { onChange, value } }) => (
               <CustomInput
@@ -233,80 +303,48 @@ export default function askQuestion() {
             )}
           />
 
-          {/* <Controller
-            control={control}
-            rules={{ required: "Bitte gebe deinen Marja an!" }}
-            name="marja"
-            render={({ field: { onChange, value } }) => (
-              <CustomInput
-                label="Marja *"
-                value={value}
-                onChangeText={onChange}
-                error={errors.marja?.message}
-                placeholder="Wer ist dein Marja?"
-                style={themeStyles.text}
-                autoCapitalize="none"
-              />
-            )}
-          /> */}
-
+          {/* MARJA */}
           <View style={styles.marjaContainer}>
             <ThemedText style={styles.label}>Marja *</ThemedText>
             <Controller
               control={control}
-              rules={{
-                validate: (value) => {
-                  // Ensure that at least one Marja is selected
-                  if (
-                    !value.sistani &&
-                    !value.khamenei &&
-                    !value.keineRechtsfrage
-                  ) {
-                    return "Bitte wähle einen Marja aus!";
-                  }
-                  return true;
-                },
-              }}
               name="marja"
               render={({ field: { onChange, value } }) => (
                 <View>
                   <CustomCheckbox
                     label="Sayid as-Sistani"
                     value={value.sistani}
-                    onValueChange={
-                      () =>
-                        onChange({
-                          sistani: true,
-                          khamenei: false,
-                          keineRechtsfrage: false,
-                        }) // Select Sistani, deselect Khamenei
+                    onValueChange={() =>
+                      onChange({
+                        sistani: true,
+                        khamenei: false,
+                        keineRechtsfrage: false,
+                      })
                     }
                   />
                   <CustomCheckbox
                     label="Sayid al-Khamenei"
                     value={value.khamenei}
-                    onValueChange={
-                      () =>
-                        onChange({
-                          sistani: false,
-                          khamenei: true,
-                          keineRechtsfrage: false,
-                        }) // Select Khamenei, deselect Sistani
+                    onValueChange={() =>
+                      onChange({
+                        sistani: false,
+                        khamenei: true,
+                        keineRechtsfrage: false,
+                      })
                     }
                   />
                   <CustomCheckbox
                     label="Keine Rechtsfrage"
                     value={value.keineRechtsfrage}
-                    onValueChange={
-                      () =>
-                        onChange({
-                          sistani: false,
-                          khamenei: false,
-                          keineRechtsfrage: true,
-                        }) // neither
+                    onValueChange={() =>
+                      onChange({
+                        sistani: false,
+                        khamenei: false,
+                        keineRechtsfrage: true,
+                      })
                     }
                   />
-                  {errors.marja && (
+                  {errors.marja?.message && (
                     <ThemedText style={styles.errorText}>
                       {errors.marja.message}
                     </ThemedText>
@@ -316,9 +354,9 @@ export default function askQuestion() {
             />
           </View>
 
+          {/* QUESTION */}
           <Controller
             control={control}
-            rules={{ required: "Bitte gebe deine Frage ein!" }}
             name="question"
             render={({ field: { onChange, value } }) => (
               <CustomInput
@@ -335,17 +373,15 @@ export default function askQuestion() {
             )}
           />
 
+          {/* AGE */}
           <Controller
             control={control}
-            rules={{
-              required: "Bitte gebe dein Alter ein!",
-            }}
             name="user_age"
             render={({ field: { onChange, value } }) => (
               <CustomInput
                 label="Alter *"
-                value={value?.toString() || ""}
-                onChangeText={(text: string) => onChange(parseInt(text) || "")}
+                value={value?.toString()}
+                onChangeText={(txt: string) => onChange(Number(txt) || 0)}
                 keyboardType="numeric"
                 error={errors.user_age?.message}
                 placeholder="Dein Alter"
@@ -354,9 +390,9 @@ export default function askQuestion() {
             )}
           />
 
+          {/* GENDER */}
           <Controller
             control={control}
-            rules={{ required: "Bitte gebe dein Geschlecht an!" }}
             name="user_gender"
             render={({ field: { onChange, value } }) => (
               <CustomInput
@@ -371,20 +407,14 @@ export default function askQuestion() {
             )}
           />
 
+          {/* EMAIL */}
           <Controller
             control={control}
-            rules={{
-              required: "Bitte gebe deinen Email an!",
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: "Ungültige Emailadresse",
-              },
-            }}
             name="user_email"
             render={({ field: { onChange, value } }) => (
               <CustomInput
                 label="Email *"
-                value={value || ""}
+                value={value}
                 onChangeText={onChange}
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -395,9 +425,11 @@ export default function askQuestion() {
             )}
           />
         </View>
+
+        {/* SUBMIT BUTTON */}
         <Pressable
           style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-          onPress={handleSubmit(onSubmit)}
+          onPress={handleSubmit(handleAskQuestion)}
           disabled={loading}
         >
           {loading ? (
@@ -409,12 +441,14 @@ export default function askQuestion() {
           )}
         </Pressable>
       </ScrollView>
+
+      {/* HCAPTCHA INVISIBLE WIDGET */}
       {showCaptcha && (
         <ConfirmHcaptcha
           ref={captchaRef}
           siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
           baseUrl="https://hcaptcha.com"
-          onMessage={onMessage}
+          onMessage={onCaptchaMessage}
           languageCode="de"
           size="invisible"
         />
@@ -431,18 +465,33 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-
   title: {
     marginTop: 10,
-    marginBottom: 24,
+    marginBottom: 10,
   },
-  inputContainer: {
+  errorContainer: {
+    backgroundColor: "#FFE5E5",
+    padding: 12,
+    borderRadius: 8,
     marginBottom: 16,
+  },
+  errorText: {
+    color: Colors.universal.error,
+    fontSize: 14,
+  },
+  formContainer: {
+    flex: 1,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
+  },
+  inputContainer: {
+    marginBottom: 16,
   },
   input: {
     height: 48,
@@ -450,9 +499,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     fontSize: 16,
     borderWidth: 1,
+    borderColor: "#888",
   },
   textArea: {
-    height: 250,
+    height: 120,
     paddingTop: 12,
     paddingBottom: 12,
     textAlignVertical: "top",
@@ -488,23 +538,6 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 16,
-  },
-
-  errorContainer: {
-    backgroundColor: "#FFE5E5",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  errorText: {
-    color: Colors.universal.error,
-    fontSize: 14,
-  },
-  formContainer: {
-    flex: 1,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 20,
   },
   submitButton: {
     backgroundColor: Colors.universal.link,

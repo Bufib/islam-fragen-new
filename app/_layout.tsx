@@ -20,6 +20,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { noInternet } from "@/constants/messages";
 import { router } from "expo-router";
 import { Linking } from "react-native";
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
@@ -67,6 +68,8 @@ export default function RootLayout() {
     initSession();
   }, []);
 
+  
+
   // Hide splash screen when everything is ready
   useEffect(() => {
     if (dbInitialized && isSessionRestored) {
@@ -79,8 +82,10 @@ export default function RootLayout() {
   }
 
   return (
+    
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
+        
         <SQLiteProvider databaseName="islam-fragen.db">
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />

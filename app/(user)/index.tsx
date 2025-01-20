@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
-  Button,
 } from "react-native";
-import { Link } from "expo-router";
-import { router } from "expo-router";
+import { Link, router, useFocusEffect } from "expo-router";
+import NetInfo from "@react-native-community/netinfo";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useFetchUserQuestions,
@@ -24,17 +24,20 @@ import { useColorScheme } from "react-native";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import { userQuestionErrorLoadingQuestions } from "@/constants/messages";
+import {
+  userQuestionErrorLoadingQuestions,
+  noInternetBody,
+  noInternetHeader,
+} from "@/constants/messages";
 import NoInternet from "@/components/NoInternet";
-import { noInternetBody, noInternetHeader } from "@/constants/messages";
-import NetInfo from "@react-native-community/netinfo";
-import { useState } from "react";
 
 export default function QuestionsList() {
   // 1. Check auth state from the store
   const { isLoggedIn, session } = useAuthStore();
   const colorScheme = useColorScheme();
   const themeStyles = coustomTheme();
+
+  // Track connection status
   const [isConnected, setIsConnected] = useState<boolean | null>(true);
 
   // 2. If not logged in, redirect to login
@@ -46,7 +49,7 @@ export default function QuestionsList() {
 
   // 3. Use our hook to fetch data
   const {
-    data: questions, // Here, data is now an array of questions
+    data: questions,
     isLoading,
     isRefetching,
     refetch,
@@ -55,51 +58,30 @@ export default function QuestionsList() {
     handleRefresh,
   } = useFetchUserQuestions();
 
-
+  // 4. Subscribe to NetInfo once
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       setIsConnected(state.isConnected);
     });
-
     return () => unsubscribe();
   }, []);
 
-  // Loading state should be checked first
-  if (isLoading) {
-    return (
-      <ThemedView style={[styles.container, styles.centered]}>
-        <ActivityIndicator
-          size="large"
-          color={colorScheme === "dark" ? "white" : "black"}
-        />
-        <ThemedText style={styles.loadingText}>
-          Fragen werden geladen
-        </ThemedText>
-      </ThemedView>
-    );
-  }
+  /**
+   * 5. Optionally refetch on screen focus
+   *    This ensures we always have fresh data when user returns.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      // Only refetch if connected
+      if (isConnected) {
+        refetch();
+      }
+    }, [isConnected])
+  );
 
-  // 5. Handle error
-  if (isError) {
-    return (
-      <ThemedView style={styles.container}>
-        <ThemedView style={styles.centered}>
-          <ThemedText style={styles.errorText}>
-            {userQuestionErrorLoadingQuestions}
-          </ThemedText>
-
-          <Pressable style={styles.retryButton} onPress={refetch}>
-            <ThemedText style={styles.retryButtonText}>
-              Versuch es nochmal
-            </ThemedText>
-          </Pressable>
-        </ThemedView>
-      </ThemedView>
-    );
-  }
-
-  // 6. Render item
-  const renderQuestion = ({ item }: { item: QuestionFromUser }) => (
+  // 6. Render item (memoized for performance)
+  const renderQuestion = useCallback(
+    ({ item }: { item: QuestionFromUser }) => (
       <Pressable
         style={[styles.questionCard, themeStyles.contrast]}
         onPress={() =>
@@ -125,17 +107,55 @@ export default function QuestionsList() {
         </View>
         <Text style={styles.createdAtText}>{formateDate(item.created_at)}</Text>
       </Pressable>
+    ),
+    [themeStyles]
   );
 
-  // 7. Render the full list
+  // 7. Return early if loading
+  if (isLoading) {
+    return (
+      <ThemedView style={[styles.container, styles.centered]}>
+        <ActivityIndicator
+          size="large"
+          color={colorScheme === "dark" ? "white" : "black"}
+        />
+        <ThemedText style={styles.loadingText}>
+          Fragen werden geladen
+        </ThemedText>
+      </ThemedView>
+    );
+  }
+
+  // 8. Show error if fetch fails
+  if (isError) {
+    return (
+      <ThemedView style={styles.container}>
+        <View style={styles.centered}>
+          <ThemedText style={styles.errorText}>
+            {userQuestionErrorLoadingQuestions}
+          </ThemedText>
+          <Pressable style={styles.retryButton} onPress={refetch}>
+            <ThemedText style={styles.retryButtonText}>
+              Versuch es nochmal
+            </ThemedText>
+          </Pressable>
+        </View>
+      </ThemedView>
+    );
+  }
+
+  // 9. Main UI
   return (
     <ThemedView style={[styles.container, themeStyles.defaultBackgorundColor]}>
-      <NoInternet />
+      {/* If offline, show your "No Internet" banner at top */}
+      {!isConnected && <NoInternet />}
+
+      {/* Show update available button
       {hasUpdate && (
         <Pressable style={styles.updateButton} onPress={handleRefresh}>
           <Text style={styles.updateButtonText}>Aktualisieren</Text>
         </Pressable>
-      )}
+      )} */}
 
       <FlatList
         data={questions}
@@ -147,7 +167,17 @@ export default function QuestionsList() {
           questions?.length === 0 && !isLoading && styles.emptyListContainer,
         ]}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+          <RefreshControl
+            refreshing={isRefetching}
+            onRefresh={() => {
+              // If user is offline, skip or show a message
+              if (!isConnected) {
+                // e.g. Alert.alert("Offline", "Kein Internet. Bitte später erneut versuchen.");
+                return;
+              }
+              refetch();
+            }}
+          />
         }
         ListEmptyComponent={
           <ThemedView style={styles.emptyContainer}>
@@ -161,7 +191,12 @@ export default function QuestionsList() {
       />
 
       <Pressable
-        style={[styles.askQuestionButton, !isConnected && {backgroundColor: Colors.universal.created_atTextColor}]}
+        style={[
+          styles.askQuestionButton,
+          !isConnected && {
+            backgroundColor: Colors.universal.created_atTextColor,
+          },
+        ]}
         onPress={() => router.push("/(user)/askQuestion")}
         disabled={!isConnected}
       >
@@ -245,14 +280,6 @@ const styles = StyleSheet.create({
   },
   questionFooter: {
     alignSelf: "flex-end",
-  },
-  category: {
-    fontSize: 12,
-    color: "#666",
-    backgroundColor: "#f0f0f0",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
   },
   statusBadge: {
     paddingHorizontal: 8,

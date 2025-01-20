@@ -9,7 +9,7 @@ const handleLogout = async () => {
     await clearSession();
     logoutSuccess();
     router.replace("/"); // Navigate to home
-  } catch (error) {
+  } catch (error: any) {
     console.error("Logout failed:", error);
     Alert.alert(logoutErrorGeneral, error.message);
   }

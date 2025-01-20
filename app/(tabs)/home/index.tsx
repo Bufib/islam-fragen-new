@@ -10,8 +10,11 @@ import { ScrollView } from "react-native";
 import QuestionLinks from "@/components/QuestionLinks";
 import { Image } from "expo-image";
 import { coustomTheme } from "@/utils/coustomTheme";
+import { useFetchUserQuestions } from "@/hooks/useFetchUserQuestions";
 export default function index() {
   const themeStyles = coustomTheme();
+
+
   return (
     <SafeAreaView
       edges={["top"]}
@@ -36,6 +39,6 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingTop: 20,
-    paddingBottom: 40,
+    paddingBottom: 10,
   },
 });

@@ -87,10 +87,9 @@ export const useFetchUserQuestions = () => {
           filter: `user_id=eq.${userId}`,
         },
         () => {
-          askQuestionQuestionSendSuccess();
-
+          setHasUpdate(true);
+          userQuestionsNewAnswerForQuestions();
           handleRefresh();
-          router.push("/");
         }
       )
       .on(
@@ -103,7 +102,9 @@ export const useFetchUserQuestions = () => {
         },
         () => {
           setHasUpdate(true);
+          setHasUpdate(true);
           userQuestionsNewAnswerForQuestions();
+          handleRefresh();
         }
       )
       .on(
@@ -117,6 +118,7 @@ export const useFetchUserQuestions = () => {
         () => {
           setHasUpdate(true);
           userQuestionsNewAnswerForQuestions();
+          handleRefresh();
         }
       )
       .subscribe();

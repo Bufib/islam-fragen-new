@@ -1,61 +1,158 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   View,
+  Text,
   TextInput,
   Button,
   Switch,
   Alert,
   StyleSheet,
-  Text,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  Pressable,
+  useColorScheme,
 } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import { supabase } from "@/utils/supabase";
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
-import { useAuthStore } from "@/stores/authStore";
-import { coustomTheme } from "@/utils/coustomTheme";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import NetInfo from "@react-native-community/netinfo";
 import Feather from "@expo/vector-icons/Feather";
-import { Pressable } from "react-native";
+import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
+import { supabase } from "@/utils/supabase";
+import { useAuthStore } from "@/stores/authStore";
+import { ThemedText } from "@/components/ThemedText";
+import { coustomTheme } from "@/utils/coustomTheme";
+import { router } from "expo-router";
+
 import {
   loginError,
   loginSuccess,
   loginEmailNotEmpty,
   loginPasswordNotEmpty,
 } from "@/constants/messages";
-import { Colors } from "@/constants/Colors";
-import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
-import { router } from "expo-router";
-import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
-import { useState } from "react";
-import { useColorScheme } from "react-native";
-type LoginFormValues = {
-  email: string;
-  password: string;
+
+// ---- START: TYPES & SCHEMA ----
+
+/** The shape of our form data. */
+const loginSchema = z.object({
+  email: z
+    .string()
+    .nonempty("Bitte eine E-Mail angeben.")
+    .email("Bitte eine gültige E-Mail angeben."),
+  password: z
+    .string()
+    .nonempty("Bitte ein Passwort angeben."),
+});
+
+/** Derive the TypeScript type from the schema. */
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+/** Typed event for hCaptcha messages. */
+type CaptchaEvent = {
+  nativeEvent: {
+    data: string;
+  };
 };
 
+// ---- END: TYPES & SCHEMA ----
+
 export default function LoginScreen() {
+  const themeStyles = coustomTheme();
+  const colorScheme = useColorScheme();
+
+  // React Hook Form
   const {
     control,
     handleSubmit,
     formState: { errors },
-    reset,
     getValues,
-  } = useForm<LoginFormValues>();
+    reset,
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const { setSession } = useAuthStore();
-  const [stayLoggedIn, setStayLoggedIn] = useState(false);
+  // Local States
   const [isLoading, setIsLoading] = useState(false);
-  const [showCaptcha, setShowCaptcha] = useState(false);
-  const captchaRef = useRef(null);
-  const themeStyles = coustomTheme();
+  const [stayLoggedIn, setStayLoggedIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const colorScheme = useColorScheme();
+  const [showCaptcha, setShowCaptcha] = useState(false);
 
-  const loginWithSupabase = async (
+  // hCaptcha Ref
+  const captchaRef = useRef<ConfirmHcaptcha | null>(null);
+
+  // Access auth store
+  const { setSession } = useAuthStore();
+
+  useEffect(() => {
+    // If user requested captcha, show it as soon as it's available
+    if (showCaptcha && captchaRef.current) {
+      captchaRef.current.show();
+    }
+  }, [showCaptcha]);
+
+  /**
+   * 2. Called when the user has typed email + password,
+   *    and we want to do a captcha challenge before logging in.
+   */
+  const onSubmit = async (formData: LoginFormValues) => {
+    // 2.1 Check for network connection
+    const netInfo = await NetInfo.fetch();
+    if (!netInfo.isConnected) {
+      Alert.alert("Keine Internetverbindung", "Bitte überprüfe dein Internet.");
+      return;
+    }
+
+    // 2.2 If connected, show captcha
+    setShowCaptcha(true);
+  };
+
+  /**
+   * 3. If captcha is successful, we call `loginWithSupabase`
+   */
+  const onCaptchaMessage = async (event: CaptchaEvent) => {
+    // If Captcha is not actually open, ignore any stray message
+    if (!showCaptcha) return;
+
+    const token = event.nativeEvent.data;
+    switch (token) {
+      case "error":
+      case "expired":
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+        );
+        return;
+
+      case "cancel":
+        setShowCaptcha(false);
+        Alert.alert(
+          "Fehler",
+          "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
+        );
+        return;
+
+      case "open":
+        // Just the captcha opening. Do nothing
+        return;
+
+      default:
+        // We got a real token
+        const { email, password } = getValues();
+        await loginWithSupabase(email, password, token);
+    }
+  };
+
+  /**
+   * 4. The actual login function that calls Supabase,
+   *    using the captcha token from step #3.
+   */
+  async function loginWithSupabase(
     email: string,
     password: string,
     captchaToken: string
-  ) => {
+  ) {
     setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -65,115 +162,64 @@ export default function LoginScreen() {
       });
 
       if (error) {
-        // Überprüfe die genaue Fehlermeldung
+        // You can handle more specific errors here
         if (error.message.includes("Invalid login credentials")) {
-          Alert.alert(
-            "Login fehlgeschlagen",
-            "E-Mail oder Passwort ist falsch."
-          );
+          Alert.alert("Login fehlgeschlagen", "E-Mail oder Passwort ist falsch.");
         } else if (error.message.includes("User not found")) {
           Alert.alert("Login fehlgeschlagen", "Benutzer existiert nicht.");
+        } else if (error.message.includes("Email not confirmed")) {
+          Alert.alert("Login fehlgeschlagen", "E-Mail ist noch nicht bestätigt.");
         } else {
           Alert.alert("Login fehlgeschlagen", error.message);
         }
-        return false;
+        return;
       }
 
-      if (data.session) {
+      if (data?.session) {
+        // Store session in your auth store
         await setSession(data.session, stayLoggedIn);
+
+        // Clear form
         reset();
+
+        // Show success or your custom function:
         loginSuccess();
-        router.push("/(tabs)/home");
+
+        // Navigate to home
+        router.replace("/(tabs)/home");
       }
     } catch (error: any) {
-      Alert.alert(
-        loginError,
-        error.message || "Es gab einen Fehler beim login."
-      );
+      Alert.alert(error, error.message || "Es gab einen Fehler beim Login.");
     } finally {
-      setIsLoading(false);
       setShowCaptcha(false);
+      setIsLoading(false);
     }
-  };
-
-  const onMessage = async (event: any) => {
-    if (event && event.nativeEvent.data) {
-      const token = event.nativeEvent.data;
-
-      if (["error", "expired"].includes(token)) {
-        if (!showCaptcha) {
-          //Skip so message doesn't appear spontanousley while app is opened and captcha expires
-          console.log("Captcha not active.");
-          return;
-        }
-        setShowCaptcha(false);
-        Alert.alert(
-          "Fehler",
-          "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
-        );
-      } else if (token === "cancel") {
-        setShowCaptcha(false);
-        Alert.alert(
-          "Fehler",
-          "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
-        );
-      } else if (token === "open") {
-        // Captcha opened
-      } else {
-        const { email, password } = getValues();
-        await loginWithSupabase(email, password, token);
-      }
-    }
-  };
-
-  const onSubmit = async () => {
-    const { email, password } = getValues();
-
-    if (!email || !password) {
-      Alert.alert("Fehler", "Bitte fülle alle Felder aus.");
-      return;
-    }
-
-    setShowCaptcha(true);
-  };
-
-  useEffect(() => {
-    if (showCaptcha && captchaRef.current) {
-      try {
-        captchaRef.current?.show();
-      } catch (error) {
-        console.error("Captcha konnte nicht geöffnet werden:", error);
-        setShowCaptcha(false);
-      }
-    }
-  }, [showCaptcha]);
+  }
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[styles.container, themeStyles.defaultBackgorundColor]}
     >
-      <ScrollView
-        style={[styles.scrollViewContainer]}
-        contentContainerStyle={styles.scrollViewContent}
-      >
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={[styles.contentContainer, themeStyles.contrast]}>
           <ThemedText style={styles.title} type="title">
             Login
           </ThemedText>
 
+          {/* EMAIL FIELD */}
           <Controller
             control={control}
-            name="email"
             rules={{ required: loginEmailNotEmpty }}
+            name="email"
             render={({ field: { onChange, value } }) => (
               <TextInput
                 style={[styles.input, themeStyles.text]}
                 placeholder="E-mail"
-                onChangeText={onChange}
-                value={value}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                onChangeText={onChange}
+                value={value}
               />
             )}
           />
@@ -181,38 +227,29 @@ export default function LoginScreen() {
             <Text style={styles.error}>{errors.email.message}</Text>
           )}
 
+          {/* PASSWORD FIELD */}
           <Controller
             control={control}
-            name="password"
             rules={{ required: loginPasswordNotEmpty }}
+            name="password"
             render={({ field: { onChange, value } }) => (
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={[styles.passwordInput, themeStyles.text]}
-                  placeholder="Password"
+                  placeholder="Passwort"
+                  secureTextEntry={!showPassword}
                   onChangeText={onChange}
                   value={value}
-                  secureTextEntry={!showPassword}
                 />
                 <Pressable
-                  onPress={() => setShowPassword(!showPassword)}
+                  onPress={() => setShowPassword((prev) => !prev)}
                   style={styles.eyeIcon}
                 >
-                  <Text>
-                    {showPassword ? (
-                      <Feather
-                        name="eye"
-                        size={24}
-                        color={colorScheme === "dark" ? "white" : "black"}
-                      />
-                    ) : (
-                      <Feather
-                        name="eye-off"
-                        size={24}
-                        color={colorScheme === "dark" ? "white" : "black"}
-                      />
-                    )}
-                  </Text>
+                  <Feather
+                    name={showPassword ? "eye" : "eye-off"}
+                    size={24}
+                    color={colorScheme === "dark" ? "#fff" : "#000"}
+                  />
                 </Pressable>
               </View>
             )}
@@ -221,6 +258,7 @@ export default function LoginScreen() {
             <Text style={styles.error}>{errors.password.message}</Text>
           )}
 
+          {/* STAY LOGGED IN SWITCH */}
           <View style={styles.stayLoggedInContainer}>
             <Switch value={stayLoggedIn} onValueChange={setStayLoggedIn} />
             <ThemedText style={styles.stayLoggedInText}>
@@ -228,29 +266,33 @@ export default function LoginScreen() {
             </ThemedText>
           </View>
 
+          {/* LOGIN BUTTON */}
           <Button
-            title="Einloggen"
+            title={isLoading ? "Wird geladen..." : "Einloggen"}
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}
           />
-           <Button
+
+          {/* FORGOT PASSWORD */}
+          <Button
             title="Passwort vergessen"
             onPress={() => router.replace("/forgotPassword")}
           />
+
+          {/* SIGNUP */}
           <Button
-            title="Ich möchte mich gerne Registrieren"
+            title="Registrieren"
             onPress={() => router.replace("/signup")}
           />
-           
         </View>
       </ScrollView>
 
+      {/* HCAPTCHA INVISIBLE WIDGET */}
       {showCaptcha && (
         <ConfirmHcaptcha
           ref={captchaRef}
           siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
-          baseUrl="https://hcaptcha.com"
-          onMessage={onMessage}
+          onMessage={onCaptchaMessage}
           languageCode="de"
           size="invisible"
         />
@@ -262,35 +304,31 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollViewContainer: {
-    flex: 1,
     padding: 20,
   },
   scrollViewContent: {
     flexGrow: 1,
     justifyContent: "center",
   },
-
   contentContainer: {
     borderWidth: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 50,
-    borderRadius: 20,
+    padding: 20,
+    borderRadius: 12,
   },
   title: {
     fontWeight: "bold",
     marginBottom: 24,
     textAlign: "center",
+    fontSize: 20,
   },
   input: {
     borderWidth: 1,
     padding: 12,
-    marginBottom: 16,
     borderRadius: 8,
+    marginBottom: 16,
   },
   error: {
-    color: Colors.universal.error,
+    color: "red",
     marginBottom: 12,
   },
   passwordContainer: {
@@ -308,9 +346,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   stayLoggedInContainer: {
-    marginTop: 10,
     flexDirection: "row",
-    alignSelf: "center",
+    alignItems: "center",
     marginBottom: 16,
   },
   stayLoggedInText: {
@@ -318,3 +355,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
