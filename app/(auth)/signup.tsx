@@ -79,13 +79,16 @@ const schema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: signUpUserPasswordConformation,
-    path: ["confirmPassword"], // Show error message on confirmPassword
+    path: ["confirmPassword"], // Show error on confirmPassword
   });
 
 // ---- END: TYPE + SCHEMA DEFINITIONS ----
 
-// Add a maximum verification attempts constant
+// Max verification attempts for entering the code
 const MAX_VERIFICATION_ATTEMPTS = 3;
+
+// Max resend attempts to get a new code
+const MAX_RESEND_ATTEMPTS = 3;
 
 export default function SignUpScreen() {
   const {
@@ -100,23 +103,28 @@ export default function SignUpScreen() {
   const themeStyles = coustomTheme();
   const colorScheme = useColorScheme();
 
-  // State
+  // Loading state
   const [isLoading, setIsLoading] = useState(false);
+
+  // Password visibility
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // For hCaptcha
+  // hCaptcha
   const [showCaptcha, setShowCaptcha] = useState(false);
   const captchaRef = useRef<ConfirmHcaptcha | null>(null);
 
-  // For email verification
+  // Email verification
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [currentEmail, setCurrentEmail] = useState("");
   const [currentUsername, setCurrentUsername] = useState("");
-  
+
   // Track verification attempts
   const [verificationAttempts, setVerificationAttempts] = useState(0);
+
+  // Track resend attempts
+  const [resendAttempts, setResendAttempts] = useState(0);
 
   // Show the captcha when state changes
   useEffect(() => {
@@ -126,11 +134,12 @@ export default function SignUpScreen() {
   }, [showCaptcha]);
 
   /**
-   * Reset verification attempts when the modal is closed.
+   * Reset attempts (verification & resend) whenever the modal closes.
    */
   useEffect(() => {
     if (!showVerificationModal) {
       setVerificationAttempts(0);
+      setResendAttempts(0);
     }
   }, [showVerificationModal]);
 
@@ -197,16 +206,15 @@ export default function SignUpScreen() {
       }
 
       // Proceed with signup
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { username },
-          captchaToken,
-        },
-      });
-
-      console.log('Signup response:', { signUpData, signUpError }); // Add 
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { username },
+            captchaToken,
+          },
+        });
 
       if (signUpError) {
         console.log(signUpError);
@@ -282,13 +290,15 @@ export default function SignUpScreen() {
 
           // If verification is successful -> create user record in "user" table
           if (data.user) {
-            const { error: userError } = await supabase.from("user").insert([
-              {
-                user_id: data.user.id,
-                user_username: currentUsername,
-                user_email: currentEmail,
-              },
-            ]);
+            const { error: userError } = await supabase
+              .from("user")
+              .insert([
+                {
+                  user_id: data.user.id,
+                  user_username: currentUsername,
+                  user_email: currentEmail,
+                },
+              ]);
 
             if (userError) {
               throw new Error(userError.message);
@@ -314,8 +324,20 @@ export default function SignUpScreen() {
 
   /**
    * Function to resend the verification code if user didn't receive it.
+   * With a max resend limit.
    */
   const resendVerificationCode = async () => {
+    // Check if we have already hit the max
+    if (resendAttempts >= MAX_RESEND_ATTEMPTS) {
+      Alert.alert(
+        "Error",
+        "You have reached the maximum number of resend attempts. Please wait or contact support."
+      );
+      return;
+    }
+    // Increment resend attempts
+    setResendAttempts((prev) => prev + 1);
+
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.resend({
