@@ -446,8 +446,7 @@ export default function AskQuestionScreen() {
       {showCaptcha && (
         <ConfirmHcaptcha
           ref={captchaRef}
-          siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
-          baseUrl="https://hcaptcha.com"
+          siteKey="2bf09a6a-7b84-4dd0-853e-9ef0805401a8"
           onMessage={onCaptchaMessage}
           languageCode="de"
           size="invisible"

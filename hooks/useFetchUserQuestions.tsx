@@ -229,8 +229,8 @@ export const useFetchUserQuestions = () => {
   });
 
   const handleRefresh = async () => {
-    await queryClient.invalidateQueries({ 
-      queryKey: ["questionsFromUser", userId] 
+    await queryClient.invalidateQueries({
+      queryKey: ["questionsFromUser", userId],
     });
     setHasUpdate(false);
   };

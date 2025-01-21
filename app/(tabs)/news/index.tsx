@@ -28,6 +28,7 @@ export default function NewsFeed() {
     showUpdateButton,
     handleRefresh: refetch,
     isRefetching,
+    isLoading
   } = useFetchNews();
 
   const themeStyles = coustomTheme();
@@ -43,15 +44,6 @@ export default function NewsFeed() {
   const ListFooter = () => {
     if (!hasNextPage) return null;
 
-    // useEffect(() => {
-    //   const fetchNewsWithoutLoadButton = async () => {
-    //     if (isAdmin && showUpdateButton) {
-    //       await handleRefreshAndScroll();
-    //     }
-    //   };
-    //   fetchNewsWithoutLoadButton();
-    // }, [isAdmin, showUpdateButton]);
-
     return (
       <ThemedView style={styles.loadMoreContainer}>
         {isFetchingNextPage ? (
@@ -66,7 +58,7 @@ export default function NewsFeed() {
     );
   };
 
-  if (!news || news.length === 0) {
+  if (isLoading) {
     return (
       <SafeAreaView
         style={[styles.container, themeStyles.defaultBackgorundColor]}
@@ -81,6 +73,16 @@ export default function NewsFeed() {
     );
   }
 
+  if (!news || news.length === 0) {
+    return (
+      <SafeAreaView
+        style={[styles.container, themeStyles.defaultBackgorundColor, {justifyContent: "center", alignItems: "center"}]}
+        edges={["top"]}
+      >
+        <ThemedText>Es gibt derzeit noch keine Nachrichten!</ThemedText>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView
       style={[styles.container, themeStyles.defaultBackgorundColor]}

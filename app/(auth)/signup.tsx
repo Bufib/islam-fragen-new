@@ -272,7 +272,7 @@
 //     // Increment attempts
 //     setVerificationAttempts((prev) => prev + 1);
 
-//     const TIMEOUT = 30000; // 30 seconds
+//     const TIMEOUT = 60000; // 60 seconds
 //     const timeoutPromise = new Promise<never>((_, reject) =>
 //       setTimeout(() => reject(new Error("Verification timeout")), TIMEOUT)
 //     );
@@ -773,7 +773,7 @@ const schema = z
       .min(3, signUpUserNameMin)
       .regex(
         /^[a-zA-Z0-9_]+$/,
-        "Username can only contain letters, numbers, and underscores."
+        "Der Benutzername darf nur Buchstaben, Zahlen und Unterstriche enthalten."
       ),
     email: z
       .string({ required_error: signUpEmailNotEmpty })
@@ -952,8 +952,8 @@ export default function SignUpScreen() {
         setShowVerificationModal(true);
 
         Alert.alert(
-          "Verification Required",
-          "Please check your email for a verification code."
+          "Verifizierung erforderlich",
+          "Bitte prüfe deine E-Mails auf einen Bestätigungscode."
         );
       }
     } catch (error: any) {
@@ -970,16 +970,16 @@ export default function SignUpScreen() {
     // 4.1 Check attempts
     if (verificationAttempts >= MAX_VERIFICATION_ATTEMPTS) {
       Alert.alert(
-        "Too Many Attempts",
-        "You've exceeded the maximum number of verification attempts. Please request a new code.",
+        "Zu viele Versuche",
+       "Du hast die maximale Anzahl an Verifizierungsversuchen überschritten. Bitte foder einen neuen Code an.",
         [
           {
-            text: "Cancel",
+            text: "Abbrechen",
             style: "cancel",
             onPress: () => setShowVerificationModal(false),
           },
           {
-            text: "Resend Code",
+            text: "Code erneut senden",
             onPress: resendVerificationCode,
           },
         ]
@@ -989,7 +989,7 @@ export default function SignUpScreen() {
     setVerificationAttempts((prev) => prev + 1);
 
     // 4.2 Timeout for verification
-    const TIMEOUT = 30000; // 30 seconds
+    const TIMEOUT = 60000; // 60 seconds
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("Verification timeout")), TIMEOUT)
     );
@@ -1029,7 +1029,7 @@ export default function SignUpScreen() {
       ]);
     } catch (error: any) {
       if (error.message === "Verification timeout") {
-        Alert.alert("Error", "Verification timed out. Please try again.");
+        Alert.alert("Error", "Die Verifizierung ist abgelaufen. Bitte versuche es erneut.");
       } else {
         Alert.alert(signUpErrorGeneral, error.message);
       }
@@ -1043,7 +1043,7 @@ export default function SignUpScreen() {
     if (resendAttempts >= MAX_RESEND_ATTEMPTS) {
       Alert.alert(
         "Error",
-        "You have reached the maximum number of resend attempts. Please wait or contact support."
+       "Du hast die maximale Anzahl an erneuten Sendeversuchen erreicht. Bitte warte etwas bevor du es erneut versuchst."
       );
       return;
     }
@@ -1057,7 +1057,7 @@ export default function SignUpScreen() {
       });
       if (error) throw error;
 
-      Alert.alert("Success", "A new verification code has been sent.");
+      Alert.alert("Erfolg", "Ein neuer Bestätigungscode wurde gesendet.");
     } catch (error: any) {
       Alert.alert("Error", error.message);
     } finally {
@@ -1245,8 +1245,7 @@ export default function SignUpScreen() {
       {showCaptcha && (
         <ConfirmHcaptcha
           ref={captchaRef}
-          siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
-          baseUrl="https://hcaptcha.com"
+          siteKey="46059823-5a16-4179-98ac-347075bcf465"
           onMessage={onCaptchaMessage}
           languageCode="de"
           size="invisible"
@@ -1350,7 +1349,6 @@ const styles = StyleSheet.create({
   logInText: {
     fontSize: 16,
     fontWeight: "600",
-    marginRight: 8,
   },
   modalOverlay: {
     flex: 1,

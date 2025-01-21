@@ -1,197 +1,21 @@
-// // import React, { useState } from "react";
-// // import {
-// //   View,
-// //   Text,
-// //   TextInput,
-// //   TouchableOpacity,
-// //   StyleSheet,
-// //   Alert,
-// // } from "react-native";
-// // import { z } from "zod";
-// // import { supabase } from "@/utils/supabase";
-// // import { router } from "expo-router";
-// // // Password validation schema
-// // const passwordSchema = z
-// //   .string()
-// //   .min(8, { message: "Das Passwort muss mindestens 8 Zeichen lang sein." })
-// //   .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^+=\-]).{8,}$/, {
-// //     message:
-// //       "Das Passwort muss Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen enthalten.",
-// //   });
 
-// // // Form schema with password confirmation
-// // const passwordFormSchema = z
-// //   .object({
-// //     password: passwordSchema,
-// //     confirmPassword: z.string(),
-// //   })
-// //   .refine((data) => data.password === data.confirmPassword, {
-// //     message: "Die Passwörter stimmen nicht überein",
-// //     path: ["confirmPassword"],
-// //   });
 
-// // const changePassword = () => {
-// //   const [password, setPassword] = useState("");
-// //   const [confirmPassword, setConfirmPassword] = useState("");
-// //   const [errors, setErrors] = useState({});
-// //   const [loading, setLoading] = useState(false);
 
-// //   const handlePasswordChange = async () => {
-// //     try {
-// //       setLoading(true);
-// //       setErrors({});
-
-// //       // Validate using Zod
-// //       const validationResult = passwordFormSchema.safeParse({
-// //         password,
-// //         confirmPassword,
-// //       });
-
-// //       if (!validationResult.success) {
-// //         const formattedErrors = {};
-// //         validationResult.error.errors.forEach((error) => {
-// //           formattedErrors[error.path[0]] = error.message;
-// //         });
-// //         setErrors(formattedErrors);
-// //         return;
-// //       }
-
-// //       // Update password in Supabase
-// //       const { error } = await supabase.auth.updateUser({
-// //         password: password,
-// //       });
-
-// //       if (error) throw error;
-
-// //       Alert.alert("Erfolg", "Passwort erfolgreich aktualisiert");
-// //       setPassword("");
-// //       setConfirmPassword("");
-// //       router.push("/(tabs)/settings/");
-// //     } catch (error) {
-// //       Alert.alert("Fehler", error.message);
-// //     } finally {
-// //       setLoading(false);
-// //     }
-// //   };
-
-// //   const renderError = (key) => {
-// //     return errors[key] ? (
-// //       <Text style={styles.errorText}>{errors[key]}</Text>
-// //     ) : null;
-// //   };
-
-// //   return (
-// //     <View style={styles.container}>
-// //       <Text style={styles.title}>Passwort ändern</Text>
-
-// //       <View style={styles.inputContainer}>
-// //         <Text style={styles.label}>Neues Passwort</Text>
-// //         <TextInput
-// //           style={styles.input}
-// //           value={password}
-// //           onChangeText={setPassword}
-// //           secureTextEntry
-// //           placeholder="Neues Passwort eingeben"
-// //           placeholderTextColor="#666"
-// //         />
-// //         {renderError("password")}
-// //       </View>
-
-// //       <View style={styles.inputContainer}>
-// //         <Text style={styles.label}>Passwort bestätigen</Text>
-// //         <TextInput
-// //           style={styles.input}
-// //           value={confirmPassword}
-// //           onChangeText={setConfirmPassword}
-// //           secureTextEntry
-// //           placeholder="Passwort bestätigen"
-// //           placeholderTextColor="#666"
-// //         />
-// //         {renderError("confirmPassword")}
-// //       </View>
-
-// //       <TouchableOpacity
-// //         style={[styles.button, loading && styles.buttonDisabled]}
-// //         onPress={handlePasswordChange}
-// //         disabled={loading}
-// //       >
-// //         <Text style={styles.buttonText}>
-// //           {loading ? "Wird aktualisiert..." : "Passwort aktualisieren"}
-// //         </Text>
-// //       </TouchableOpacity>
-// //     </View>
-// //   );
-// // };
-
-// // const styles = StyleSheet.create({
-// //   container: {
-// //     flex: 1,
-// //     padding: 20,
-// //     backgroundColor: "#fff",
-// //   },
-// //   title: {
-// //     fontSize: 24,
-// //     fontWeight: "bold",
-// //     marginBottom: 30,
-// //     color: "#1a1a1a",
-// //   },
-// //   inputContainer: {
-// //     marginBottom: 20,
-// //   },
-// //   label: {
-// //     fontSize: 16,
-// //     marginBottom: 8,
-// //     color: "#333",
-// //     fontWeight: "500",
-// //   },
-// //   input: {
-// //     backgroundColor: "#f5f5f5",
-// //     borderRadius: 8,
-// //     padding: 15,
-// //     fontSize: 16,
-// //     color: "#1a1a1a",
-// //     borderWidth: 1,
-// //     borderColor: "#e0e0e0",
-// //   },
-// //   errorText: {
-// //     color: "#dc3545",
-// //     fontSize: 14,
-// //     marginTop: 5,
-// //   },
-// //   button: {
-// //     backgroundColor: "#007AFF",
-// //     borderRadius: 8,
-// //     padding: 15,
-// //     alignItems: "center",
-// //     marginTop: 20,
-// //   },
-// //   buttonDisabled: {
-// //     backgroundColor: "#99c4ff",
-// //   },
-// //   buttonText: {
-// //     color: "#fff",
-// //     fontSize: 16,
-// //     fontWeight: "600",
-// //   },
-// // });
-
-// // export default changePassword;
-
-// import React, { useState } from "react";
+// import React, { useState, useRef, useEffect } from "react";
 // import {
 //   View,
 //   Text,
 //   TextInput,
-//   TouchableOpacity,
+//   Pressable,
 //   StyleSheet,
 //   Alert,
-//   Pressable,
 //   useColorScheme,
 // } from "react-native";
 // import { z } from "zod";
 // import { supabase } from "@/utils/supabase";
 // import { router } from "expo-router";
 // import Feather from "@expo/vector-icons/Feather";
+// import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
 
 // // Password validation schema
 // const passwordSchema = z
@@ -225,9 +49,11 @@
 //   const [loading, setLoading] = useState(false);
 //   const [showPassword, setShowPassword] = useState(false);
 //   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+//   const [showCaptcha, setShowCaptcha] = useState(false);
+//   const captchaRef = useRef(null);
 //   const colorScheme = useColorScheme();
 
-//   const handlePasswordChange = async () => {
+//   const handlePasswordChangeWithCaptcha = async (captchaToken: string) => {
 //     try {
 //       setLoading(true);
 //       setErrors({});
@@ -249,7 +75,7 @@
 //         return;
 //       }
 
-//       // Update password in Supabase
+//       // Update password in Supabase with captcha token
 //       const { error } = await supabase.auth.updateUser({
 //         password: password,
 //       });
@@ -264,8 +90,69 @@
 //       Alert.alert("Fehler", error.message);
 //     } finally {
 //       setLoading(false);
+//       setShowCaptcha(false);
 //     }
 //   };
+
+//   const onMessage = async (event: any) => {
+//     if (event && event.nativeEvent.data) {
+//       const token = event.nativeEvent.data;
+
+//       if (["error", "expired"].includes(token)) {
+//         if (!showCaptcha) {
+//           console.log("Captcha not active.");
+//           return;
+//         }
+//         setShowCaptcha(false);
+//         Alert.alert(
+//           "Fehler",
+//           "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+//         );
+//       } else if (token === "cancel") {
+//         setShowCaptcha(false);
+//         Alert.alert(
+//           "Fehler",
+//           "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
+//         );
+//       } else if (token === "open") {
+//         // Captcha opened
+//       } else {
+//         await handlePasswordChangeWithCaptcha(token);
+//       }
+//     }
+//   };
+
+//   const handlePasswordChange = async () => {
+//     // Initial validation before showing captcha
+//     const validationResult = passwordFormSchema.safeParse({
+//       password,
+//       confirmPassword,
+//     });
+
+//     if (!validationResult.success) {
+//       const formattedErrors: FormErrors = {};
+//       validationResult.error.errors.forEach((error) => {
+//         if (error.path[0]) {
+//           formattedErrors[error.path[0] as keyof PasswordFormData] = error.message;
+//         }
+//       });
+//       setErrors(formattedErrors);
+//       return;
+//     }
+
+//     setShowCaptcha(true);
+//   };
+
+//   useEffect(() => {
+//     if (showCaptcha && captchaRef.current) {
+//       try {
+//         captchaRef.current?.show();
+//       } catch (error) {
+//         console.error("Captcha konnte nicht geöffnet werden:", error);
+//         setShowCaptcha(false);
+//       }
+//     }
+//   }, [showCaptcha]);
 
 //   const renderError = (key: keyof FormErrors) => {
 //     return errors[key] ? (
@@ -343,7 +230,7 @@
 //         {renderError("confirmPassword")}
 //       </View>
 
-//       <TouchableOpacity
+//       <Pressable
 //         style={[styles.button, loading && styles.buttonDisabled]}
 //         onPress={handlePasswordChange}
 //         disabled={loading}
@@ -351,7 +238,18 @@
 //         <Text style={styles.buttonText}>
 //           {loading ? "Wird aktualisiert..." : "Passwort aktualisieren"}
 //         </Text>
-//       </TouchableOpacity>
+//       </Pressable>
+
+//       {showCaptcha && (
+//         <ConfirmHcaptcha
+//           ref={captchaRef}
+//           siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
+//           baseUrl="https://hcaptcha.com"
+//           onMessage={onMessage}
+//           languageCode="de"
+//           size="invisible"
+//         />
+//       )}
 //     </View>
 //   );
 // };
@@ -419,15 +317,17 @@
 // export default ChangePassword;
 
 
+
+
+
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   Alert,
-  Pressable,
   useColorScheme,
 } from "react-native";
 import { z } from "zod";
@@ -445,14 +345,17 @@ const passwordSchema = z
       "Das Passwort muss Groß- und Kleinbuchstaben, Zahlen und Sonderzeichen enthalten.",
   });
 
-// Form schema with password confirmation
+// Form schema with password confirmation and old password
 const passwordFormSchema = z
   .object({
+    oldPassword: z
+      .string()
+      .min(1, { message: "Bitte gib dein altes Passwort ein." }),
     password: passwordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Die Passwörter stimmen nicht überein",
+    message: "Die Passwörter stimmen nicht überein.",
     path: ["confirmPassword"],
   });
 
@@ -462,51 +365,52 @@ type FormErrors = {
 };
 
 const ChangePassword = () => {
+  const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+
+  // Eye toggle states
+  const [showOldPassword, setShowOldPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Captcha states
   const [showCaptcha, setShowCaptcha] = useState(false);
-  const captchaRef = useRef(null);
+  const captchaRef = useRef<ConfirmHcaptcha>(null);
+
   const colorScheme = useColorScheme();
 
+  /**
+   * Handles the final password update call after captcha has validated.
+   * @param captchaToken - The token returned by hCaptcha
+   */
   const handlePasswordChangeWithCaptcha = async (captchaToken: string) => {
     try {
+     
       setLoading(true);
       setErrors({});
 
-      // Validate using Zod
-      const validationResult = passwordFormSchema.safeParse({
-        password,
-        confirmPassword,
-      });
-
-      if (!validationResult.success) {
-        const formattedErrors: FormErrors = {};
-        validationResult.error.errors.forEach((error) => {
-          if (error.path[0]) {
-            formattedErrors[error.path[0] as keyof PasswordFormData] = error.message;
-          }
-        });
-        setErrors(formattedErrors);
-        return;
-      }
-
-      // Update password in Supabase with captcha token
-      const { error } = await supabase.auth.updateUser({
+      // Update password in Supabase
+      const { data, error } = await supabase.auth.updateUser({
         password: password,
         options: { captchaToken }
       });
 
-      if (error) throw error;
+      console.log("error" + error)
 
-      Alert.alert("Erfolg", "Passwort erfolgreich aktualisiert");
+      if (error) {
+        console.log(error)
+        throw error;
+      }
+      Alert.alert("Erfolg", "Dein Passwort wurde erfolgreich aktualisiert.");
+      setOldPassword("");
       setPassword("");
       setConfirmPassword("");
       router.push("/(tabs)/settings/");
     } catch (error: any) {
+      console.log(error)
       Alert.alert("Fehler", error.message);
     } finally {
       setLoading(false);
@@ -514,13 +418,16 @@ const ChangePassword = () => {
     }
   };
 
+  /**
+   * Callback for the hCaptcha modal/webview messages
+   */
   const onMessage = async (event: any) => {
-    if (event && event.nativeEvent.data) {
+    if (event?.nativeEvent?.data) {
       const token = event.nativeEvent.data;
 
       if (["error", "expired"].includes(token)) {
         if (!showCaptcha) {
-          console.log("Captcha not active.");
+          console.log("Captcha nicht aktiv.");
           return;
         }
         setShowCaptcha(false);
@@ -531,42 +438,94 @@ const ChangePassword = () => {
       } else if (token === "cancel") {
         setShowCaptcha(false);
         Alert.alert(
-          "Fehler",
+          "Abgebrochen",
           "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
         );
       } else if (token === "open") {
-        // Captcha opened
+        console.log("open")
+        // Captcha opened, no action required
       } else {
+        console.log("else")
+        // We have a valid captcha token
         await handlePasswordChangeWithCaptcha(token);
       }
     }
   };
 
+  /**
+   * Initial handling: checks if the old password is correct,
+   * then shows the captcha if everything is valid.
+   */
   const handlePasswordChange = async () => {
-    // Initial validation before showing captcha
-    const validationResult = passwordFormSchema.safeParse({
-      password,
-      confirmPassword,
-    });
-
-    if (!validationResult.success) {
-      const formattedErrors: FormErrors = {};
-      validationResult.error.errors.forEach((error) => {
-        if (error.path[0]) {
-          formattedErrors[error.path[0] as keyof PasswordFormData] = error.message;
-        }
+    try {
+      // Basic form validation (oldPassword, new password & confirm)
+      const validationResult = passwordFormSchema.safeParse({
+        oldPassword,
+        password,
+        confirmPassword,
       });
-      setErrors(formattedErrors);
-      return;
-    }
 
-    setShowCaptcha(true);
+      if (!validationResult.success) {
+        const formattedErrors: FormErrors = {};
+        validationResult.error.errors.forEach((error) => {
+          if (error.path[0]) {
+            formattedErrors[error.path[0] as keyof PasswordFormData] =
+              error.message;
+          }
+        });
+        setErrors(formattedErrors);
+        return;
+      }
+
+      // 2) Check if new password is the same as the old password
+      if (oldPassword === password) {
+        Alert.alert(
+          "Fehler",
+          "Dein neues Passwort darf nicht dein altes sein."
+        );
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+
+      // Check the user's old password by re-signing in
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        Alert.alert("Fehler", "Benutzerdaten konnten nicht abgerufen werden.");
+        setLoading(false);
+        return;
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email || "",
+        password: oldPassword,
+      });
+
+      if (signInError) {
+        Alert.alert("Fehler", "Dein altes Passwort ist nicht korrekt!");
+        setLoading(false);
+        return;
+      }
+
+      // Old password is correct, show captcha
+      setShowCaptcha(true);
+    } catch (error: any) {
+      Alert.alert("Fehler", error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // Show captcha when the showCaptcha state changes
   useEffect(() => {
     if (showCaptcha && captchaRef.current) {
       try {
-        captchaRef.current?.show();
+        captchaRef.current.show();
       } catch (error) {
         console.error("Captcha konnte nicht geöffnet werden:", error);
         setShowCaptcha(false);
@@ -574,6 +533,9 @@ const ChangePassword = () => {
     }
   }, [showCaptcha]);
 
+  /**
+   * Helper to render validation error messages
+   */
   const renderError = (key: keyof FormErrors) => {
     return errors[key] ? (
       <Text style={styles.errorText}>{errors[key]}</Text>
@@ -584,6 +546,41 @@ const ChangePassword = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Passwort ändern</Text>
 
+      {/* Old Password Input */}
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Altes Passwort</Text>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            value={oldPassword}
+            onChangeText={setOldPassword}
+            secureTextEntry={!showOldPassword}
+            placeholder="Altes Passwort eingeben"
+            placeholderTextColor="#666"
+          />
+          <Pressable
+            onPress={() => setShowOldPassword(!showOldPassword)}
+            style={styles.eyeIcon}
+          >
+            {showOldPassword ? (
+              <Feather
+                name="eye"
+                size={24}
+                color={colorScheme === "dark" ? "white" : "black"}
+              />
+            ) : (
+              <Feather
+                name="eye-off"
+                size={24}
+                color={colorScheme === "dark" ? "white" : "black"}
+              />
+            )}
+          </Pressable>
+        </View>
+        {renderError("oldPassword")}
+      </View>
+
+      {/* New Password Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Neues Passwort</Text>
         <View style={styles.passwordContainer}>
@@ -617,6 +614,7 @@ const ChangePassword = () => {
         {renderError("password")}
       </View>
 
+      {/* Confirm Password Input */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Passwort bestätigen</Text>
         <View style={styles.passwordContainer}>
@@ -650,7 +648,8 @@ const ChangePassword = () => {
         {renderError("confirmPassword")}
       </View>
 
-      <TouchableOpacity
+      {/* Submit Button */}
+      <Pressable
         style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handlePasswordChange}
         disabled={loading}
@@ -658,13 +657,13 @@ const ChangePassword = () => {
         <Text style={styles.buttonText}>
           {loading ? "Wird aktualisiert..." : "Passwort aktualisieren"}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
 
+      {/* Captcha */}
       {showCaptcha && (
         <ConfirmHcaptcha
           ref={captchaRef}
-          siteKey="c2a47a96-0c8e-48b8-a6c6-e60a2e9e4228"
-          baseUrl="https://hcaptcha.com"
+          siteKey="858ecaee-05ce-4f76-ba48-f1fe4ce0d1d4"
           onMessage={onMessage}
           languageCode="de"
           size="invisible"
@@ -673,6 +672,8 @@ const ChangePassword = () => {
     </View>
   );
 };
+
+export default ChangePassword;
 
 const styles = StyleSheet.create({
   container: {
@@ -733,5 +734,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-
-export default ChangePassword;

@@ -288,6 +288,7 @@ export const useFetchNews = () => {
     isFetchingNextPage,
     refetch,
     isRefetching,
+    isLoading,
     isError,
     error,
   } = useInfiniteQuery<NewsItemType[], Error>({
@@ -373,6 +374,7 @@ export const useFetchNews = () => {
     isRefetching,
     isError,
     error,
+    isLoading,
     showUpdateButton,
     hasNewNewsData,
     isRefreshing,

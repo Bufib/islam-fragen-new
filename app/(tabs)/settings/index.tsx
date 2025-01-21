@@ -22,6 +22,8 @@ import handleLogout from "@/utils/handleLogout";
 import { getQuestionCount } from "@/utils/initializeDatabase";
 import handleOpenExternalUrl from "@/utils/handleOpenExternalUrl";
 import { Image } from "expo-image";
+import { Platform } from "react-native";
+import { Alert } from "react-native";
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
@@ -30,6 +32,11 @@ const Settings = () => {
   const [paypalLink, setPaypalLink] = useState<string>("");
   const [version, setVersion] = useState<string | null>("");
   const [questionCount, setQuestionCount] = useState<number | null>(0);
+
+  const email = "frage@islamische-fragen.de";
+  const subject = "Account Löschen";
+  const body =
+    "Salam, ich würde gerne mein Account löschen. Mein Benutzername lautet: Salam";
 
   useEffect(() => {
     const savedColorSetting = Storage.getItemSync("isDarkMode");
@@ -127,14 +134,7 @@ const Settings = () => {
 
         {isLoggedIn && (
           <>
-            <ThemedText
-              style={styles.linkText}
-              onPress={() =>
-                Linking.openURL("https://example.com/account-loeschen")
-              }
-            >
-              Account löschen
-            </ThemedText>
+            <ThemedText style={styles.linkText}>Account löschen</ThemedText>
 
             <ThemedText
               style={styles.linkText}
