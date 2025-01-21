@@ -148,6 +148,7 @@ export default function LoginScreen() {
    * 4. The actual login function that calls Supabase,
    *    using the captcha token from step #3.
    */
+  
   async function loginWithSupabase(
     email: string,
     password: string,
