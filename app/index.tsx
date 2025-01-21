@@ -6,7 +6,7 @@ import { View, StyleSheet } from "react-native";
 import { Colors } from "@/constants/Colors";
 
 export default function Index() {
-  const videoSource = require("@/assets/videos/bismilAllah.mp4");
+  const videoSource = require("@/assets/videos/introduction.mp4");
   const [isFirstOpen, setIsFirstOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // State to handle the loading check
   const [videoEnded, setVideoEnded] = useState(false);
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: Colors.universal.bismilAllahBackground,
+    backgroundColor: Colors.universal.introductionBackground,
   },
   video: {
     width: "100%",

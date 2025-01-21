@@ -112,7 +112,7 @@ export const Colors = {
     chatBubbleAnswer: "#E8F5E9",
     statusText: "#ffffff",
     questionBoxQuestionText: "#666",
-    bismilAllahBackground: "#4fa1b8",
+    introductionBackground: "#4fa1b8",
     indexItemBackgroundColor:  "#4fa1b8",
     // indexItemBackgroundColor: "#3498DB",
     error: "#DC2626",
