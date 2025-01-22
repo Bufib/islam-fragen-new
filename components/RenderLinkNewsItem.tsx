@@ -19,8 +19,8 @@ const RenderLinkNewsItem = ({
   index,
   isExternal,
 }: RenderLinkNewsItemProps) => {
-  const colorScheme = useColorScheme(); // Now this hook is inside a component
-
+  const colorScheme = useColorScheme();
+  
   return (
     <Pressable
       key={index}

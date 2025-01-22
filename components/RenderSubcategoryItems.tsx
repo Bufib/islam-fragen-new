@@ -54,7 +54,7 @@ function RenderSubcategoryItems() {
   if (isLoading) {
     return (
       <View style={styles.centeredContainer}>
-        <ThemedText>Loading questions...</ThemedText>
+        <ThemedText>Fragen werden geladen...</ThemedText>
       </View>
     );
   }

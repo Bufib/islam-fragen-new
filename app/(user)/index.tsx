@@ -194,7 +194,7 @@ export default function QuestionsList() {
         style={[
           styles.askQuestionButton,
           !isConnected && {
-            backgroundColor: Colors.universal.created_atTextColor,
+            backgroundColor: Colors.universal.fadeColor,
           },
         ]}
         onPress={() => router.push("/(user)/askQuestion")}
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   createdAtText: {
-    color: Colors.universal.created_atTextColor,
+    color: Colors.universal.fadeColor,
   },
   emptyContainer: {
     alignItems: "center",

@@ -6,7 +6,6 @@ import { Stack } from "expo-router";
 
 export default function categories() {
   const { category } = useLocalSearchParams<{ category: string }>();
-
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -14,6 +13,7 @@ export default function categories() {
           headerTitle: category,
         }}
       />
+      
       <RenderCategoryItems category={category} />
     </View>
   );

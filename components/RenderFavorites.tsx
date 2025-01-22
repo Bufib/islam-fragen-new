@@ -8,7 +8,6 @@ import { useColorScheme } from "react-native";
 import { router } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import {
-  getQuestionsForSubcategory,
   QuestionType,
   getFavoriteQuestions,
 } from "../utils/initializeDatabase";
@@ -54,12 +53,22 @@ function RenderFavoriteQuestions() {
   if (isLoading) {
     return (
       <View style={styles.centeredContainer}>
-        <ThemedText>Loading questions...</ThemedText>
+        <ThemedText>Fragen werden geladen...</ThemedText>
       </View>
     );
   }
 
-  // Main render with questions
+  if ((questions.length === 0 || !questions) && !isLoading) {
+    return (
+      <View style={styles.centeredContainer}>
+        <ThemedText style={styles.emptyText}>
+          Du hast noch keine Favoriten! {"\n"} Klicke auf den Stern bei einer
+          Frage um diese zu deinen Favoriten hinzuzufügen
+        </ThemedText>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, themeStyle.defaultBackgorundColor]}>
       <FlatList
@@ -93,7 +102,7 @@ function RenderFavoriteQuestions() {
               <Entypo
                 name="chevron-thin-right"
                 size={24}
-                color={colorScheme === "light" ? "black" : "white"}
+                color={colorScheme === "dark" ? "#fff" : "#000"}
               />
             </ThemedView>
           </Pressable>
@@ -136,6 +145,11 @@ const styles = StyleSheet.create({
   questionText: {
     fontSize: 16,
     textAlign: "left",
+  },
+  emptyText: {
+    textAlign: "center",
+    fontWeight: "500",
+    fontSize: 16,
   },
 });
 

@@ -1,20 +1,12 @@
 import * as React from "react";
-import { View, useWindowDimensions, Text, StyleSheet } from "react-native";
-import { TabView, TabBar } from "react-native-tab-view";
-import { ThemedText } from "@/components/ThemedText";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ThemedView } from "@/components/ThemedView";
-import { Colors } from "@/constants/Colors";
-import { registerRootComponent } from "expo";
 import { ScrollView } from "react-native";
 import QuestionLinks from "@/components/QuestionLinks";
-import { Image } from "expo-image";
 import { coustomTheme } from "@/utils/coustomTheme";
-import { useFetchUserQuestions } from "@/hooks/useFetchUserQuestions";
+
 export default function index() {
   const themeStyles = coustomTheme();
-
-
   return (
     <SafeAreaView
       edges={["top"]}

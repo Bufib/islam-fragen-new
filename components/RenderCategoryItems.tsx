@@ -1,4 +1,3 @@
-// Import required modules and hooks
 import { useEffect, useState } from "react";
 import { View, Pressable, Text, StyleSheet, FlatList } from "react-native";
 import { coustomTheme } from "@/utils/coustomTheme";
@@ -43,7 +42,7 @@ function RenderCategoryItems() {
   if (isLoading) {
     return (
       <View style={styles.centeredContainer}>
-        <Text>Loading data...</Text>
+        <Text>Daten werden geladen...</Text>
       </View>
     );
   }

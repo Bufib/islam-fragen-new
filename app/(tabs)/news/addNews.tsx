@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Controller } from "react-hook-form";
-
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
@@ -96,7 +95,7 @@ export default function AddNews() {
           name="internal_url"
           render={({ field: { onChange, value } }) => (
             <TitleSearchInput
-              value={value}
+              value={value || ""}
               onChangeText={onChange}
               themeStyles={themeStyles}
             />
@@ -246,7 +245,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   disabledButton: {
-    backgroundColor: Colors.universal.created_atTextColor,
+    backgroundColor: Colors.universal.fadeColor,
   },
   submitButtonText: {
     color: Colors.universal.white,

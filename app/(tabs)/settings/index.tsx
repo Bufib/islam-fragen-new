@@ -1,7 +1,6 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   StyleSheet,
-  Text,
   View,
   Switch,
   Appearance,
@@ -22,8 +21,7 @@ import handleLogout from "@/utils/handleLogout";
 import { getQuestionCount } from "@/utils/initializeDatabase";
 import handleOpenExternalUrl from "@/utils/handleOpenExternalUrl";
 import { Image } from "expo-image";
-import { Platform } from "react-native";
-import { Alert } from "react-native";
+
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");

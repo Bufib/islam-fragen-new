@@ -208,6 +208,6 @@ const styles = StyleSheet.create({
   },
   newsDate: {
     fontSize: 14,
-    color: Colors.universal.created_atTextColor,
+    color: Colors.universal.fadeColor,
   },
 });

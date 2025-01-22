@@ -105,7 +105,8 @@ export const Colors = {
     modalQuestionBlurredBackground: "rgba(0, 0, 0, 0.5)",
     arrowUp: "#2980b9",
     borderBottomToggleSettings: "#ccc",
-    created_atTextColor: "#888",
+    fadeColor: "#888",
+    
     pickImageButton: "#007bff",
     submitButton: "#28a745",
     chatBubbleQuestion: "#E3F2FD",

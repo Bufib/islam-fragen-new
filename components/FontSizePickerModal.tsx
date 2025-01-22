@@ -25,7 +25,7 @@ const FontSizePickerModal: React.FC<FontSizePickerModalProps> = ({
   const themeStyles = coustomTheme();
 
   const { fontSize, lineHeight, setFontSize, setLineHeight } =
-    useFontSizeStore(); // Use Zustand store for font size
+    useFontSizeStore(); // Zustand store for font size
 
   const [pickerValue, setPickerValue] = React.useState(
     fontSizeOptions.find((option) => option.fontSize === fontSize)?.label ||
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     width: 300,
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
   },

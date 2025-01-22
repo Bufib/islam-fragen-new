@@ -226,7 +226,6 @@ export default function QuestionLinks() {
       name: "Ethik",
       image: require("@/assets/images/ethik.png"),
     },
-
     {
       name: "Ratschläge",
       image: require("@/assets/images/ratschlaege.png"),
@@ -285,7 +284,6 @@ export default function QuestionLinks() {
             ]}
           >
             {/* Image top and text bottom */}
-
             {category.name !== "Stelle eine Frage" && (
               <View style={styles.buttonContentContainerNormal}>
                 <Image
@@ -303,7 +301,6 @@ export default function QuestionLinks() {
             )}
 
             {/* Text left and Image right */}
-
             {category.name === "Stelle eine Frage" && (
               <View style={styles.buttonContentContainerAskQuestion}>
                 <View style={styles.elementTextContainerAskQuestion}>
@@ -365,7 +362,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     borderWidth: 2,
-    backgroundColor: Colors.universal.indexItemBackgroundColor,
+    backgroundColor: "#4fa1b8",
   },
 
   askQuestionElement: {

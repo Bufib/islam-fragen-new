@@ -167,13 +167,13 @@
 //         }}
 //         onFocus={() => setShowSuggestions(true)}
 //         placeholder="Tippe einen Titel, um zu suchen..."
-//         placeholderTextColor="#888"
+//         placeholderTextColor="{Colors.universal.fadeColor
 //       />
 
 //       {/* SUGGESTIONS LIST */}
 //       {loading && showSuggestions && (
 //         <View style={[styles.suggestionsContainer, themeStyles.contrast]}>
-//           <ActivityIndicator size="small" color="#888" />
+//           <ActivityIndicator size="small" color="{Colors.universal.fadeColor />
 //         </View>
 //       )}
 
@@ -442,9 +442,9 @@ export const TitleSearchInput = ({
               value={searchText}
               onChangeText={setSearchText}
               placeholder="Suche nach einem Title"
-              placeholderTextColor="#888"
+              placeholderTextColor={Colors.universal.fadeColor}
             />
-            {loading && <ActivityIndicator size="small" color="#888" />}
+            {loading && <ActivityIndicator size="small" color={Colors.universal.fadeColor} />}
             {!loading && searchResults.length > 0 && (
               <FlatList
                 data={searchResults}
@@ -533,7 +533,7 @@ const styles = StyleSheet.create({
   noResults: {
     padding: 12,
     textAlign: "center",
-    color: "#888",
+    color: Colors.universal.fadeColor,
   },
   closeButton: {
     marginTop: 16,
