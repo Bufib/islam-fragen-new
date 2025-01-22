@@ -9,14 +9,7 @@ export const noInternetBody =
 // SignUp
 export const signUpErrorGeneral = "Fehler beim Registrieren!";
 
-export const signUpSuccess = () => {
-  return Toast.show({
-    type: "success",
-    text1: "Registrieren Erfolgreich!",
-    text2: "Bitte überprüfe deine E-mail",
-    topOffset: 60,
-  });
-};
+
 
 export const signUpUserNameMin =
   "Benutzername muss mindestens 3 Zeichen lang sein";
@@ -38,17 +31,12 @@ export const signUpPasswordNotEmpty = "Passwort darf nicht leer sein.";
 
 // Login
 export const loginError = "Fehler beim login";
-export const loginSuccess = () => {
-  return Toast.show({
-    type: "success",
-    text1: "Salam alaikum!",
-    text1Style: { fontSize: 16, fontWeight: "600" },
-    topOffset: 60,
-  });
-};
+
 
 export const loginEmailNotEmpty = "Bitte gib deine E-Mail-Adresse ein!";
 export const loginPasswordNotEmpty = "Bitte gib dein Passwort ein!";
+
+
 // Logout
 export const logoutErrorGeneral = "Fehler beim ausloggen";
 export const logoutSuccess = () => {
@@ -148,3 +136,6 @@ export const noInternet = () => {
     topOffset: 60,
   });
 };
+
+
+export const cancleCaptcha = "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"

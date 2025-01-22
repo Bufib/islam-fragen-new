@@ -1,6 +1,3 @@
-
-
-
 // import React, { useState, useRef, useEffect } from "react";
 // import {
 //   View,
@@ -316,10 +313,6 @@
 
 // export default ChangePassword;
 
-
-
-
-
 import React, { useState, useRef, useEffect } from "react";
 import {
   View,
@@ -388,29 +381,29 @@ const ChangePassword = () => {
    */
   const handlePasswordChangeWithCaptcha = async (captchaToken: string) => {
     try {
-     
       setLoading(true);
       setErrors({});
 
       // Update password in Supabase
+      console.log(password);
       const { data, error } = await supabase.auth.updateUser({
         password: password,
-        options: { captchaToken }
       });
-
-      console.log("error" + error)
+      
+      console.log("error" + error);
 
       if (error) {
-        console.log(error)
+        console.log(error);
         throw error;
+      } else {
+        Alert.alert("Erfolg", "Dein Passwort wurde erfolgreich aktualisiert.");
+        setOldPassword("");
+        setPassword("");
+        setConfirmPassword("");
       }
-      Alert.alert("Erfolg", "Dein Passwort wurde erfolgreich aktualisiert.");
-      setOldPassword("");
-      setPassword("");
-      setConfirmPassword("");
       router.push("/(tabs)/settings/");
     } catch (error: any) {
-      console.log(error)
+      console.log(error);
       Alert.alert("Fehler", error.message);
     } finally {
       setLoading(false);
@@ -442,10 +435,10 @@ const ChangePassword = () => {
           "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
         );
       } else if (token === "open") {
-        console.log("open")
+        console.log("open");
         // Captcha opened, no action required
       } else {
-        console.log("else")
+        console.log("else");
         // We have a valid captcha token
         await handlePasswordChangeWithCaptcha(token);
       }

@@ -24,17 +24,17 @@ import { useAuthStore } from "@/stores/authStore";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { router } from "expo-router";
-
+import Toast from "react-native-toast-message";
 import {
-  loginError,
-  loginSuccess,
+ 
   loginEmailNotEmpty,
   loginPasswordNotEmpty,
 } from "@/constants/messages";
+import { Colors } from "@/constants/Colors";
 
 // ---- START: TYPES & SCHEMA ----
 
-/** The shape of our form data. */
+/** 1. The shape of our form data. */
 const loginSchema = z.object({
   email: z
     .string()
@@ -45,10 +45,10 @@ const loginSchema = z.object({
     .nonempty("Bitte ein Passwort angeben."),
 });
 
-/** Derive the TypeScript type from the schema. */
+/** 1.1 Derive the TypeScript type from the schema. */
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-/** Typed event for hCaptcha messages. */
+/** 1.2 Typed event for hCaptcha messages. */
 type CaptchaEvent = {
   nativeEvent: {
     data: string;
@@ -129,7 +129,7 @@ export default function LoginScreen() {
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
-          "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
+          "Bitte nicht wegklicken, die Überprüfung wird sonst abgebrochen!"
         );
         return;
 
@@ -163,7 +163,7 @@ export default function LoginScreen() {
       });
 
       if (error) {
-        // You can handle more specific errors here
+        // specific errors
         if (error.message.includes("Invalid login credentials")) {
           Alert.alert("Login fehlgeschlagen", "E-Mail oder Passwort ist falsch.");
         } else if (error.message.includes("User not found")) {
@@ -183,8 +183,13 @@ export default function LoginScreen() {
         // Clear form
         reset();
 
-        // Show success or your custom function:
-        loginSuccess();
+        // Show success
+        Toast.show({
+            type: "success",
+            text1: "Salam alaikum!",
+            text1Style: { fontSize: 16, fontWeight: "600" },
+            topOffset: 60,
+          });
 
         // Navigate to home
         router.replace("/(tabs)/home");
@@ -329,7 +334,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   error: {
-    color: "red",
+    color: Colors.universal.error,
     marginBottom: 12,
   },
   passwordContainer: {

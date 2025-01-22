@@ -704,8 +704,6 @@
 //   },
 // });
 
-
-
 import React, { useRef, useEffect, useState } from "react";
 import {
   View,
@@ -733,10 +731,9 @@ import { router } from "expo-router";
 import { ThemedText } from "@/components/ThemedText";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { Colors } from "@/constants/Colors";
-
+import Toast from "react-native-toast-message";
 import {
   signUpErrorGeneral,
-  signUpSuccess,
   signUpUserNameAlreadyInUsage,
   signUpUserEmailAlreadyInUsage,
   signUpUserNameMin,
@@ -748,9 +745,10 @@ import {
   signUpPasswordNotEmpty,
   signUpUsernameNotEmpty,
   signUpUserPasswordConformation,
+  cancleCaptcha,
 } from "@/constants/messages";
 
-// ---- START: TYPE + SCHEMA DEFINITIONS ----
+/** 1. TYPE + SCHEMA DEFINITIONS */
 
 type SignUpFormValues = {
   username: string;
@@ -846,7 +844,7 @@ export default function SignUpScreen() {
   }, [showCaptcha]);
 
   /**
-   * Reset attempts (verification & resend) whenever the modal closes.
+   * 2. Reset attempts (verification & resend) whenever the modal closes.
    */
   useEffect(() => {
     if (!showVerificationModal) {
@@ -855,7 +853,7 @@ export default function SignUpScreen() {
     }
   }, [showVerificationModal]);
 
-  // ----- 1) Check if username or email exists -----
+  /** 3. Check if username or email exists */
   const checkUserExists = async (username: string, email: string) => {
     try {
       const { data, error } = await supabase
@@ -881,11 +879,11 @@ export default function SignUpScreen() {
     }
   };
 
-  // ----- 2) The main function that checks network & user existence, then opens captcha -----
+  /** 3. The main function that checks network & user existence, then opens captcha */
   const handleSignup = async (formData: SignUpFormValues) => {
     setIsLoading(true);
     try {
-      // 2.1 Check network
+      // 3.1 Check network
       const netInfo = await NetInfo.fetch();
       if (!netInfo.isConnected) {
         Alert.alert(noInternetHeader, noInternetBody);
@@ -893,7 +891,7 @@ export default function SignUpScreen() {
         return;
       }
 
-      // 2.2 Check username/email duplicates
+      // 3.2 Check username/email duplicates
       const { usernameExists, emailExists } = await checkUserExists(
         formData.username,
         formData.email
@@ -910,7 +908,7 @@ export default function SignUpScreen() {
         return;
       }
 
-      // 2.3 If checks pass, open captcha
+      // 3.3 If checks pass, open captcha
       setShowCaptcha(true);
     } catch (error: any) {
       Alert.alert(signUpErrorGeneral, error.message);
@@ -919,7 +917,7 @@ export default function SignUpScreen() {
     }
   };
 
-  // ----- 3) Actual Supabase signup function after captcha success -----
+  /** 4. Actual Supabase signup function after captcha success */
   const signUpWithSupabase = async (
     username: string,
     email: string,
@@ -965,13 +963,13 @@ export default function SignUpScreen() {
     }
   };
 
-  // ----- 4) Handle final verification of the code the user enters -----
+  /** 5) Handle final verification of the code the user enters */
   const handleVerification = async () => {
-    // 4.1 Check attempts
+    // 5.1 Check attempts
     if (verificationAttempts >= MAX_VERIFICATION_ATTEMPTS) {
       Alert.alert(
         "Zu viele Versuche",
-       "Du hast die maximale Anzahl an Verifizierungsversuchen überschritten. Bitte foder einen neuen Code an.",
+        "Du hast die maximale Anzahl an Verifizierungsversuchen überschritten. Bitte fordere einen neuen Code an.",
         [
           {
             text: "Abbrechen",
@@ -988,7 +986,7 @@ export default function SignUpScreen() {
     }
     setVerificationAttempts((prev) => prev + 1);
 
-    // 4.2 Timeout for verification
+    // 5.2 Timeout for verification
     const TIMEOUT = 60000; // 60 seconds
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("Verification timeout")), TIMEOUT)
@@ -1006,7 +1004,7 @@ export default function SignUpScreen() {
           });
           if (error) throw new Error(error.message);
 
-          // 4.3 Insert user data into "user" table
+          // 5.3 Insert user data into "user" table
           if (data.user) {
             const { error: userError } = await supabase.from("user").insert([
               {
@@ -1022,14 +1020,22 @@ export default function SignUpScreen() {
 
             // If successful, close modal & navigate
             setShowVerificationModal(false);
-            signUpSuccess();
+            Toast.show({
+                type: "success",
+                text1: "Registrieren Erfolgreich!",
+                text2: "Bitte überprüfe deine E-mail!",
+                topOffset: 60,
+              });
             router.push("/(tabs)/home");
           }
         })(),
       ]);
     } catch (error: any) {
       if (error.message === "Verification timeout") {
-        Alert.alert("Error", "Die Verifizierung ist abgelaufen. Bitte versuche es erneut.");
+        Alert.alert(
+          "Error",
+          "Die Verifizierung ist abgelaufen. Bitte versuche es erneut."
+        );
       } else {
         Alert.alert(signUpErrorGeneral, error.message);
       }
@@ -1038,16 +1044,16 @@ export default function SignUpScreen() {
     }
   };
 
-  // ----- 5) Function to resend the verification code -----
+  /** 6. Function to resend the verification code */
+  // Only if code really resend -> attempt + 1
   const resendVerificationCode = async () => {
     if (resendAttempts >= MAX_RESEND_ATTEMPTS) {
       Alert.alert(
         "Error",
-       "Du hast die maximale Anzahl an erneuten Sendeversuchen erreicht. Bitte warte etwas bevor du es erneut versuchst."
+        "Du hast die maximale Anzahl an erneuten Sendeversuchen erreicht. Bitte warte etwas und registriere dich später erneut!"
       );
       return;
     }
-    setResendAttempts((prev) => prev + 1);
 
     try {
       setIsLoading(true);
@@ -1056,8 +1062,9 @@ export default function SignUpScreen() {
         email: currentEmail,
       });
       if (error) throw error;
-
-      Alert.alert("Erfolg", "Ein neuer Bestätigungscode wurde gesendet.");
+      setResendAttempts((prev) => prev + 1);
+      console.log("resendAttempts" + resendAttempts)
+      Alert.alert("Erfolg", "Ein neuer Bestätigungscode wurde gesendet!");
     } catch (error: any) {
       Alert.alert("Error", error.message);
     } finally {
@@ -1065,7 +1072,7 @@ export default function SignUpScreen() {
     }
   };
 
-  // ----- 6) Captcha message callback: triggers signUpWithSupabase on success -----
+  /** 7. Captcha message callback: triggers signUpWithSupabase on success */
   const onCaptchaMessage = async (event: CaptchaEvent) => {
     const token = event.nativeEvent.data;
     if (!token) return;
@@ -1082,10 +1089,7 @@ export default function SignUpScreen() {
       );
     } else if (token === "cancel") {
       setShowCaptcha(false);
-      Alert.alert(
-        "Fehler",
-        "Bitte nicht wegklicken, da die Überprüfung sonst abgebrochen wird!"
-      );
+      Alert.alert("Fehler", cancleCaptcha);
     } else if (token === "open") {
       // hCaptcha is opening; do nothing
       return;
@@ -1102,13 +1106,12 @@ export default function SignUpScreen() {
     }
   };
 
-  // ----- 7) onSubmit Handler: calls handleSignup to do network + existence checks -----
+  /** 8. onSubmit Handler: calls handleSignup to do network + existence checks */
+
   const onSubmit = async (formData: SignUpFormValues) => {
-    // Delegates to `handleSignup`
     handleSignup(formData);
   };
 
-  // ------------------ UI Rendering ------------------
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -1260,13 +1263,15 @@ export default function SignUpScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, themeStyles.contrast]}>
-            <ThemedText style={styles.modalTitle}>Email Verification</ThemedText>
+            <ThemedText style={styles.modalTitle}>
+              Email Verification
+            </ThemedText>
             <ThemedText style={styles.modalSubtitle}>
               Please enter the verification code sent to {currentEmail}
             </ThemedText>
             <TextInput
               style={[styles.input, themeStyles.text]}
-              placeholder="Enter verification code"
+              placeholder="Dein Verifizierungscode"
               value={verificationCode}
               onChangeText={setVerificationCode}
               keyboardType="number-pad"
@@ -1277,13 +1282,16 @@ export default function SignUpScreen() {
             ) : (
               <View style={styles.modalButtonsContainer}>
                 <Button
-                  title="Cancel"
+                  title="Abbrechen"
                   onPress={() => setShowVerificationModal(false)}
                 />
                 <View style={styles.buttonSpacer} />
-                <Button title="Verify" onPress={handleVerification} />
+                <Button title="Verifizieren" onPress={handleVerification} />
                 <View style={styles.buttonSpacer} />
-                <Button title="Resend Code" onPress={resendVerificationCode} />
+                <Button
+                  title="Code erneut senden"
+                  onPress={resendVerificationCode}
+                />
               </View>
             )}
           </View>
@@ -1293,7 +1301,6 @@ export default function SignUpScreen() {
   );
 }
 
-// ------------------ Styles ------------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
