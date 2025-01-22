@@ -30,7 +30,7 @@ const schema = z
     code: z
       .string()
       .nonempty("Code wird benötigt")
-      // .regex(/^\d{6}$/, "Code muss 6 Ziffern enthalten") // Example if code is always 6 digits
+      //! .regex(/^\d{6}$/, "Code muss 6 Ziffern enthalten") // Example if code is always 6 digits
       .min(1, "Code wird benötigt"),
     newPassword: z
       .string()
@@ -80,18 +80,24 @@ export function ResetPassword() {
     // 2) Check for internet connectivity
     const netInfo = await NetInfo.fetch();
     if (!netInfo.isConnected) {
-      Alert.alert("Keine Internetverbindung", "Bitte überprüfe deine Verbindung.");
+      Alert.alert(
+        "Keine Internetverbindung",
+        "Bitte überprüfe deine Verbindung."
+      );
       return;
     }
 
-    setLoading(true);
     try {
+      setLoading(true);
+
       // 1) Verify the recovery token
-      const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: data.code,
-        type: "recovery",
-      });
+      const { data: verifyData, error: verifyError } =
+        await supabase.auth.verifyOtp({
+          email,
+          token: data.code,
+          type: "recovery",
+        });
+
       if (verifyError) throw verifyError;
 
       // 2) Update the password
@@ -150,7 +156,10 @@ export function ResetPassword() {
               value={value}
               secureTextEntry={!showPassword}
             />
-            <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+            <Pressable
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
               {showPassword ? (
                 <Feather
                   name="eye"
@@ -168,7 +177,9 @@ export function ResetPassword() {
           </View>
         )}
       />
-      {errors.newPassword && <Text style={styles.error}>{errors.newPassword.message}</Text>}
+      {errors.newPassword && (
+        <Text style={styles.error}>{errors.newPassword.message}</Text>
+      )}
 
       {/* CONFIRM PASSWORD FIELD */}
       <Controller
@@ -210,7 +221,10 @@ export function ResetPassword() {
 
       {/* 3) Button with a basic loading indicator */}
       {loading ? (
-        <ActivityIndicator style={styles.loadingIndicator} color={Colors.universal.link} />
+        <ActivityIndicator
+          style={styles.loadingIndicator}
+          color={Colors.universal.link}
+        />
       ) : (
         <Button
           title="Passwort aktualisieren"

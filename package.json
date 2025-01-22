@@ -23,7 +23,8 @@
     "@react-native-picker/picker": "2.9.0",
     "@react-navigation/bottom-tabs": "^7.0.0",
     "@react-navigation/native": "^7.0.0",
-    "@supabase/supabase-js": "^2.47.10",
+    "@shopify/flash-list": "1.7.1",
+    "@supabase/supabase-js": "^2.48.0",
     "@tanstack/react-query": "^5.62.11",
     "base64-arraybuffer": "^1.0.2",
     "expo": "~52.0.26",
@@ -64,8 +65,7 @@
     "react-native-webview": "13.12.5",
     "yup": "^1.6.1",
     "zod": "^3.24.1",
-    "zustand": "^5.0.2",
-    "@shopify/flash-list": "1.7.1"
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
