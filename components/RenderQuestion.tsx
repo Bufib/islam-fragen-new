@@ -132,7 +132,7 @@ const RenderQuestion = ({
                   <Feather
                     name="check"
                     size={24}
-                    color={colorScheme === "dark" ? "white" : "black"}
+                    color={colorScheme === "dark" ? "#fff" : "#000"}
                   />
                   <ThemedText>Kopiert!</ThemedText>
                 </View>
@@ -140,7 +140,7 @@ const RenderQuestion = ({
                 <AntDesign
                   name="copy1"
                   size={24}
-                  color={colorScheme === "dark" ? "white" : "black"}
+                  color={colorScheme === "dark" ? "#fff" : "#000"}
                   style={styles.copyIcon}
                   onPress={() => {
                     copyToClipboardSingleAnswer(question?.answer);
@@ -170,7 +170,7 @@ const RenderQuestion = ({
                     <Feather
                       name="check"
                       size={24}
-                      color={colorScheme === "dark" ? "white" : "black"}
+                      color={colorScheme === "dark" ? "#fff" : "#000"}
                     />
                     <ThemedText>Kopiert!</ThemedText>
                   </View>
@@ -178,7 +178,7 @@ const RenderQuestion = ({
                   <AntDesign
                     name="copy1"
                     size={24}
-                    color={colorScheme === "dark" ? "white" : "black"}
+                    color={colorScheme === "dark" ? "#fff" : "#000"}
                     style={styles.copyIcon}
                     onPress={() => {
                       copyToClipboardMarja(
@@ -209,7 +209,7 @@ const RenderQuestion = ({
                     <Feather
                       name="check"
                       size={24}
-                      color={colorScheme === "dark" ? "white" : "black"}
+                      color={colorScheme === "dark" ? "#fff" : "#000"}
                     />
                     <ThemedText>Kopiert!</ThemedText>
                   </View>
@@ -217,7 +217,7 @@ const RenderQuestion = ({
                   <AntDesign
                     name="copy1"
                     size={24}
-                    color={colorScheme === "dark" ? "white" : "black"}
+                    color={colorScheme === "dark" ? "#fff" : "#000"}
                     style={styles.copyIcon}
                     onPress={() => {
                       copyToClipboardMarja(question?.answer_sistani, "sistani");

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, useColorScheme } from "react-native";
+import { View, StyleSheet, useColorScheme } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { Stack } from "expo-router";
@@ -126,10 +126,9 @@ export default function question() {
         subcategory={subcategory}
         questionId={parseInt(questionId, 10)}
       />
-      {/* FontSizePickerModal */}
       <FontSizePickerModal
         visible={modalVisible}
-        onClose={() => setModalVisible(false)} // Close modal
+        onClose={() => setModalVisible(false)} 
       />
     </View>
   );
