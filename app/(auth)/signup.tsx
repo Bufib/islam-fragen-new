@@ -836,6 +836,43 @@ export default function SignUpScreen() {
   // Track resend attempts
   const [resendAttempts, setResendAttempts] = useState(0);
 
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN") {
+        if (session?.user) {
+          // Insert user data into "user" table
+          const { error: userError } = await supabase.from("user").insert([
+            {
+              user_id: session.user.id,
+              username: currentUsername,
+              email: currentEmail,
+            },
+          ]);
+
+          if (userError) {
+            Alert.alert(signUpErrorGeneral, userError.message);
+            return;
+          }
+
+          // Success
+          setShowVerificationModal(false);
+          Toast.show({
+            type: "success",
+            text1: "Registrieren Erfolgreich!",
+            topOffset: 60,
+          });
+          router.replace("/(tabs)/home");
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   // Show the captcha when state changes
   useEffect(() => {
     if (showCaptcha && captchaRef.current) {
@@ -998,30 +1035,6 @@ export default function SignUpScreen() {
             type: "signup",
           });
           if (error) throw new Error(error.message);
-
-          // 5.3 Insert user data into "user" table
-          if (data.user) {
-            const { error: userError } = await supabase.from("user").insert([
-              {
-                user_id: data.user.id,
-                username: currentUsername,
-                email: currentEmail,
-              },
-            ]);
-
-            if (userError) {
-              throw new Error(userError.message);
-            }
-
-            // If successful, close modal & navigate
-            setShowVerificationModal(false);
-            Toast.show({
-              type: "success",
-              text1: "Registrieren Erfolgreich!",
-              topOffset: 60,
-            });
-            router.replace("/(tabs)/home");
-          }
         })(),
       ]);
     } catch (error: any) {
