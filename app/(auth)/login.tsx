@@ -85,6 +85,35 @@ export default function LoginScreen() {
   const { setSession } = useAuthStore();
 
   useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN') {
+          // Store session in your auth store
+          await setSession(session, stayLoggedIn);
+
+          // Clear form
+          reset();
+
+          // Show success toast
+          Toast.show({
+            type: "success",
+            text1: "Salam alaikum!",
+            text1Style: { fontSize: 16, fontWeight: "600" },
+            topOffset: 60,
+          });
+
+          // Navigate to home
+          router.replace("/(tabs)/home");
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     // If user requested captcha, show it as soon as it's available
     if (showCaptcha && captchaRef.current) {
       captchaRef.current.show();
@@ -175,25 +204,8 @@ export default function LoginScreen() {
         }
         return;
       }
-
-      if (data?.session) {
-        // Store session in your auth store
-        await setSession(data.session, stayLoggedIn);
-
-        // Clear form
-        reset();
-
-        // Show success
-        Toast.show({
-            type: "success",
-            text1: "Salam alaikum!",
-            text1Style: { fontSize: 16, fontWeight: "600" },
-            topOffset: 60,
-          });
-
-        // Navigate to home
-        router.replace("/(tabs)/home");
-      }
+      // Success handling moved to auth state listener
+      
     } catch (error: any) {
       Alert.alert(error, error.message || "Es gab einen Fehler beim Login.");
     } finally {
