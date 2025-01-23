@@ -39,15 +39,15 @@ const QuestionSchema = z.object({
       "Bitte wähle einen Marja aus!"
     ),
   question: z.string().min(1, "Bitte gebe deine Frage ein!"),
-  user_age: z
+  age: z
     .number({ invalid_type_error: "Bitte gebe dein Alter ein!" })
     .min(1, "Bitte gebe dein Alter ein!"),
-  user_gender: z.string().min(1, "Bitte gebe dein Geschlecht an!"),
-  user_email: z
+  gender: z.string().min(1, "Bitte gebe dein Geschlecht an!"),
+  email: z
     .string()
     .email("Ungültige Emailadresse")
     .min(1, "Bitte gebe deinen Email an!"),
-  user_username: z.string().optional(),
+  username: z.string().optional(),
 });
 
 // The TypeScript definition derived from Zod:
@@ -124,7 +124,7 @@ export default function AskQuestionScreen() {
 
   // Access user info
   const session = useAuthStore((state) => state.session);
-  const user_username = useAuthStore((state) => state.user_username);
+  const username = useAuthStore((state) => state.username);
 
   // Theming
   const themeStyles = coustomTheme();
@@ -148,20 +148,20 @@ export default function AskQuestionScreen() {
         keineRechtsfrage: false,
       },
       question: "",
-      user_age: undefined,
-      user_gender: "",
-      user_email: "",
-      user_username: "",
+      age: undefined,
+      gender: "",
+      email: "",
+      username: "",
     },
   });
 
   // If user already has a username stored in the store,
   // you can auto-fill it so they don't have to retype:
   useEffect(() => {
-    if (user_username) {
-      setValue("user_username", user_username);
+    if (username) {
+      setValue("username", username);
     }
-  }, [user_username, setValue]);
+  }, [username, setValue]);
 
   // Show captcha when state toggles
   useEffect(() => {
@@ -195,14 +195,13 @@ export default function AskQuestionScreen() {
         .insert([
           {
             user_id: session.user.id,
-            user_username: data.user_username ?? user_username,
+            username: data.username ?? username,
             title: data.title,
             marja: selectedMarja,
             question: data.question,
-            user_age: data.user_age,
-            user_gender: data.user_gender,
-            user_email: data.user_email,
-            status: "Beantwortung steht noch aus",
+            age: data.age,
+            gender: data.gender,
+            email: data.email,
           },
         ]);
 
@@ -376,14 +375,14 @@ export default function AskQuestionScreen() {
           {/* AGE */}
           <Controller
             control={control}
-            name="user_age"
+            name="age"
             render={({ field: { onChange, value } }) => (
               <CustomInput
                 label="Alter *"
                 value={value?.toString()}
                 onChangeText={(txt: string) => onChange(Number(txt) || 0)}
                 keyboardType="numeric"
-                error={errors.user_age?.message}
+                error={errors.age?.message}
                 placeholder="Dein Alter"
                 style={themeStyles.text}
               />
@@ -393,13 +392,13 @@ export default function AskQuestionScreen() {
           {/* GENDER */}
           <Controller
             control={control}
-            name="user_gender"
+            name="gender"
             render={({ field: { onChange, value } }) => (
               <CustomInput
                 label="Geschlecht *"
                 value={value}
                 onChangeText={onChange}
-                error={errors.user_gender?.message}
+                error={errors.gender?.message}
                 placeholder="Dein Geschlecht"
                 style={themeStyles.text}
                 autoCapitalize="none"
@@ -410,7 +409,7 @@ export default function AskQuestionScreen() {
           {/* EMAIL */}
           <Controller
             control={control}
-            name="user_email"
+            name="email"
             render={({ field: { onChange, value } }) => (
               <CustomInput
                 label="Email *"
@@ -418,7 +417,7 @@ export default function AskQuestionScreen() {
                 onChangeText={onChange}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                error={errors.user_email?.message}
+                error={errors.email?.message}
                 placeholder="Deine Emailadresse"
                 style={themeStyles.text}
               />

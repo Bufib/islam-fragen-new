@@ -858,8 +858,8 @@ export default function SignUpScreen() {
     try {
       const { data, error } = await supabase
         .from("user")
-        .select("user_username, user_email")
-        .or(`user_username.ilike.${username},user_email.ilike.${email}`);
+        .select("username, email")
+        .or(`username.ilike.${username},email.ilike.${email}`);
 
       if (error) {
         Alert.alert(signUpErrorGeneral, error.message);
@@ -867,10 +867,8 @@ export default function SignUpScreen() {
       }
 
       // If the query finds matching data, return true for existing values
-      const usernameExists = data.some(
-        (user) => user.user_username === username
-      );
-      const emailExists = data.some((user) => user.user_email === email);
+      const usernameExists = data.some((user) => user.username === username);
+      const emailExists = data.some((user) => user.email === email);
 
       return { usernameExists, emailExists };
     } catch (error: any) {
@@ -949,10 +947,7 @@ export default function SignUpScreen() {
         setCurrentUsername(username);
         setShowVerificationModal(true);
 
-        Alert.alert(
-          "Verifizierung erforderlich",
-          "Bitte prüfe deine E-Mails auf einen Bestätigungscode."
-        );
+        Alert.alert("Verifizierung erforderlich");
       }
     } catch (error: any) {
       console.log(error);
@@ -1009,8 +1004,8 @@ export default function SignUpScreen() {
             const { error: userError } = await supabase.from("user").insert([
               {
                 user_id: data.user.id,
-                user_username: currentUsername,
-                user_email: currentEmail,
+                username: currentUsername,
+                email: currentEmail,
               },
             ]);
 
@@ -1021,12 +1016,11 @@ export default function SignUpScreen() {
             // If successful, close modal & navigate
             setShowVerificationModal(false);
             Toast.show({
-                type: "success",
-                text1: "Registrieren Erfolgreich!",
-                text2: "Bitte überprüfe deine E-mail!",
-                topOffset: 60,
-              });
-            router.push("/(tabs)/home");
+              type: "success",
+              text1: "Registrieren Erfolgreich!",
+              topOffset: 60,
+            });
+            router.replace("/(tabs)/home");
           }
         })(),
       ]);
@@ -1063,7 +1057,7 @@ export default function SignUpScreen() {
       });
       if (error) throw error;
       setResendAttempts((prev) => prev + 1);
-      console.log("resendAttempts" + resendAttempts)
+      console.log("resendAttempts" + resendAttempts);
       Alert.alert("Erfolg", "Ein neuer Bestätigungscode wurde gesendet!");
     } catch (error: any) {
       Alert.alert("Error", error.message);

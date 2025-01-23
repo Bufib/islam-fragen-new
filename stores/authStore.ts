@@ -7,7 +7,7 @@ const PERSIST_LOGIN_KEY = "persist_login";
 
 type AuthStore = {
   session: Session | null;
-  user_username: string;
+  username: string;
   isAdmin: boolean;
   isLoggedIn: boolean;
   isPersisted: boolean;
@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   isAdmin: false,
   isLoggedIn: false,
   isPersisted: false,
-  user_username: "",
+  username: "",
 
   // Fetch user role from the user_role table
   async getUserRole(
@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const { data, error } = await supabase
         .from("user")
-        .select("role, user_username")
+        .select("role, username")
         .eq("user_id", userId)
         .single();
 
@@ -44,7 +44,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       return {
         role: data?.role || null,
-        username: data?.user_username || "",
+        username: data?.username || "",
       };
     } catch (err) {
       console.error("Unexpected error fetching user role:", err);
@@ -69,7 +69,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           isAdmin,
           isLoggedIn: true,
           isPersisted: persist,
-          user_username: username || "",
+          username: username || "",
         });
       }
     } catch (error) {
@@ -114,7 +114,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             isAdmin,
             isLoggedIn: true,
             isPersisted: true,
-            user_username: username || "", // Use the destructured username
+            username: username || "", // Use the destructured username
           });
           return true;
         }

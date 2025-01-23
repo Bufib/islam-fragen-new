@@ -375,6 +375,32 @@ const ChangePassword = () => {
 
   const colorScheme = useColorScheme();
 
+  /** Supabase wont work without this */
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "USER_UPDATED") {
+        Alert.alert("Erfolg", "Dein Passwort wurde erfolgreich aktualisiert.", [
+          {
+            text: "OK",
+            onPress: () => {
+              setOldPassword("");
+              setPassword("");
+              setConfirmPassword("");  setShowCaptcha(false)
+              router.push("/(tabs)/settings/");
+            
+            },
+          },
+        ]);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   /**
    * Handles the final password update call after captcha has validated.
    * @param captchaToken - The token returned by hCaptcha
@@ -384,24 +410,15 @@ const ChangePassword = () => {
       setLoading(true);
       setErrors({});
 
-      // Update password in Supabase
-      console.log(password);
-      const { data, error } = await supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         password: password,
       });
-      
-      console.log("error" + error);
 
       if (error) {
         console.log(error);
         throw error;
-      } else {
-        Alert.alert("Erfolg", "Dein Passwort wurde erfolgreich aktualisiert.");
-        setOldPassword("");
-        setPassword("");
-        setConfirmPassword("");
       }
-      router.push("/(tabs)/settings/");
+      // Success handling moved to event listener
     } catch (error: any) {
       console.log(error);
       Alert.alert("Fehler", error.message);

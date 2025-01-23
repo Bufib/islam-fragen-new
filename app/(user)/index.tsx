@@ -23,11 +23,7 @@ import { useColorScheme } from "react-native";
 import { coustomTheme } from "@/utils/coustomTheme";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
-import {
-  userQuestionErrorLoadingQuestions,
-  noInternetBody,
-  noInternetHeader,
-} from "@/constants/messages";
+import { userQuestionErrorLoadingQuestions } from "@/constants/messages";
 import NoInternet from "@/components/NoInternet";
 
 export default function QuestionsList() {
@@ -107,8 +103,10 @@ export default function QuestionsList() {
         <Text style={styles.createdAtText}>{formateDate(item.created_at)}</Text>
       </Pressable>
     ),
+
     [themeStyles]
   );
+
 
   // 7. Return early if loading
   if (isLoading) {
@@ -176,7 +174,6 @@ export default function QuestionsList() {
               }
               refetch();
             }}
-
           />
         }
         ListEmptyComponent={

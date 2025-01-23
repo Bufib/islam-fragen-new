@@ -187,6 +187,7 @@ export type QuestionFromUser = {
   user_age: string;
   internal_url: string[];
   created_at: string;
+  approval_status: string
 };
 
 export type AskQuestionFormData = {

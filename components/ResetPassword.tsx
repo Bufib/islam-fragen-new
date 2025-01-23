@@ -15,7 +15,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Feather from "@expo/vector-icons/Feather";
 import NetInfo from "@react-native-community/netinfo";
-
+import { useEffect } from "react";
 import { supabase } from "@/utils/supabase";
 import { useLocalSearchParams, router } from "expo-router";
 import { Colors } from "@/constants/Colors";
@@ -71,13 +71,103 @@ export function ResetPassword() {
     resolver: zodResolver(schema),
   });
 
+  // const handleUpdatePassword = async (data: ResetPasswordFormValues) => {
+  //   if (!email) {
+  //     Alert.alert("Error", "E-mail wird benötigt!");
+  //     return;
+  //   }
+
+  //   // Check for internet connectivity
+  //   const netInfo = await NetInfo.fetch();
+  //   if (!netInfo.isConnected) {
+  //     Alert.alert(
+  //       "Keine Internetverbindung",
+  //       "Bitte überprüfe deine Verbindung."
+  //     );
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+
+  //     // Verify the recovery token
+  //     const { data: verifyData, error: verifyError } =
+  //       await supabase.auth.verifyOtp({
+  //         email,
+  //         token: data.code,
+  //         type: "recovery",
+  //       });
+
+  //     if (verifyError) throw verifyError;
+
+  //     if (!verifyData.session) {
+  //       throw new Error("Session could not be created after OTP verification.");
+  //     }
+
+  //     console.log("OTP verified successfully");
+
+  //     // Defer the password update operation
+
+  //     try {
+  //       const { error: updateError } = await supabase.auth.updateUser({
+  //         password: data.newPassword,
+  //       });
+  //       if (updateError) throw updateError;
+
+  //       // Success
+  //       Alert.alert("Erfolg", "Dein Passwort wurde aktualisiert.");
+  //       router.replace("/login");
+  //     } catch (updateError) {
+  //       if (updateError instanceof Error) {
+  //         Alert.alert("Error", updateError.message);
+  //       } else {
+  //         Alert.alert("Error", "Ein unerwarteter Fehler ist aufgetreten.");
+  //       }
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       // More user-friendly errors:
+  //       if (error.message.includes("Invalid or expired token")) {
+  //         Alert.alert("Fehler", "Der Code ist ungültig oder abgelaufen.");
+  //       } else {
+  //         Alert.alert("Error", error.message);
+  //       }
+  //     } else {
+  //       Alert.alert("Error", "Ein unerwarteter Fehler ist aufgetreten.");
+  //     }
+  //     setLoading(false); // Ensure loading is stopped in case of error
+  //   }
+  // };
+
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "USER_UPDATED") {
+        Alert.alert("Erfolg", "Dein Passwort wurde aktualisiert.", [
+          {
+            text: "OK",
+
+            onPress: () => router.replace("/login"),
+          },
+        ]);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Move the handler to the main component
   const handleUpdatePassword = async (data: ResetPasswordFormValues) => {
     if (!email) {
-      Alert.alert("Error", "Email is required");
+      Alert.alert("Error", "E-mail wird benötigt!");
       return;
     }
 
-    // 2) Check for internet connectivity
     const netInfo = await NetInfo.fetch();
     if (!netInfo.isConnected) {
       Alert.alert(
@@ -89,8 +179,6 @@ export function ResetPassword() {
 
     try {
       setLoading(true);
-
-      // 1) Verify the recovery token
       const { data: verifyData, error: verifyError } =
         await supabase.auth.verifyOtp({
           email,
@@ -99,26 +187,27 @@ export function ResetPassword() {
         });
 
       if (verifyError) throw verifyError;
+      if (!verifyData.session) {
+        throw new Error("Session could not be created after OTP verification.");
+      }
 
-      // 2) Update the password
+      console.log("OTP verified successfully");
+
       const { error: updateError } = await supabase.auth.updateUser({
         password: data.newPassword,
       });
-      if (updateError) throw updateError;
 
-      // Success
-      Alert.alert("Erfolg", "Dein Passwort wurde aktualisiert.");
-      router.replace("/login");
+      if (updateError) throw updateError;
+      // Success handling is now in the event listener
     } catch (error) {
       if (error instanceof Error) {
-        // More user-friendly errors:
         if (error.message.includes("Invalid or expired token")) {
           Alert.alert("Fehler", "Der Code ist ungültig oder abgelaufen.");
         } else {
           Alert.alert("Error", error.message);
         }
       } else {
-        Alert.alert("Error", "Ein unerwarteter Fehler ist aufgetreten");
+        Alert.alert("Error", "Ein unerwarteter Fehler ist aufgetreten.");
       }
     } finally {
       setLoading(false);

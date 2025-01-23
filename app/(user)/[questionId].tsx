@@ -1,4 +1,3 @@
-// app/questions/[questionId].tsx
 import React, { useEffect } from "react";
 import {
   View,
