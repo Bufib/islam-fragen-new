@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from "react";
 import {
   Modal,
@@ -57,22 +56,25 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
     }
   }, [isVisible]);
 
-  const fetchWithTimeout = useCallback(async (url: string, options: RequestInit) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
-    
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      throw error;
-    }
-  }, []);
+  const fetchWithTimeout = useCallback(
+    async (url: string, options: RequestInit) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    },
+    []
+  );
 
   const handleProceedToPassword = () => {
     setShowConfirmation(false);
@@ -91,14 +93,20 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   const handleConfirm = async () => {
     // Check rate limiting
     if (attemptCount >= MAX_ATTEMPTS) {
-      const timeRemaining = Math.ceil((ATTEMPT_RESET_TIME - (Date.now() - lastAttemptTime)) / 1000);
-      setError(`Zu viele Versuche. Bitte versuche es in ${Math.ceil(timeRemaining / 60)} Minuten erneut.`);
+      const timeRemaining = Math.ceil(
+        (ATTEMPT_RESET_TIME - (Date.now() - lastAttemptTime)) / 1000
+      );
+      setError(
+        `Zu viele Versuche. Bitte versuche es in ${Math.ceil(
+          timeRemaining / 60
+        )} Minuten erneut.`
+      );
       return;
     }
 
     setLoading(true);
     setError(null);
-    setAttemptCount(prev => prev + 1);
+    setAttemptCount((prev) => prev + 1);
     setLastAttemptTime(Date.now());
 
     if (!user?.email) {
@@ -109,10 +117,11 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
 
     try {
       // Re-authenticate using the provided password
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
-        password,
-      });
+      const { data, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email: user.email,
+          password,
+        });
 
       if (signInError) {
         setError("Falsches Passwort!");
@@ -135,7 +144,6 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ userId: user.id }),
       });
 
       if (!response.ok) {
@@ -147,7 +155,7 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
       onDeleteSuccess?.();
       handleCancel();
     } catch (err: any) {
-      if (err.name === 'AbortError') {
+      if (err.name === "AbortError") {
         setError("Zeitüberschreitung. Bitte versuche es erneut.");
       } else {
         setError(err.message || "Etwas ist schiefgelaufen");
@@ -173,20 +181,23 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                 Account Löschen
               </ThemedText>
               <ThemedText style={styles.warningText}>
-                Bist du sicher, dass du deinen Account löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.
+                Bist du sicher, dass du deinen Account löschen möchtest? Diese
+                Aktion kann nicht rückgängig gemacht werden.
               </ThemedText>
               <ThemedText style={styles.warningSubText}>
                 Alle deine Daten werden permanent gelöscht.
               </ThemedText>
               <View style={styles.buttonRow}>
-                <TouchableOpacity 
-                  style={[styles.button, styles.deleteButton]} 
+                <TouchableOpacity
+                  style={[styles.button, styles.deleteButton]}
                   onPress={handleProceedToPassword}
                 >
-                  <Text style={styles.buttonTextDelete}>Ja, Account löschen</Text>
+                  <Text style={styles.buttonTextDelete}>
+                    Ja, Account löschen
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.button, styles.cancelButton]} 
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
                   onPress={handleCancel}
                 >
                   <Text style={styles.buttonTextCancel}>Abbrechen</Text>
@@ -208,7 +219,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                 <TextInput
                   style={[styles.passwordInput, themeStyles.text]}
                   placeholder="Passwort"
-                  placeholderTextColor={colorScheme === "dark" ? "#888" : "#666"}
+                  placeholderTextColor={
+                    colorScheme === "dark" ? "#888" : "#666"
+                  }
                   secureTextEntry={!showPassword}
                   value={password}
                   onChangeText={setPassword}
@@ -227,18 +240,26 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               </View>
 
               {error && <Text style={styles.error}>{error}</Text>}
-              {loading && <ActivityIndicator size="small" color={Colors.universal.link} />}
+              {loading && (
+                <ActivityIndicator size="small" color={Colors.universal.link} />
+              )}
 
               <View style={styles.buttonRow}>
-                <TouchableOpacity 
-                  style={[styles.button, styles.deleteButton, loading || password.length === 0 ? styles.disabledButton : null]} 
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    styles.deleteButton,
+                    loading || password.length === 0
+                      ? styles.disabledButton
+                      : null,
+                  ]}
                   onPress={handleConfirm}
                   disabled={loading || password.length === 0}
                 >
                   <Text style={styles.buttonTextDelete}>Bestätigen</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.button, styles.cancelButton]} 
+                <TouchableOpacity
+                  style={[styles.button, styles.cancelButton]}
                   onPress={handleCancel}
                   disabled={loading}
                 >
@@ -294,8 +315,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
@@ -325,7 +346,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     minWidth: 120,
-    alignItems: 'center',
+    alignItems: "center",
   },
   deleteButton: {
     backgroundColor: "#dc3545",
