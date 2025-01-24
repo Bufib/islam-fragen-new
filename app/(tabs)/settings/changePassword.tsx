@@ -443,7 +443,7 @@ const ChangePassword = () => {
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
-          "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+          "3. Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
         );
       } else if (token === "cancel") {
         setShowCaptcha(false);

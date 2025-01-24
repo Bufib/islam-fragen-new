@@ -9,6 +9,7 @@ type AuthStore = {
   session: Session | null;
   username: string;
   isAdmin: boolean;
+  isModerator: boolean;
   isLoggedIn: boolean;
   isPersisted: boolean;
   setSession: (session: Session | null, persist: boolean) => Promise<void>;
@@ -22,6 +23,7 @@ type AuthStore = {
 export const useAuthStore = create<AuthStore>((set, get) => ({
   session: null,
   isAdmin: false,
+  isModerator: false,
   isLoggedIn: false,
   isPersisted: false,
   username: "",
@@ -59,6 +61,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         // Fetch the user's role from the user_roles table
         const { role, username } = await get().getUserRole(session.user.id);
         const isAdmin = role === "admin";
+        const isModerator = role === "moderator";
 
         // Save persistence preference
         await AsyncStorage.setItem(PERSIST_LOGIN_KEY, String(persist));
@@ -67,6 +70,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         set({
           session,
           isAdmin,
+          isModerator,
           isLoggedIn: true,
           isPersisted: persist,
           username: username || "",
@@ -85,6 +89,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       set({
         session: null,
         isAdmin: false,
+        isModerator: false,
         isLoggedIn: false,
         isPersisted: false,
       });
@@ -107,11 +112,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           // Fetch the user's role and username
           const { role, username } = await get().getUserRole(session.user.id); // Destructure role and username
           const isAdmin = role === "admin"; // Compare role properly
+          const isModerator = role === "moderator";
+
 
           // Update the state with session, role, and username
           set({
             session,
             isAdmin,
+            isModerator,
             isLoggedIn: true,
             isPersisted: true,
             username: username || "", // Use the destructured username

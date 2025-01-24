@@ -1,11 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Switch,
-  Appearance,
-  Pressable,
-} from "react-native";
+import { StyleSheet, View, Switch, Appearance, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
@@ -21,6 +15,8 @@ import handleLogout from "@/utils/handleLogout";
 import { getQuestionCount } from "@/utils/initializeDatabase";
 import handleOpenExternalUrl from "@/utils/handleOpenExternalUrl";
 import { Image } from "expo-image";
+import DeleteUserModal from "@/components/DeleteUserModal";
+import Toast from "react-native-toast-message";
 
 const Settings = () => {
   const colorScheme = useColorScheme();
@@ -30,11 +26,20 @@ const Settings = () => {
   const [paypalLink, setPaypalLink] = useState<string>("");
   const [version, setVersion] = useState<string | null>("");
   const [questionCount, setQuestionCount] = useState<number | null>(0);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
-  const email = "frage@islamische-fragen.de";
-  const subject = "Account Löschen";
-  const body =
-    "Salam, ich würde gerne mein Account löschen. Mein Benutzername lautet: Salam";
+  const { session } = useAuthStore();
+
+  const handleDeleteSuccess = () => {
+    clearSession(); // SignOut and remove session
+    router.replace("/(tabs)/home/");
+    Toast.show({
+      type: "success",
+      text1: "Account erfolgreich gelöscht!",
+      text1Style: { fontWeight: "500" },
+      topOffset: 60,
+    });
+  };
 
   useEffect(() => {
     const savedColorSetting = Storage.getItemSync("isDarkMode");
@@ -132,7 +137,12 @@ const Settings = () => {
 
         {isLoggedIn && (
           <>
-            <ThemedText style={styles.linkText}>Account löschen</ThemedText>
+            <ThemedText
+              style={styles.linkText}
+              onPress={() => setOpenDeleteModal(true)}
+            >
+              Account löschen
+            </ThemedText>
 
             <ThemedText
               style={styles.linkText}
@@ -191,6 +201,12 @@ const Settings = () => {
           Impressum
         </ThemedText>
       </ThemedView>
+      <DeleteUserModal
+        isVisible={openDeleteModal}
+        onClose={() => setOpenDeleteModal(false)}
+        onDeleteSuccess={handleDeleteSuccess}
+        serverUrl="https://your-api-url.com" // Replace with your actual server URL
+      />
     </SafeAreaView>
   );
 };

@@ -28,7 +28,7 @@ export default function NewsFeed() {
     showUpdateButton,
     handleRefresh: refetch,
     isRefetching,
-    isLoading
+    isLoading,
   } = useFetchNews();
 
   const themeStyles = coustomTheme();
@@ -39,7 +39,7 @@ export default function NewsFeed() {
     // Scroll to top after refetch
     flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
   };
-  const isAdmin = useAuthStore((state) => state.isAdmin);
+  const { isAdmin } = useAuthStore();
 
   const ListFooter = () => {
     if (!hasNextPage) return null;
@@ -76,7 +76,11 @@ export default function NewsFeed() {
   if (!news || news.length === 0) {
     return (
       <SafeAreaView
-        style={[styles.container, themeStyles.defaultBackgorundColor, {justifyContent: "center", alignItems: "center"}]}
+        style={[
+          styles.container,
+          themeStyles.defaultBackgorundColor,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
         edges={["top"]}
       >
         <ThemedText>Es gibt derzeit noch keine Nachrichten!</ThemedText>
@@ -102,15 +106,15 @@ export default function NewsFeed() {
         <ThemedText style={styles.headerText} type="title">
           Neuigkeiten
         </ThemedText>
-        {isAdmin && (
-          <Ionicons
-            name="add-circle-outline"
-            size={35}
-            color={colorScheme === "dark" ? "white" : "black"}
-            style={styles.addIcon}
-            onPress={() => router.push("/news/addNews")}
-          />
-        )}
+        {isAdmin  && (
+            <Ionicons
+              name="add-circle-outline"
+              size={35}
+              color={colorScheme === "dark" ? "white" : "black"}
+              style={styles.addIcon}
+              onPress={() => router.push("/news/addNews")}
+            />
+          )}
       </ThemedView>
 
       <FlashList

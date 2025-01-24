@@ -1092,7 +1092,7 @@ export default function SignUpScreen() {
       setShowCaptcha(false);
       Alert.alert(
         "Fehler",
-        "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+        "2. Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
       );
     } else if (token === "cancel") {
       setShowCaptcha(false);

@@ -243,7 +243,7 @@ export default function AskQuestionScreen() {
         setShowCaptcha(false);
         Alert.alert(
           "Fehler",
-          "Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
+          "4. Captcha-Überprüfung fehlgeschlagen. Bitte versuche es erneut."
         );
         return;
 
