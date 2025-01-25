@@ -183,8 +183,8 @@ export type QuestionFromUser = {
   status: "Beantwortet" | "Beantwortung steht noch aus" | "Abgelehnt";
   marja: string;
   title: string;
-  user_gender: string;
-  user_age: string;
+  gender: string;
+  age: string;
   internal_url: string[];
   created_at: string;
   approval_status: string

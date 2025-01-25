@@ -76,14 +76,28 @@ export default function NewsFeed() {
   if (!news || news.length === 0) {
     return (
       <SafeAreaView
-        style={[
-          styles.container,
-          themeStyles.defaultBackgorundColor,
-          { justifyContent: "center", alignItems: "center" },
-        ]}
+        style={[styles.container, themeStyles.defaultBackgorundColor]}
         edges={["top"]}
       >
-        <ThemedText>Es gibt derzeit noch keine Nachrichten!</ThemedText>
+        <ThemedView style={styles.headerContainer}>
+          <ThemedText style={styles.headerText} type="title">
+            Neuigkeiten
+          </ThemedText>
+          {isAdmin && (
+            <Ionicons
+              name="add-circle-outline"
+              size={35}
+              color={colorScheme === "dark" ? "white" : "black"}
+              style={styles.addIcon}
+              onPress={() => router.push("/news/addNews")}
+            />
+          )}
+        </ThemedView>
+        <ThemedView
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ThemedText>Es gibt derzeit noch keine Nachrichten!</ThemedText>
+        </ThemedView>
       </SafeAreaView>
     );
   }
@@ -106,15 +120,15 @@ export default function NewsFeed() {
         <ThemedText style={styles.headerText} type="title">
           Neuigkeiten
         </ThemedText>
-        {isAdmin  && (
-            <Ionicons
-              name="add-circle-outline"
-              size={35}
-              color={colorScheme === "dark" ? "white" : "black"}
-              style={styles.addIcon}
-              onPress={() => router.push("/news/addNews")}
-            />
-          )}
+        {isAdmin && (
+          <Ionicons
+            name="add-circle-outline"
+            size={35}
+            color={colorScheme === "dark" ? "white" : "black"}
+            style={styles.addIcon}
+            onPress={() => router.push("/news/addNews")}
+          />
+        )}
       </ThemedView>
 
       <FlashList

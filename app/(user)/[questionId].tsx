@@ -123,7 +123,7 @@ export default function QuestionDetailScreen() {
             Geschlecht: {question.user_gender}
           </Text>
           <Text style={[styles.bubbleText, styles.informationText]}>
-            Alter: {question.user_age}
+            Alter: {question.age}
           </Text>
           {/* Spacer */}
           <View style={{ marginBottom: 10 }}></View>
