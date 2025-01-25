@@ -120,7 +120,7 @@ export default function QuestionDetailScreen() {
             Marja: {question.marja}
           </Text>
           <Text style={[styles.bubbleText, styles.informationText]}>
-            Geschlecht: {question.user_gender}
+            Geschlecht: {question.gender}
           </Text>
           <Text style={[styles.bubbleText, styles.informationText]}>
             Alter: {question.age}
