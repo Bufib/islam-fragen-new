@@ -138,14 +138,14 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
       }
 
       // Make DELETE request to your server with timeout
-      const response = await fetchWithTimeout(`${serverUrl}/delete-user`, {
-        method: "DELETE",
+      const response = await fetchWithTimeout(`${serverUrl}/delete-account`, {
+        method: "POST", // Changed to POST as our Edge Function expects POST
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
+      
       if (!response.ok) {
         const respJson = await response.json();
         throw new Error(respJson.error || "Fehler beim Löschen des Accounts");
