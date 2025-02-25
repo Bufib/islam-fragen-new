@@ -2,13 +2,13 @@ import { Sizes } from "./types";
   
   export const returnSize = (width: number, height: number): Sizes => {
     const isLarge = width > 380 && height > 900;
-    const isMedium = width < 380 && height > 750;
+    const isMedium = width < 380 && height > 700;
   
     return {
       elementSize: isLarge ? 120 : isMedium ? 110 : 90,
       fontSize: isLarge ? 13 : isMedium ? 12 : 11,
       iconSize: isLarge ? 65 : isMedium ? 60 : 50,
-      imageSize: isLarge ? 300 : isMedium ? 250 : 200,
+      imageSize: isLarge ? 300 : isMedium ? 280 : 200,
       gap: isLarge ? 30 : isMedium ? 20 : 15
     };
   };
