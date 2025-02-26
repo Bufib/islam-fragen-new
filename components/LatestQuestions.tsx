@@ -18,7 +18,7 @@ import { useInitializeDatabase } from "@/hooks/useInitializeDatabase.ts";
 const LatestQuestions: React.FC = () => {
   const [latestQuestions, setLatestQuestions] = useState<QuestionType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-const dbInitialized = useInitializeDatabase();
+  const dbInitialized = useInitializeDatabase();
   const themeStyles = CoustomTheme();
   const colorScheme = useColorScheme();
 
@@ -59,6 +59,9 @@ const dbInitialized = useInitializeDatabase();
   };
 
   useEffect(() => {
+    if (!dbInitialized) {
+      return;
+    }
     const loadLatestQuestions = async () => {
       setIsLoading(true);
       try {
