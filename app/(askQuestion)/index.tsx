@@ -23,6 +23,7 @@ import { NoInternet } from "@/components/NoInternet";
 import { QuestionFromUser } from "@/utils/types";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
+import Toast from "react-native-toast-message";
 export default function QuestionsList() {
   // 1. Check auth state from the store
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
@@ -115,6 +116,7 @@ export default function QuestionsList() {
     return (
       <ThemedView style={styles.container}>
         <View style={styles.centered}>
+          <NoInternet showToast={true} showUI={true} />
           <ThemedText style={styles.errorText}>
             {userQuestionErrorLoadingQuestions}
           </ThemedText>
@@ -130,6 +132,7 @@ export default function QuestionsList() {
             </ThemedText>
           </Pressable>
         </View>
+        <Toast />
       </ThemedView>
     );
   }
@@ -181,10 +184,7 @@ export default function QuestionsList() {
       />
 
       <Pressable
-        style={[
-          styles.askQuestionButton,
-          !hasInternet && styles.disabled
-        ]}
+        style={[styles.askQuestionButton, !hasInternet && styles.disabled]}
         onPress={() => router.push("/(askQuestion)/askQuestion")}
         disabled={!hasInternet}
       >

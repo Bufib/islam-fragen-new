@@ -2,7 +2,7 @@
   "expo": {
     "name": "Islam-Fragen", // von klein zu groß
     "slug": "islam-fragen",
-    "version": "10.0.0",
+    "version": "11.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -27,7 +27,7 @@
       "package": "com.bufib.islamFragen",
       "googleServicesFile": "./android/app/google-services.json",
       "permissions": ["android.permission.RECORD_AUDIO"],
-      "versionCode": 9
+      "versionCode": 10
     },
     "web": {
       "bundler": "metro",
@@ -45,7 +45,7 @@
             "image": "./assets/images/splash-icon-dark.png",
             "backgroundColor": "#242c40"
           },
-          "imageWidth": 200
+          "imageWidth": 500
         }
       ],
       [
