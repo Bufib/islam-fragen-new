@@ -2,7 +2,7 @@ import { Sizes } from "./types";
   
   export const returnSize = (width: number, height: number): Sizes => {
     const isLarge = width > 380 && height > 900;
-    const isMedium = width < 380 && height > 700;
+    const isMedium = width < 380 && height > 650;
   
     return {
       elementSize: isLarge ? 120 : isMedium ? 110 : 90,

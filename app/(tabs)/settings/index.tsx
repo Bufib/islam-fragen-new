@@ -101,9 +101,7 @@ const Settings = () => {
         </ThemedText>
 
         <Pressable
-          onPress={
-            isLoggedIn ? logout : () => router.push("/(auth)/login")
-          }
+          onPress={isLoggedIn ? logout : () => router.push("/(auth)/login")}
           style={({ pressed }) => [
             styles.buttonContainer,
             {

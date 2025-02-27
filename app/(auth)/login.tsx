@@ -29,6 +29,7 @@ import {
 import { Colors } from "@/constants/Colors";
 import { NoInternet } from "@/components/NoInternet";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
+import useNotificationStore from "@/stores/notificationStore";
 
 // Login data schema
 const loginSchema = z.object({
@@ -75,6 +76,11 @@ export default function LoginScreen() {
         setTimeout(async () => {
           try {
             await setSession(session, stayLoggedIn);
+            // Check and request notification permission
+            const notificationStore = useNotificationStore.getState();
+            if (notificationStore.permissionStatus === "undetermined") {
+              await notificationStore.toggleGetNotifications();
+            }
             reset();
             Toast.show({
               type: "success",
