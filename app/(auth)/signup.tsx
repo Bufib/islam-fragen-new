@@ -51,8 +51,8 @@ const schema = z
       .string({ required_error: signUpUsernameNotEmpty })
       .min(3, signUpUserNameMin)
       .regex(
-        /^[a-zA-Z0-9_]+$/,
-        "Der Benutzername darf nur Buchstaben, Zahlen und Unterstriche enthalten."
+       /^[a-zA-Z0-9_-]+$/,
+        "Der Benutzername darf nur Buchstaben, Zahlen, Binde- und Unterstriche enthalten."
       ),
     email: z
       .string({ required_error: "E-mail darf nicht leer sein." })
@@ -61,7 +61,8 @@ const schema = z
       .string({ required_error: signUpPasswordNotEmpty })
       .min(8, signUpUserPasswordMin)
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^+=\-]).{8,}$/,
+        // /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=\-\[\]{};\:"\\|'<>?,./~]).{8,}$/,
         signUpUserPasswordFormat
       ),
     confirmPassword: z

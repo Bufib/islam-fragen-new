@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    padding: 20,
+    padding: 10,
     borderTopWidth: 1,
     borderTopColor: "rgba(0,0,0,0.1)",
   },

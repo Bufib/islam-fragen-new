@@ -407,7 +407,7 @@ import { CoustomTheme } from "@/utils/coustomTheme";
 import { TouchableWithoutFeedback } from "react-native";
 import { NoInternet } from "./NoInternet";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
-
+import { signUpUserPasswordFormat } from "@/constants/messages";
 /**
  * Schema for resetting password.
  */
@@ -422,8 +422,8 @@ const schema = z
       .nonempty("Password wird benötigt")
       .min(8, "Passwort muss mindestens 8 Zeichen lang sein")
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^+=\-]).{8,}$/,
-        "Passwort muss mind. einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen enthalten"
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=\-\[\]{};\:"\\|'<>?,./~]).{8,}$/,
+        signUpUserPasswordFormat
       ),
     confirmPassword: z
       .string({ required_error: "Password wird benötigt" })
@@ -570,11 +570,11 @@ export function ResetPassword() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView
-           behavior={Platform.OS === "ios" ? "padding" : "height"}
-           style={[styles.container, themeStyles.defaultBackgorundColor]}
-           keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-           enabled
-         >
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={[styles.container, themeStyles.defaultBackgorundColor]}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+        enabled
+      >
         <NoInternet showUI={true} showToast={false} />
         {/* CODE FIELD */}
         <Controller
@@ -767,7 +767,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   disable: {
-    opacity: 0.5
+    opacity: 0.5,
   },
   disabledButton: {
     color: Colors.universal.error,
