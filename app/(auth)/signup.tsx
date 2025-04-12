@@ -51,7 +51,7 @@ const schema = z
       .string({ required_error: signUpUsernameNotEmpty })
       .min(3, signUpUserNameMin)
       .regex(
-       /^[a-zA-Z0-9_-]+$/,
+        /^[a-zA-Z0-9_-]+$/,
         "Der Benutzername darf nur Buchstaben, Zahlen, Binde- und Unterstriche enthalten."
       ),
     email: z
@@ -429,7 +429,8 @@ export default function SignUpScreen() {
         <NoInternet showUI={true} showToast={false} />
         <View style={[styles.contentContainer, themeStyles.contrast]}>
           <ThemedText style={styles.title} type="subtitle">
-          Erstelle jetzt einen kostenlosen Account, um deine Fragen versenden zu können.
+            Erstelle jetzt einen kostenlosen Account, um deine Fragen versenden
+            zu können.
           </ThemedText>
 
           {/* Username Field */}
@@ -595,8 +596,20 @@ export default function SignUpScreen() {
               <ThemedText style={styles.modalTitle}>
                 E-Mail-Verifizierung
               </ThemedText>
-              <ThemedText style={styles.modalSubtitle}>
+              <ThemedText style={[styles.modalSubtitle, { fontWeight: 500 }]}>
                 Bitte gib den Code ein, der an {currentEmail} gesendet wurde.
+              </ThemedText>
+              <ThemedText
+                style={[
+                  styles.modalSubtitle,
+                  {
+                    fontStyle: "italic",
+                    fontWeight: 300,
+                  },
+                ]}
+              >
+                Falls du keinen Code bekommen hast, überpürfe erste deinen
+                Spam-Ordner, bevor du einen neuen anforderst!
               </ThemedText>
               <TextInput
                 style={[styles.input, themeStyles.text]}

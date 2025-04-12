@@ -27,6 +27,8 @@ import useNotificationStore from "@/stores/notificationStore";
 import { useInitializeDatabase } from "@/hooks/useInitializeDatabase.ts";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
 import { NoInternet } from "@/components/NoInternet";
+import Constants from "expo-constants";
+
 const Settings = () => {
   const colorScheme = useColorScheme();
   const [isDarkMode, setIsDarkMode] = useState(colorScheme === "dark");
@@ -119,13 +121,10 @@ const Settings = () => {
       <ScrollView style={styles.scrollView}>
         <NoInternet showToast={false} showUI={true} />
         <View style={styles.section}>
-          {isLoggedIn ? (
-            <ThemedText style={styles.sectionTitle}>
-              Darstellung & Benachrichtigung
-            </ThemedText>
-          ) : (
-            <ThemedText style={styles.sectionTitle}>Darstellung</ThemedText>
-          )}
+          <ThemedText style={styles.sectionTitle}>
+            Darstellung & Benachrichtigung
+          </ThemedText>
+          <ThemedText style={styles.sectionTitle}>Darstellung</ThemedText>
 
           <View style={styles.settingRow}>
             <View>
@@ -146,29 +145,27 @@ const Settings = () => {
               }
             />
           </View>
-          {isLoggedIn && (
-            <View style={styles.settingRow}>
-              <View>
-                <ThemedText style={styles.settingTitle}>
-                  Benachrichtigungen
-                </ThemedText>
-                <ThemedText style={styles.settingSubtitle}>
-                  Push-Benachrichtigungen erhalten
-                </ThemedText>
-              </View>
-              <Switch
-                value={getNotifications}
-                onValueChange={hasInternet ? toggleGetNotifications : undefined}
-                trackColor={{
-                  false: Colors.light.trackColor,
-                  true: Colors.dark.trackColor,
-                }}
-                thumbColor={
-                  isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
-                }
-              />
+          <View style={styles.settingRow}>
+            <View>
+              <ThemedText style={styles.settingTitle}>
+                Benachrichtigungen
+              </ThemedText>
+              <ThemedText style={styles.settingSubtitle}>
+                Push-Benachrichtigungen erhalten
+              </ThemedText>
             </View>
-          )}
+            <Switch
+              value={getNotifications}
+              onValueChange={hasInternet ? toggleGetNotifications : undefined}
+              trackColor={{
+                false: Colors.light.trackColor,
+                true: Colors.dark.trackColor,
+              }}
+              thumbColor={
+                isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
+              }
+            />
+          </View>
         </View>
 
         {isLoggedIn && (
@@ -211,9 +208,15 @@ const Settings = () => {
           </ThemedText>
 
           {isAdmin && isLoggedIn && (
-            <ThemedText style={styles.versionText}>
-              Version: {version}
-            </ThemedText>
+            <>
+              <ThemedText style={styles.versionText}>
+                Datenbank-version: {version}
+              </ThemedText>
+
+              <ThemedText style={styles.versionText}>
+                App-Version: {Constants.expoConfig?.version}
+              </ThemedText>
+            </>
           )}
         </View>
 
@@ -346,9 +349,9 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: "row",
     justifyContent: "space-evenly",
-    padding: 10,
     borderTopWidth: 1,
     borderTopColor: "rgba(0,0,0,0.1)",
+    marginBottom: 60,
   },
   footerLink: {
     color: Colors.universal.link,
