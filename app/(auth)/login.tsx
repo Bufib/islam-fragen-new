@@ -78,6 +78,7 @@ export default function LoginScreen() {
             await setSession(session, stayLoggedIn);
             // Check and request notification permission
             const notificationStore = useNotificationStore.getState();
+            console.log(notificationStore);
             if (notificationStore.permissionStatus === "undetermined") {
               await notificationStore.toggleGetNotifications();
             }
