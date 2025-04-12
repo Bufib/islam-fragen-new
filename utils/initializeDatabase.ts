@@ -580,7 +580,7 @@ export const getLatestQuestions = async (
     const rows = await db.getAllAsync<QuestionType>(
       `
       SELECT * FROM question
-      ORDER BY datetime(created_at) ASC
+      ORDER BY datetime(created_at) DESC
       LIMIT ?;
     `,
       [limit]
