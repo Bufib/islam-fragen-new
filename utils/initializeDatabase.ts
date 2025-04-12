@@ -11,6 +11,7 @@ import {
 import debounce from "lodash/debounce";
 import { Alert, Platform } from "react-native";
 import handleOpenExternalUrl from "./handleOpenExternalUrl";
+import Constants from "expo-constants";
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
 
@@ -88,28 +89,22 @@ export const initializeDatabase = async () => {
   // Check if versions in Storage are up to date.
   const checkVersion = async () => {
     try {
-      // Check data version for your questions and related content.
+      // Data version check for your questions.
       const versionFromStorage = await Storage.getItem("version");
       const versionFromSupabase = await fetchVersionFromSupabase();
-
       if (versionFromSupabase && versionFromStorage !== versionFromSupabase) {
         await fetchQuestionsFromSupabase();
         await fetchPayPalLink();
         await Storage.setItemSync("version", versionFromSupabase);
       }
 
-      // Check app version for whole app updates.
-      let appVersionFromStorage = await Storage.getItem("app_version");
+      // App version check: Compare current app version to the version required from Supabase.
+      const currentAppVersion = Constants.expoConfig?.version;
       const appVersionFromSupabase = await fetchAppVersionFromSupabase();
-
-      // If this is the first launch (no stored version), store it and do nothing else.
-      if (!appVersionFromStorage && appVersionFromSupabase) {
-        await Storage.setItemSync("app_version", appVersionFromSupabase);
-      }
-      // Otherwise, if the stored app version is out-of-date, alert the user.
-      else if (
-        appVersionFromStorage &&
-        appVersionFromStorage !== appVersionFromSupabase
+      if (
+        currentAppVersion &&
+        appVersionFromSupabase &&
+        currentAppVersion !== appVersionFromSupabase
       ) {
         Alert.alert(
           "Update Verfügbar",
@@ -121,8 +116,6 @@ export const initializeDatabase = async () => {
             },
           ]
         );
-        // Update the stored version after alerting the user.
-        await Storage.setItemSync("app_version", appVersionFromSupabase);
       }
     } catch (error: any) {
       console.error(
