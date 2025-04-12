@@ -34,7 +34,7 @@ export const useAppReviewStore = create<AppReviewState>((set, get) => ({
     const daysSinceInstall = installDate
       ? (now - installDate) / (1000 * 60 * 60 * 24)
       : 0;
-    const thresholdDays = 2; // Only show after 7 days
+    const thresholdDays = 3; // Only show after 3 days
     // If "remind me later" is set and the current time is before that date, do not show.
     if (remindLaterDate && now < remindLaterDate) return false;
 
