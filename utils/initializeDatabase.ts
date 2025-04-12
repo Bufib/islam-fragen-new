@@ -352,28 +352,28 @@ export const getQuestionCount = async (): Promise<number> => {
   }
 };
 
-const syncSingleQuestion = async (question: QuestionType) => {
-  const db = await getDatabase();
-  await db.runAsync(
-    `
-    INSERT OR REPLACE INTO question
-    (id, title, question, answer, answer_sistani, answer_khamenei, category_name, subcategory_name, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-  `,
-    [
-      question.id,
-      question.title,
-      question.question,
-      question.answer,
-      question.answer_sistani,
-      question.answer_khamenei,
-      question.category_name,
-      question.subcategory_name,
-      question.created_at,
-    ]
-  );
-  console.log("Question synced:", question.id);
-};
+// const syncSingleQuestion = async (question: QuestionType) => {
+//   const db = await getDatabase();
+//   await db.runAsync(
+//     `
+//     INSERT OR REPLACE INTO question
+//     (id, title, question, answer, answer_sistani, answer_khamenei, category_name, subcategory_name, created_at)
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+//   `,
+//     [
+//       question.id,
+//       question.title,
+//       question.question,
+//       question.answer,
+//       question.answer_sistani,
+//       question.answer_khamenei,
+//       question.category_name,
+//       question.subcategory_name,
+//       question.created_at,
+//     ]
+//   );
+//   console.log("Question synced:", question.id);
+// };
 
 const createFavoritesTable = async () => {
   const db = await getDatabase();
@@ -461,11 +461,11 @@ export const getFavoriteQuestions = async (): Promise<QuestionType[]> => {
   }
 };
 
-const deleteQuestionFromSQLite = async (questionId: number) => {
-  const db = await getDatabase();
-  await db.runAsync(`DELETE FROM question WHERE id = ?;`, [questionId]);
-  console.log("Question deleted:", questionId);
-};
+// const deleteQuestionFromSQLite = async (questionId: number) => {
+//   const db = await getDatabase();
+//   await db.runAsync(`DELETE FROM question WHERE id = ?;`, [questionId]);
+//   console.log("Question deleted:", questionId);
+// };
 
 export const getSubcategoriesForCategory = async (
   categoryName: string

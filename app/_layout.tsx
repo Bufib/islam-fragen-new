@@ -26,6 +26,7 @@ import ReMountManager from "@/components/ReMountManager";
 import { View, Text } from "react-native";
 import { useConnectionStatus } from "@/hooks/useConnectionStatus";
 import { Colors } from "@/constants/Colors";
+import AppReviewPrompt from "@/components/AppReviewPrompt";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -196,6 +197,7 @@ export default function RootLayout() {
                 />
                 <Stack.Screen name="+not-found" />
               </Stack>
+              <AppReviewPrompt />
               <StatusBar style="auto" />
             </SQLiteProvider>
           </SupabaseRealtimeProvider>
