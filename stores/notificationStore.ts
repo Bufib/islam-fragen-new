@@ -124,7 +124,7 @@ const useNotificationStore = create<NotificationState>()(
     (set, get) => {
       // Removed AppState listener from here.
       return {
-        getNotifications: Platform.OS === 'ios' ? "false" : "true",
+        getNotifications: Platform.OS === "ios" ? false : true,
         permissionStatus: "undetermined",
         checkPermissions: async () => {
           try {

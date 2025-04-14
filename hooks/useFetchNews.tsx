@@ -61,10 +61,10 @@ export const useFetchNews = () => {
       return allPages.length;
     },
     maxPages: 4,
-    staleTime: 900000,  // 15 min 
-    gcTime: 3600000, // 1 hour
+    staleTime: 0, 
+    gcTime: 86400000, // 1 day
     refetchOnMount: true,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
 
