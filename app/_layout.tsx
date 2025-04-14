@@ -12,7 +12,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useInitializeDatabase } from "@/hooks/useInitializeDatabase.ts";
 import { SQLiteProvider } from "expo-sqlite";
 import Toast from "react-native-toast-message";
-import { ActivityIndicator, Appearance } from "react-native";
+import { ActivityIndicator, Appearance, Platform } from "react-native";
 import { Storage } from "expo-sqlite/kv-store";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/utils/queryClient";
@@ -67,6 +67,17 @@ export default function RootLayout() {
     hydrateStores();
   }, []);
 
+  // Request notification permission on first launch for iOS.
+  useEffect(() => {
+    if (storesHydrated && Platform.OS === "ios") {
+      const { getNotifications, permissionStatus, toggleGetNotifications } =
+        useNotificationStore.getState();
+      if (!getNotifications && permissionStatus === "undetermined") {
+        toggleGetNotifications();
+      }
+    }
+  }, [storesHydrated]);
+
   // Session restoration effect
   useEffect(() => {
     const initSession = async () => {
@@ -77,11 +88,11 @@ export default function RootLayout() {
   }, []);
 
   //! Store push token
-  // useEffect(() => {
-  //   if (expoPushToken?.data) {
-  //     console.log("Push Token:", expoPushToken.data);
-  //   }
-  // }, [expoPushToken]);
+  useEffect(() => {
+    if (expoPushToken?.data) {
+      console.log("Push Token:", expoPushToken.data);
+    }
+  }, [expoPushToken]);
 
   //! Handle notifications
   // useEffect(() => {
