@@ -128,7 +128,6 @@ const styles = StyleSheet.create({
   flatListStyle: {
     paddingTop: 10,
     paddingHorizontal: 10,
-    
   },
   item: {
     flexDirection: "row",
@@ -138,7 +137,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 8,
     borderWidth: 0.5,
-
   },
   questionContainer: {
     flex: 1,

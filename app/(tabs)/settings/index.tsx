@@ -40,10 +40,12 @@ const Settings = () => {
   const [version, setVersion] = useState<string | null>("");
   const [questionCount, setQuestionCount] = useState<number | null>(0);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const { getNotifications, toggleGetNotifications } = useNotificationStore();
+  const { getNotifications, toggleGetNotifications, permissionStatus } = useNotificationStore();
   const dbInitialized = useInitializeDatabase();
   const hasInternet = useConnectionStatus();
   const logout = useLogout();
+  const effectiveEnabled = getNotifications && permissionStatus === "granted";
+
 
   const handleDeleteSuccess = () => {
     clearSession(); // SignOut and remove session
@@ -121,10 +123,13 @@ const Settings = () => {
       <ScrollView style={styles.scrollView}>
         <NoInternet showToast={false} showUI={true} />
         <View style={styles.section}>
-          <ThemedText style={styles.sectionTitle}>
-            Darstellung & Benachrichtigung
-          </ThemedText>
-          <ThemedText style={styles.sectionTitle}>Darstellung</ThemedText>
+          {isLoggedIn ? (
+            <ThemedText style={styles.sectionTitle}>
+              Darstellung & Benachrichtigung
+            </ThemedText>
+          ) : (
+            <ThemedText style={styles.sectionTitle}>Darstellung</ThemedText>
+          )}
 
           <View style={styles.settingRow}>
             <View>
@@ -145,27 +150,30 @@ const Settings = () => {
               }
             />
           </View>
-          <View style={styles.settingRow}>
-            <View>
-              <ThemedText style={styles.settingTitle}>
-                Benachrichtigungen
-              </ThemedText>
-              <ThemedText style={styles.settingSubtitle}>
-                Push-Benachrichtigungen erhalten
-              </ThemedText>
+          {isLoggedIn && (
+            <View style={styles.settingRow}>
+              <View>
+                <ThemedText style={styles.settingTitle}>
+                  Benachrichtigungen
+                </ThemedText>
+                <ThemedText style={styles.settingSubtitle}>
+                  Push-Benachrichtigungen erhalten
+                </ThemedText>
+              </View>
+              <Switch
+                //! value={getNotifications}
+                value={effectiveEnabled}
+                onValueChange={hasInternet ? toggleGetNotifications : undefined}
+                trackColor={{
+                  false: Colors.light.trackColor,
+                  true: Colors.dark.trackColor,
+                }}
+                thumbColor={
+                  isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
+                }
+              />
             </View>
-            <Switch
-              value={getNotifications}
-              onValueChange={hasInternet ? toggleGetNotifications : undefined}
-              trackColor={{
-                false: Colors.light.trackColor,
-                true: Colors.dark.trackColor,
-              }}
-              thumbColor={
-                isDarkMode ? Colors.light.thumbColor : Colors.dark.thumbColor
-              }
-            />
-          </View>
+          )}
         </View>
 
         {isLoggedIn && (

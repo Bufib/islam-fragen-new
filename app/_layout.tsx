@@ -87,12 +87,12 @@ export default function RootLayout() {
     initSession();
   }, []);
 
-  //! Store push token
-  useEffect(() => {
-    if (expoPushToken?.data) {
-      console.log("Push Token:", expoPushToken.data);
-    }
-  }, [expoPushToken]);
+  // //! Store push token
+  // useEffect(() => {
+  //   if (expoPushToken?.data) {
+  //     console.log("Push Token:", expoPushToken.data);
+  //   }
+  // }, [expoPushToken]);
 
   //! Handle notifications
   // useEffect(() => {
