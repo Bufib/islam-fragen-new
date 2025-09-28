@@ -152,7 +152,7 @@ const RenderQuestion = ({
                 </View>
               ) : (
                 <AntDesign
-                  name="copy1"
+                  name="copy"
                   size={24}
                   color={colorScheme === "dark" ? "#fff" : "#000"}
                   style={styles.copyIcon}
@@ -190,7 +190,7 @@ const RenderQuestion = ({
                   </View>
                 ) : (
                   <AntDesign
-                    name="copy1"
+                    name="copy"
                     size={24}
                     color={colorScheme === "dark" ? "#fff" : "#000"}
                     style={styles.copyIcon}
@@ -230,7 +230,7 @@ const RenderQuestion = ({
                   </View>
                 ) : (
                   <AntDesign
-                    name="copy1"
+                    name="copy"
                     size={24}
                     color={colorScheme === "dark" ? "#fff" : "#000"}
                     style={styles.copyIcon}

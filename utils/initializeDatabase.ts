@@ -730,16 +730,16 @@ export const initializeDatabase = async () => {
         appVersionFromSupabase &&
         currentAppVersion !== appVersionFromSupabase
       ) {
-        Alert.alert(
-          "Update Verfügbar",
-          "Eine neue version ist im App-Store verfügbar!",
-          [
-            {
-              text: "Update",
-              onPress: () => handleOpenExternalUrl(getStoreURL()),
-            },
-          ]
-        );
+        // Alert.alert(
+        //   "Update Verfügbar",
+        //   "Eine neue version ist im App-Store verfügbar!",
+        //   [
+        //     {
+        //       text: "Update",
+        //       onPress: () => handleOpenExternalUrl(getStoreURL()),
+        //     },
+        //   ]
+        // );
       }
     } catch (error: any) {
       console.error(

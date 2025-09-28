@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Islam-Fragen", // von klein zu groß
+    "name": "Islam-Fragen",
     "slug": "islam-fragen",
-    "version": "12.0.0",
+    "version": "2.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -14,7 +14,9 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select images.",
         "CFBundleAllowMixedLocalizations": true,
-        "CFBundleLocalizations": ["de"],
+        "CFBundleLocalizations": [
+          "de"
+        ],
         "CFBundleDevelopmentRegion": "de"
       }
     },
@@ -23,11 +25,12 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-
       "package": "com.bufib.islamFragen",
       "googleServicesFile": "./android/app/google-services.json",
-      "permissions": ["android.permission.RECORD_AUDIO"],
-      "versionCode": 11
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "versionCode": 15
     },
     "web": {
       "bundler": "metro",
@@ -45,7 +48,7 @@
             "image": "./assets/images/splash-icon-light.png",
             "backgroundColor": "#242c40"
           },
-          "imageWidth": 200
+          "imageWidth": 400
         }
       ],
       [
@@ -70,7 +73,6 @@
           }
         }
       ],
-
       "expo-font",
       [
         "expo-notifications",
@@ -80,7 +82,18 @@
           "defaultChannel": "default",
           "enableBackgroundRemoteNotifications": false
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0"
+          }
+        }
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

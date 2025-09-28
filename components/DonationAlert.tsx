@@ -56,7 +56,7 @@ const DonationAlert: React.FC<DonationAlertProps> = ({
         {/* Close Button */}
         <Pressable style={styles.closeButton} onPress={onClose}>
           <AntDesign
-            name="closecircle"
+            name="close-circle"
             size={22}
             color={colorScheme === "dark" ? "#fff" : "#333"}
           />
