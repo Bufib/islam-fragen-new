@@ -12,7 +12,12 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useInitializeDatabase } from "@/hooks/useInitializeDatabase.ts";
 import { SQLiteProvider } from "expo-sqlite";
 import Toast from "react-native-toast-message";
-import { ActivityIndicator, Appearance, Platform } from "react-native";
+import {
+  ActivityIndicator,
+  Appearance,
+  BackHandler,
+  Platform,
+} from "react-native";
 import { Storage } from "expo-sqlite/kv-store";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/utils/queryClient";
@@ -51,6 +56,19 @@ export default function RootLayout() {
     };
     setColorTheme();
   }, []);
+
+  // //! Needed or sign up won't work!
+  // // If removeEventListener doesn’t exist, patch it on-the-fly:
+  // if (typeof (BackHandler as any).removeEventListener !== "function") {
+  //   (BackHandler as any).removeEventListener = (
+  //     eventName: any,
+  //     handler: () => boolean
+  //   ) => {
+  //     // Create a dummy subscription and immediately remove it.
+  //     const subscription = BackHandler.addEventListener(eventName, handler);
+  //     subscription.remove();
+  //   };
+  // }
 
   useEffect(() => {
     const hydrateStores = async () => {

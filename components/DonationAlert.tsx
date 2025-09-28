@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { Pressable, StyleSheet, Alert } from "react-native";
-import Modal from "react-native-modal";
+import { Pressable, StyleSheet, Alert, View } from "react-native";
+import { Modal } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { useColorScheme } from "react-native";
@@ -38,15 +38,15 @@ const DonationAlert: React.FC<DonationAlertProps> = ({
 
   return (
     <Modal
-      isVisible={isVisible}
-      onBackdropPress={onClose} // Close when tapping outside
-      onSwipeComplete={onClose} // Swipe down to close
-      swipeDirection="down"
-      animationIn="slideInUp"
-      animationOut="slideOutDown"
-      backdropOpacity={0.5}
-      style={styles.modal}
+      visible={isVisible}
+      transparent
+      animationType="slide" // replaces animationIn/Out
+      onRequestClose={onClose} // Android back button
+      statusBarTranslucent={true} // nicer overlay on Android
     >
+      <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
+      {/* Backdrop (replaces onBackdropPress/backdropOpacity) */}
+      <Pressable style={styles.backdrop} onPress={onClose} />
       <ThemedView
         style={[
           styles.container,
@@ -84,6 +84,7 @@ const DonationAlert: React.FC<DonationAlertProps> = ({
           </ThemedText>
         </Pressable>
       </ThemedView>
+      </View>
       <Toast />
     </Modal>
   );
@@ -92,10 +93,10 @@ const DonationAlert: React.FC<DonationAlertProps> = ({
 export default DonationAlert;
 
 const styles = StyleSheet.create({
-  modal: {
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 0, // Fullscreen overlay
+
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   container: {
     width: "85%",
